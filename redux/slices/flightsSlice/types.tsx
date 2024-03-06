@@ -16,5 +16,4 @@ export type Flight = {
   mtow: number;
   parkingPosition: string;
   // chargeNote: Charges;
-  number;
 };
