@@ -202,15 +202,15 @@ const initialState: Configs = {
       landingFee: {
         perTon: 3.5,
         lightAircraft: 1,
-        dayQuotaPercentage: 20,
-        nightQuotaPercentage: 20,
+        winterPeriodQuotaPercentage: 20, //winter, between 18:00 - 07:00
+        summerPeriodQuotaPercentage: 20, //summer between 20:00 - 06:00
       },
       takeoffFee: {
         perTon: 3.5,
         lightAircraft: 1,
 
-        dayQuotaPercentage: 20,
-        nightQuotaPercentage: 20,
+        winterPeriodQuotaPercentage: 20,
+        summerPeriodQuotaPercentage: 20,
       },
       passengerFee: {
         perPax: 8.7,
