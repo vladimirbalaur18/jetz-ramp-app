@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
 // This is the initial state of the slice
+
 const initialState = {
   flightsArray: [
     {

@@ -13,6 +13,7 @@ import { Provider } from "react-redux";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import { store } from "@/redux/store";
+import { Text } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -62,6 +63,13 @@ function RootLayoutNav() {
         >
           <Stack>
             <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(createFlight)/createFlight"
+              options={{
+                headerShown: true,
+                title: "Create a new flight",
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </PaperProvider>

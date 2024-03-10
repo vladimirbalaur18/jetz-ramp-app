@@ -2,8 +2,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
+import { MD3Colors } from "react-native-paper";
+import { useColorScheme } from "react-native";
+import Colors from "@/constants/Colors";
 export default function Layout() {
+  const themeStyle = useColorScheme();
+  const iconColor = Colors[themeStyle as "light" | "dark"].text;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer>
@@ -11,9 +15,13 @@ export default function Layout() {
           name="index" // This is the name of the page and must match the url from root
           options={{
             drawerLabel: "Home",
-            title: "Main page",
+            title: "Active flights",
             drawerIcon: () => (
-              <MaterialCommunityIcons name="airport" size={24} color="black" />
+              <MaterialCommunityIcons
+                name="airport"
+                size={24}
+                color={iconColor}
+              />
             ),
           }}
         />
@@ -23,7 +31,7 @@ export default function Layout() {
             drawerLabel: "Configuration",
             title: "Configurations",
             drawerIcon: () => (
-              <FontAwesome6 name="user-gear" size={24} color="black" />
+              <FontAwesome6 name="user-gear" size={24} color={iconColor} />
             ),
           }}
         />
