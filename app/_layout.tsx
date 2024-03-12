@@ -25,6 +25,9 @@ export {
   ErrorBoundary,
 } from "expo-router";
 
+import { enGB, registerTranslation } from "react-native-paper-dates";
+registerTranslation("en-GB", enGB);
+
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationDark: NavigationDarkTHeme,
   reactNavigationLight: NavigationDefaultTheme,

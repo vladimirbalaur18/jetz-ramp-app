@@ -42,6 +42,6 @@ export type Payment = {
 export enum Company {}
 
 export enum FlightSchedule {
-  NonScheduled = "NON-SCHEDULED",
-  Other = "OTHER",
+  NonScheduled = "NonScheduler",
+  Other = "Other",
 }
