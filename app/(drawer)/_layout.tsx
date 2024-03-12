@@ -2,12 +2,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MD3Colors } from "react-native-paper";
 import { useColorScheme } from "react-native";
-import Colors from "@/constants/Colors";
+import { useTheme } from "@react-navigation/native";
+
 export default function Layout() {
   const themeStyle = useColorScheme();
-  const iconColor = Colors[themeStyle as "light" | "dark"].text;
+  const iconColor = useTheme().colors.text;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer>

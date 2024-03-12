@@ -6,14 +6,12 @@ import {
   TouchableHighlight,
   useColorScheme,
 } from "react-native";
-import { Text } from "../Themed";
 import { useState } from "react";
-import Colors from "@/constants/Colors";
-import { Icon } from "react-native-paper";
+import { Icon, useTheme, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 const FlightItem = ({ callsign = "", departure = "", arrival = "" }) => {
   const [pressed, setPressed] = useState(false);
-  const themeStyle = useColorScheme();
+  const theme = useTheme();
   return (
     <TouchableOpacity
       style={{
@@ -24,16 +22,21 @@ const FlightItem = ({ callsign = "", departure = "", arrival = "" }) => {
       <View
         style={{
           ...styles.container,
-          backgroundColor: Colors[themeStyle as "light" | "dark"].container,
+          backgroundColor: theme.colors.surfaceVariant,
           elevation: 5,
         }}
       >
-        <Text>
+        <Text
+          variant="bodySmall"
+          style={{
+            color: theme.colors.onSurfaceVariant,
+          }}
+        >
           {departure || "N/A"}{" "}
           <MaterialCommunityIcons name="arrow-right-thick" size={16} />{" "}
           {arrival || "N/A"}
         </Text>
-        <Text>{callsign}</Text>
+        <Text style={{ color: theme.colors.onSurfaceVariant }}>{callsign}</Text>
       </View>
     </TouchableOpacity>
   );

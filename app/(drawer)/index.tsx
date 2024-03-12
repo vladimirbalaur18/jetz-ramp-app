@@ -1,5 +1,5 @@
 import { Button, ScrollView, View, useColorScheme } from "react-native";
-import { Text, IconButton, MD3Colors, FAB } from "react-native-paper";
+import { Text, FAB } from "react-native-paper";
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
@@ -8,35 +8,48 @@ import { StyleSheet } from "react-native";
 import FlightItem from "@/components/FlightItem";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import Colors from "@/constants/Colors";
+import { useAppTheme } from "react-native-paper/src/core/theming";
 dayjs.extend(isToday);
+//@ts-ignore
 
 const FlightSection = ({ dateString, flights }) => {
   return (
     <View style={styles.verticalContainer}>
       <Text variant="titleMedium">{dateString}</Text>
       <View style={styles.horizontalContainer}>
-        {flights?.map((flight) => {
-          return <FlightItem callsign={flight?.callsign} />;
-        })}
+        {
+          //@ts-ignore
+          flights?.map((flight) => {
+            return <FlightItem callsign={flight?.callsign} />;
+          })
+        }
       </View>
     </View>
   );
 };
 
 export default function Page() {
+  //@ts-ignore"
+
   const flightsArr = useSelector((state) => state.flights.flightsArray);
-  const { colors } = useTheme();
-  const themeStyle = useColorScheme();
+  const theme = useTheme();
 
   const router = useRouter();
   let parseFlightsByDate = {};
 
   //agg flights by date
+  //@ts-ignore
+
   flightsArr.forEach((flight) => {
+    //@ts-ignore"
+
     const date = dayjs(flight.date).format();
+    //@ts-ignore
     if (!parseFlightsByDate[date]) {
+      //@ts-ignore
+
       parseFlightsByDate[date] = [flight];
+      //@ts-ignore
     } else parseFlightsByDate[date].push(flight);
   });
 
@@ -46,14 +59,16 @@ export default function Page() {
       {/* <Text variant="headlineMedium">Active flights</Text> */}
       <FAB
         icon="plus"
-        color={Colors[themeStyle].text}
-        style={{ ...styles.fab, backgroundColor: Colors[themeStyle].container }}
+        color={theme.colors.text}
+        style={{ ...styles.fab }}
+        variant="secondary"
         label="Create a new flight"
         onPress={() => router.navigate("/createFlight")}
       />
-      {Object.entries(parseFlightsByDate).map(([date, flights]) => {
+      {Object.entries(parseFlightsByDate).map(([date, flights], index) => {
         return (
           <FlightSection
+            key={date + index}
             dateString={
               dayjs(date)?.isToday()
                 ? "Today"
@@ -100,7 +115,7 @@ const styles = StyleSheet.create({
   },
 
   newFlightIcon: {
-    alignItems: "end",
+    alignItems: "flex-end",
     flexDirection: "column",
   },
 });
