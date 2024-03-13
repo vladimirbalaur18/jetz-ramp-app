@@ -63,7 +63,7 @@ export default function Page() {
         style={{ ...styles.fab }}
         variant="secondary"
         label="Create a new flight"
-        onPress={() => router.navigate("/createFlight")}
+        onPress={() => router.navigate("/(createFlight)/arrival")}
       />
       {Object.entries(parseFlightsByDate).map(([date, flights], index) => {
         return (

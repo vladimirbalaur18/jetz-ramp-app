@@ -4,7 +4,7 @@ import { Dayjs } from "dayjs";
 export type Flight = {
   operatorName: string;
   flightNumber: string;
-  schedule?: FlightSchedule;
+  scheduleType?: FlightSchedule;
   payment?: Payment;
   orderingCompanyName?: string;
   aircraftType?: string;
@@ -14,6 +14,6 @@ export type Flight = {
   invoiceDate?: Dayjs;
   route?: unknown;
   mtow?: number;
-  parkingPosition?: string;
+  parkingPosition?: string | number;
   // chargeNote: Charges;
 };

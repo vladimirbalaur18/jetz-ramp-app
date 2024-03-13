@@ -7,32 +7,31 @@ export type Ramp = {
 
 export type Arrival = {
   from: string;
-  datetime: Dayjs;
-  adultPassengerCount: number;
-  minorPassengerCount: number;
+  arrivalDate: Date;
+  arrivalTime: {
+    hours: number;
+    minutes: number;
+  };
+  adultCount: number;
+  minorCount: number;
   rampInspectionBeforeArrival: {
-    status: InspectionStatus;
-    FOD: FOD;
+    status: boolean;
+    FOD: boolean;
   };
 };
 
-enum FOD {
-  Found = "Found",
-  NotFound = "Not Found",
-}
-
-export enum InspectionStatus {
-  Completed = "COMPLETED",
-  NotCompleted = "NOT COMPLETED",
-}
 export type Departure = {
   to: string;
-  datetime: Dayjs;
-  adultPassengerCount: number;
-  minorPassengerCount: number;
-  rampInspectionAfterDeparture: {
-    status: InspectionStatus;
-    FOD: FOD;
+  departureDate: Date;
+  departureTime: {
+    hours: number;
+    minutes: number;
+  };
+  adultCount: number;
+  minorCount: number;
+  rampInspectionBeforeDeparture: {
+    status: boolean;
+    FOD: boolean;
   };
 };
 export type Payment = {

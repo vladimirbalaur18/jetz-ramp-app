@@ -25,33 +25,8 @@ import {
   TimePickerModal,
 } from "react-native-paper-dates";
 import dayjs, { Dayjs } from "dayjs";
-type FormData = Flight & {
-  name: string;
-  surname: string;
-  email: string;
-  scheduleType: string;
-  termsAccepted: boolean;
-  arrivalFrom: string;
-  arrivalDate: Date;
-  arrivalTime: {
-    hours: number;
-    minutes: number;
-  };
-  departurePassengers: {
-    adultCount: number;
-    minorCount: number;
-  };
-
-  arrivalPassengers: {
-    adultCount: number;
-    minorCount: number;
-  };
-  fodArrival: boolean;
-  beforeArrivalInspection: boolean;
-};
-
-const PASSWORD_MIN_LENGTH = 6;
-
+import { useRouter } from "expo-router";
+type FormData = Flight;
 const REGEX = {
   number: /^[0-9]*$/,
   airfield: /^[A-Z]{4}$/,
@@ -72,16 +47,37 @@ const ERROR_MESSAGES = {
 };
 
 const Form: React.FC = () => {
-  const { control, formState, handleSubmit } = useForm<FormData>({
+  const router = useRouter();
+  const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
     defaultValues: {
-      name: "mama",
+      aircraftRegistration: "LY-TBA",
+      aircraftType: "SR22",
+      arrival: {
+        arrivalTime: { hours: 10, minutes: 12 },
+        arrivalDate: new Date(),
+        from: "LUKK",
+        adultCount: 1,
+        minorCount: 2,
+        rampInspectionBeforeArrival: {
+          status: true,
+          FOD: true,
+        },
+      },
+      parkingPosition: 22,
+      flightNumber: "TY123",
+      operatorName: "Mama",
+      orderingCompanyName: "Mama",
+      scheduleType: FlightSchedule.NonScheduled,
     },
   });
 
   const { errors } = formState;
 
-  const submit = (data: any) => console.log(data);
+  const submit = (data: any) => {
+    console.log(data);
+    router.navigate("/(createFlight)/departure");
+  };
   const [visible, setVisible] = React.useState(false);
 
   return (
@@ -152,7 +148,7 @@ const Form: React.FC = () => {
         <Controller
           control={control}
           name="scheduleType"
-          defaultValue=""
+          defaultValue={FlightSchedule.NonScheduled}
           rules={{
             required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           }}
@@ -160,7 +156,7 @@ const Form: React.FC = () => {
             <>
               <List.Section title="Schedule type">
                 <RadioButton.Group
-                  value={value}
+                  value={FlightSchedule.NonScheduled}
                   onValueChange={(value: string) => {
                     console.log(value);
                     onChange(value);
@@ -257,13 +253,63 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="parkingPosition"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            // pattern: {
+            //   message: "Not a valid operator Name",
+            // },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Parking position"
+                style={styles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors.parkingPosition && true}
+              />
+              <HelperText type="error">
+                {errors.parkingPosition?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue={0}
+          name="mtow"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            // pattern: {
+            //   message: "Not a valid operator Name",
+            // },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="MTOW (kg)"
+                style={styles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors.mtow && true}
+              />
+              <HelperText type="error">{errors.mtow?.message}</HelperText>
+            </>
+          )}
+        />
         <View style={styles.row}>
           <Text variant="headlineSmall">Arrival</Text>
         </View>
         <Controller
           control={control}
           defaultValue=""
-          name="arrivalFrom"
+          name="arrival.from"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
@@ -279,10 +325,10 @@ const Form: React.FC = () => {
                 value={value}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
-                error={errors.arrivalFrom && true}
+                error={errors?.arrival?.from && true}
               />
               <HelperText type="error">
-                {errors.arrivalFrom?.message}
+                {errors.arrival?.from?.message}
               </HelperText>
             </>
           )}
@@ -290,7 +336,7 @@ const Form: React.FC = () => {
         <Controller
           control={control}
           defaultValue={dayjs().toDate()}
-          name="arrivalDate"
+          name="arrival.arrivalDate"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
           }}
@@ -300,13 +346,13 @@ const Form: React.FC = () => {
                 locale="en-GB"
                 label="Arrival date"
                 value={value}
-                onChange={(d) => onChange(d)}
+                onChange={(d) => onChange(dayjs(d))}
                 inputMode="start"
                 style={{ width: 200 }}
                 mode="outlined"
               />
               <HelperText type="error">
-                {errors.arrivalDate?.message}
+                {errors.arrival?.arrivalDate?.message}
               </HelperText>
             </>
           )}
@@ -317,7 +363,7 @@ const Form: React.FC = () => {
             hours: dayjs().get("hours"),
             minutes: dayjs().get("minutes"),
           }}
-          name="arrivalTime"
+          name="arrival.arrivalTime"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
           }}
@@ -362,15 +408,15 @@ const Form: React.FC = () => {
               </View>
 
               <HelperText type="error">
-                {errors.arrivalTime?.message}
+                {errors.arrival?.arrivalTime?.message}
               </HelperText>
             </>
           )}
         />
         <Controller
           control={control}
-          defaultValue={{ adultCount: 0, minorCount: 0 }}
-          name="departurePassengers"
+          defaultValue={0}
+          name="arrival.adultCount"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
@@ -383,48 +429,57 @@ const Form: React.FC = () => {
               <TextInput
                 label="Adult passenger count"
                 style={styles.input}
-                value={value?.adultCount as unknown as string}
+                value={String(value)}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) =>
-                  onChange({
-                    minorCount: value?.minorCount,
-                    adultCount: text,
-                  })
-                }
-                error={errors.departurePassengers && true}
-              />
-              <TextInput
-                label="Minor passenger count"
-                style={styles.input}
-                value={value?.minorCount as unknown as string}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) =>
-                  onChange({
-                    adultCount: value?.adultCount,
-                    minorCount: text,
-                  })
-                }
-                error={errors.departurePassengers && true}
+                onChangeText={(text) => onChange(text)}
+                error={errors.arrival?.adultCount && true}
               />
               <HelperText type="error">
-                {errors.departurePassengers?.message}
+                {errors.arrival?.adultCount?.message}
               </HelperText>
-              <Text variant="bodyLarge">
-                Total passengers:{" "}
-                {Number(value?.adultCount) + Number(value?.minorCount)}
-              </Text>
             </>
           )}
         />
-
+        <Controller
+          control={control}
+          defaultValue={0}
+          name="arrival.minorCount"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "Please insert correct format",
+              value: REGEX.number,
+            },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Minor passenger count"
+                style={styles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                keyboardType="numeric"
+                onChangeText={(text) => onChange(text)}
+                error={errors.arrival?.minorCount && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.minorCount?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Text variant="bodyLarge">
+          Total passengers:
+          {Number(getValues("arrival.adultCount")) +
+            Number(getValues("arrival.minorCount"))}
+        </Text>
         <View style={styles.row}>
           <Text variant="bodyLarge">Found FOD before arrival</Text>
           <Controller
             control={control}
             defaultValue={false}
-            name="fodArrival"
+            name="arrival.rampInspectionBeforeArrival.FOD"
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
@@ -440,7 +495,7 @@ const Form: React.FC = () => {
           <Controller
             control={control}
             defaultValue={false}
-            name="beforeArrivalInspection"
+            name="arrival.rampInspectionBeforeArrival.status"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             }}
@@ -458,13 +513,12 @@ const Form: React.FC = () => {
             {errors.beforeArrivalInspection?.message}
           </HelperText> */}
         </View>
-
         <Button
           mode="contained"
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          Submit
+          Submit arrival information
         </Button>
       </ScrollView>
     </SafeAreaView>
@@ -474,7 +528,11 @@ const Form: React.FC = () => {
 export default Form;
 
 const styles = StyleSheet.create({
-  container: { justifyContent: "center", marginHorizontal: 30 },
+  container: {
+    justifyContent: "center",
+    marginHorizontal: 30,
+    paddingVertical: 30,
+  },
   input: { marginVertical: 5 },
   row: {
     alignItems: "center",
