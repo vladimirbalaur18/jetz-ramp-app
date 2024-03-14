@@ -7,38 +7,73 @@ import {
   useColorScheme,
 } from "react-native";
 import { useState } from "react";
-import { Icon, useTheme, Text } from "react-native-paper";
+import { Icon, useTheme, Text, Menu } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-const FlightItem = ({ callsign = "", departure = "", arrival = "" }) => {
+import { Link, useRouter } from "expo-router";
+import { Flight } from "@/redux/types";
+import { useDispatch } from "react-redux";
+import { removeFlight } from "@/redux/slices/flightsSlice";
+const FlightItem = ({ flight }: { flight: Flight }) => {
   const [pressed, setPressed] = useState(false);
+  const dispatch = useDispatch();
   const theme = useTheme();
+  const router = useRouter();
+
+  //
+  const [visible, setVisible] = useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+
   return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: "transparent",
-        borderRadius: 25,
-      }}
-    >
-      <View
-        style={{
-          ...styles.container,
-          backgroundColor: theme.colors.surfaceVariant,
-          elevation: 5,
-        }}
-      >
-        <Text
-          variant="bodySmall"
+    <Menu
+      visible={visible}
+      onDismiss={closeMenu}
+      anchorPosition="bottom"
+      anchor={
+        <TouchableOpacity
           style={{
-            color: theme.colors.onSurfaceVariant,
+            backgroundColor: "transparent",
+            borderRadius: 25,
           }}
+          onPress={() => {
+            router.navigate("/(createFlight)/arrival");
+            router.setParams({ flightId: flight?.flightId || "" });
+          }}
+          onLongPress={() => openMenu()}
         >
-          {departure || "N/A"}{" "}
-          <MaterialCommunityIcons name="arrow-right-thick" size={16} />{" "}
-          {arrival || "N/A"}
-        </Text>
-        <Text style={{ color: theme.colors.onSurfaceVariant }}>{callsign}</Text>
-      </View>
-    </TouchableOpacity>
+          <View
+            style={{
+              ...styles.container,
+              backgroundColor: theme.colors.surfaceVariant,
+              elevation: 5,
+            }}
+          >
+            <Text
+              variant="bodySmall"
+              style={{
+                color: theme.colors.onSurfaceVariant,
+              }}
+            >
+              {flight?.arrival?.from || "N/A"}{" "}
+              <MaterialCommunityIcons name="arrow-right-thick" size={16} />{" "}
+              {flight?.departure?.to || "N/A"}
+            </Text>
+            <Text style={{ color: theme.colors.onSurfaceVariant }}>
+              {flight?.flightNumber}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      }
+    >
+      <Menu.Item
+        onPress={() => {
+          dispatch(removeFlight(flight?.flightId as string));
+        }}
+        title="Remove flight"
+      />
+    </Menu>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   StyleSheet,
   View,
@@ -27,6 +27,8 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 type FormData = Flight;
 
@@ -35,6 +37,14 @@ const ERROR_MESSAGES = {
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
+};
+
+const SectionTitle = ({ children }: { children: ReactNode }) => {
+  return (
+    <View style={styles.row}>
+      <Text variant="headlineSmall">{children}</Text>
+    </View>
+  );
 };
 
 const Form: React.FC = () => {
@@ -79,13 +89,9 @@ const Form: React.FC = () => {
         keyboardShouldPersistTaps="always"
         alwaysBounceVertical={false}
       >
-        <View style={styles.row}>
-          <Text variant="headlineSmall">General</Text>
-        </View>
+        <SectionTitle>Basic Handling</SectionTitle>
 
-        <View style={styles.row}>
-          <Text variant="headlineSmall">Departure</Text>
-        </View>
+        {/* <SectionTitle>Basic handling services</SectionTitle>
         <Controller
           control={control}
           defaultValue=""
@@ -325,17 +331,13 @@ const Form: React.FC = () => {
               </>
             )}
           />
-          {/* FIND SOMEWHERE TO PLACE THIS FIELD */}
-          {/* <HelperText type="error">
-            {errors.beforedepartureInspection?.message}
-          </HelperText> */}
-        </View>
+        </View> */}
         <Button
           mode="contained"
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          Submit departure information
+          Submit services information
         </Button>
       </ScrollView>
     </SafeAreaView>

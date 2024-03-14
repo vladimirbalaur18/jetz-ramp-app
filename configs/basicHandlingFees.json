@@ -1,0 +1,51 @@
+[
+    {
+        "minMTOW": 0,
+        "maxMTOW": 999,
+        "pricePerQty": 24,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 1000,
+        "maxMTOW": 1999,
+        "pricePerQty": 28,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 2000,
+        "maxMTOW": 2999,
+        "pricePerQty": 38,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 3000,
+        "maxMTOW": 4999,
+        "pricePerQty": 80,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 5000,
+        "maxMTOW": 14999,
+        "pricePerQty": 345,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 15000,
+        "maxMTOW": 29999,
+        "pricePerQty": 530,
+        "hasVAT": false,
+        "isDisbursed": false
+    },
+    {
+        "minMTOW": 30000,
+        "maxMTOW": 49999,
+        "pricePerQty": 720,
+        "hasVAT": false,
+        "isDisbursed": false
+    }
+]

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight } from "@/redux/slices/flightsSlice/types";
+import { Flight } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import {
@@ -25,57 +25,59 @@ import {
   TimePickerModal,
 } from "react-native-paper-dates";
 import dayjs, { Dayjs } from "dayjs";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 type FormData = Flight;
-const REGEX = {
-  number: /^[0-9]*$/,
-  airfield: /^[A-Z]{4}$/,
-  operatorName: /^[a-z ,.'-]+$/i,
-  aircraftRegistration:
-    /^[A-Z]-[A-Z]{4}|[A-Z]{2}-[A-Z]{3}|N[0-9]{1,5}[A-Z]{0,2}$/,
-  flightNumber:
-    /([A-Za-z]{2}|[A-Za-z]\d|\d[A-Za-z])[A-Za-z]{0,1}\d(\d{0,3})[A-Za-z]{0,1}/,
-  email:
-    /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
-};
-
+import REGEX from "@/utils/regexp";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
-
+import { useDispatch, useSelector } from "react-redux";
+import { pushArrivalInformation } from "@/redux/slices/flightsSlice";
+import { RootState } from "@/redux/store";
 const Form: React.FC = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const flights = useSelector(
+    (state: RootState) => state?.flights?.flightsArray
+  );
+  const currentFlight =
+    params?.flightId !== ""
+      ? flights?.filter(({ flightId }) => flightId === params.flightId)[0]
+      : undefined;
+
+  const dispatch = useDispatch();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: {
-      aircraftRegistration: "LY-TBA",
-      aircraftType: "SR22",
-      arrival: {
-        arrivalTime: { hours: 10, minutes: 12 },
-        arrivalDate: new Date(),
-        from: "LUKK",
-        adultCount: 1,
-        minorCount: 2,
-        rampInspectionBeforeArrival: {
-          status: true,
-          FOD: true,
-        },
-      },
-      parkingPosition: 22,
-      flightNumber: "TY123",
-      operatorName: "Mama",
-      orderingCompanyName: "Mama",
-      scheduleType: FlightSchedule.NonScheduled,
-    },
+    defaultValues: currentFlight,
+    // || {
+    //   aircraftRegistration: "LY-TBA",
+    //   aircraftType: "SR22",
+    //   arrival: {
+    //     arrivalTime: { hours: 10, minutes: 12 },
+    //     arrivalDate: new Date(),
+    //     from: "LUKK",
+    //     adultCount: 1,
+    //     minorCount: 2,
+    //     rampInspectionBeforeArrival: {
+    //       status: true,
+    //       FOD: true,
+    //     },
+    //   },
+    //   parkingPosition: 22,
+    //   flightNumber: "TY123",
+    //   operatorName: "Mama",
+    //   orderingCompanyName: "Mama",
+    //   scheduleType: FlightSchedule.NonScheduled,
+    // },
   });
 
   const { errors } = formState;
 
   const submit = (data: any) => {
-    console.log(data);
+    dispatch(pushArrivalInformation(data));
     router.navigate("/(createFlight)/departure");
   };
   const [visible, setVisible] = React.useState(false);
@@ -158,7 +160,6 @@ const Form: React.FC = () => {
                 <RadioButton.Group
                   value={FlightSchedule.NonScheduled}
                   onValueChange={(value: string) => {
-                    console.log(value);
                     onChange(value);
                   }}
                 >
@@ -346,7 +347,10 @@ const Form: React.FC = () => {
                 locale="en-GB"
                 label="Arrival date"
                 value={value}
-                onChange={(d) => onChange(dayjs(d))}
+                onChange={(d) => {
+                  alert(d);
+                  onChange(d);
+                }}
                 inputMode="start"
                 style={{ width: 200 }}
                 mode="outlined"
@@ -475,6 +479,43 @@ const Form: React.FC = () => {
             Number(getValues("arrival.minorCount"))}
         </Text>
         <View style={styles.row}>
+          <Text variant="headlineSmall">Ramp</Text>
+        </View>
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="arrival.rampInspectionBeforeArrival.agent.fullname"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "The name inserted is not in the correct format",
+              value: REGEX.name,
+            },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Ramp agent name"
+                style={styles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                keyboardType="default"
+                onChangeText={(text) => onChange(text)}
+                error={
+                  errors.arrival?.rampInspectionBeforeArrival?.agent
+                    ?.fullname && true
+                }
+              />
+              <HelperText type="error">
+                {
+                  errors.arrival?.rampInspectionBeforeArrival?.agent?.fullname
+                    ?.message
+                }
+              </HelperText>
+            </>
+          )}
+        />
+        <View style={styles.row}>
           <Text variant="bodyLarge">Found FOD before arrival</Text>
           <Controller
             control={control}
@@ -524,7 +565,6 @@ const Form: React.FC = () => {
     </SafeAreaView>
   );
 };
-
 export default Form;
 
 const styles = StyleSheet.create({

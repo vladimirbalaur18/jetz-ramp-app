@@ -1,0 +1,44 @@
+{
+    "commercial": {
+        "landingFee": {
+            "perTon": 3.5
+        },
+        "takeoffFee": {
+            "perTon": 3.5
+        },
+        "passengerFee": {
+            "perPax": 8.7
+        },
+        "securityFee": {
+            "perPax": 2.5,
+            "perTon": 0.3
+        },
+        "parkingDay": {
+            "perTon": 1.71
+        }
+    },
+    "nonCommercial": {
+        "landingFee": {
+            "perTon": 3.5,
+            "lightAircraft": 1,
+            "winterPeriodQuotaPercentage": 20,
+            "summerPeriodQuotaPercentage": 20
+        },
+        "takeoffFee": {
+            "perTon": 3.5,
+            "lightAircraft": 1,
+            "winterPeriodQuotaPercentage": 20,
+            "summerPeriodQuotaPercentage": 20
+        },
+        "passengerFee": {
+            "perPax": 8.7
+        },
+        "securityFee": {
+            "perPax": 2.5,
+            "perTon": 7.5
+        },
+        "parkingDay": {
+            "perTon": 1.71
+        }
+    }
+}

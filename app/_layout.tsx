@@ -35,27 +35,9 @@ const { LightTheme, DarkTheme } = adaptNavigationTheme({
 
 const CombinedDefaultTheme = merge(MD3LightTheme, {
   ...LightTheme,
-  // colors: {
-  //   ...LightTheme.colors,
-  //   text: "#000",
-  //   background: "#fff",
-  //   tint: tintColorLight,
-  //   tabIconDefault: "#ccc",
-  //   tabIconSelected: tintColorLight,
-  //   container: "#D8D8D8",
-  // },
 });
 const CombinedDarkTheme = merge(MD3DarkTheme, {
   ...DarkTheme,
-  // colors: {
-  //   ...DarkTheme.colors,
-  //   text: "#fff",
-  //   background: "#000",
-  //   tint: tintColorDark,
-  //   tabIconDefault: "#ccc",
-  //   tabIconSelected: tintColorDark,
-  //   container: "#494949",
-  // },
 });
 
 export const unstable_settings = {
@@ -105,14 +87,21 @@ function RootLayoutNav() {
               name="(createFlight)/arrival"
               options={{
                 headerShown: true,
-                title: "Stage 1 of 2 (Arrival)",
+                title: "Stage 1 of 3 (Arrival)",
               }}
             />
             <Stack.Screen
               name="(createFlight)/departure"
               options={{
                 headerShown: true,
-                title: "Stage 2 of 2 (Departure)",
+                title: "Stage 2 of 3 (Departure)",
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/providedServices"
+              options={{
+                headerShown: true,
+                title: "Stage 3 of 3 (Provided services)",
               }}
             />
           </Stack>

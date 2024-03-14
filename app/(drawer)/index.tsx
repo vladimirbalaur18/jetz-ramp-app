@@ -9,54 +9,45 @@ import FlightItem from "@/components/FlightItem";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useAppTheme } from "react-native-paper/src/core/theming";
+import { Flight } from "@/redux/types";
+import { RootState } from "@/redux/store";
 dayjs.extend(isToday);
-//@ts-ignore
 
-const FlightSection = ({ dateString, flights }) => {
+const FlightSection: React.FC<{
+  dateString: string;
+  flights: Flight[];
+}> = ({ dateString, flights }) => {
   return (
     <View style={styles.verticalContainer}>
       <Text variant="titleMedium">{dateString}</Text>
       <View style={styles.horizontalContainer}>
-        {
-          //@ts-ignore
-          flights?.map((flight) => {
-            return <FlightItem callsign={flight?.callsign} />;
-          })
-        }
+        {flights?.map((flight) => {
+          return <FlightItem flight={flight} />;
+        })}
       </View>
     </View>
   );
 };
 
 export default function Page() {
-  //@ts-ignore"
-
-  const flightsArr = useSelector((state) => state.flights.flightsArray);
+  const flightsArr = useSelector(
+    (state: RootState) => state.flights.flightsArray
+  );
   const theme = useTheme();
 
   const router = useRouter();
-  let parseFlightsByDate = {};
+  let parseFlightsByDate: Record<string, Flight[]> = {};
 
   //agg flights by date
-  //@ts-ignore
 
-  flightsArr.forEach((flight) => {
-    //@ts-ignore"
-
-    const date = dayjs(flight.date).format();
-    //@ts-ignore
+  flightsArr.forEach((flight: Flight) => {
+    const date = dayjs(flight.arrival?.arrivalDate).format("YYYY-MM-DD");
     if (!parseFlightsByDate[date]) {
-      //@ts-ignore
-
       parseFlightsByDate[date] = [flight];
-      //@ts-ignore
     } else parseFlightsByDate[date].push(flight);
   });
-
-  console.log(parseFlightsByDate);
   return (
     <ScrollView contentContainerStyle={styles.wrapper}>
-      {/* <Text variant="headlineMedium">Active flights</Text> */}
       <FAB
         icon="plus"
         color={theme.colors.text}

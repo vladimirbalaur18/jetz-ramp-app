@@ -2,7 +2,6 @@ import { Arrival, Departure, FlightSchedule, Payment } from "@/redux/types";
 import { Dayjs } from "dayjs";
 
 export type Flight = {
-  flightId: string;
   operatorName: string;
   flightNumber: string;
   scheduleType?: FlightSchedule;
