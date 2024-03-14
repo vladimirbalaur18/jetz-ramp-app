@@ -39,44 +39,39 @@ import { pushArrivalInformation } from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
 const Form: React.FC = () => {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const flights = useSelector(
-    (state: RootState) => state?.flights?.flightsArray
+  const currentFlight = useSelector(
+    (state: RootState) => state?.flights?.currentFlight
   );
-  const currentFlight =
-    params?.flightId !== ""
-      ? flights?.filter(({ flightId }) => flightId === params.flightId)[0]
-      : undefined;
 
   const dispatch = useDispatch();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: currentFlight,
-    // || {
-    //   aircraftRegistration: "LY-TBA",
-    //   aircraftType: "SR22",
-    //   arrival: {
-    //     arrivalTime: { hours: 10, minutes: 12 },
-    //     arrivalDate: new Date(),
-    //     from: "LUKK",
-    //     adultCount: 1,
-    //     minorCount: 2,
-    //     rampInspectionBeforeArrival: {
-    //       status: true,
-    //       FOD: true,
-    //     },
-    //   },
-    //   parkingPosition: 22,
-    //   flightNumber: "TY123",
-    //   operatorName: "Mama",
-    //   orderingCompanyName: "Mama",
-    //   scheduleType: FlightSchedule.NonScheduled,
-    // },
+    defaultValues: (currentFlight as Flight) || {
+      aircraftRegistration: "LY-TBA",
+      aircraftType: "SR22",
+      arrival: {
+        arrivalTime: { hours: 10, minutes: 12 },
+        arrivalDate: new Date(),
+        from: "LUKK",
+        adultCount: 1,
+        minorCount: 2,
+        rampInspectionBeforeArrival: {
+          status: true,
+          FOD: true,
+        },
+      },
+      parkingPosition: 22,
+      flightNumber: "TY123",
+      operatorName: "Mama",
+      orderingCompanyName: "Mama",
+      scheduleType: FlightSchedule.NonScheduled,
+    },
   });
 
   const { errors } = formState;
 
   const submit = (data: any) => {
+    console.log(data, currentFlight);
     dispatch(pushArrivalInformation(data));
     router.navigate("/(createFlight)/departure");
   };

@@ -12,9 +12,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { Flight } from "@/redux/types";
 import { useDispatch } from "react-redux";
-import { removeFlight } from "@/redux/slices/flightsSlice";
+import {
+  removeFlight,
+  setCurrentFlightById,
+} from "@/redux/slices/flightsSlice";
 const FlightItem = ({ flight }: { flight: Flight }) => {
-  const [pressed, setPressed] = useState(false);
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
@@ -39,7 +41,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
           }}
           onPress={() => {
             router.navigate("/(createFlight)/arrival");
-            router.setParams({ flightId: flight?.flightId || "" });
+            dispatch(setCurrentFlightById(flight?.flightId as string));
           }}
           onLongPress={() => openMenu()}
         >
