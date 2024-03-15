@@ -25,7 +25,7 @@ export type Arrival = {
 type Crew = {
   name: string;
   nationality?: string;
-  idNumber?: number;
+  idNumber?: string;
   idExpiry?: Date;
 };
 
@@ -72,9 +72,12 @@ export type Flight = {
   arrival?: Arrival;
   departure?: Departure;
   invoiceDate?: Date;
-  mtow?: number;
+  mtow: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
+  isLocalFlight?: boolean;
+  status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
+
   // chargeNote: Charges;
 };
 
@@ -82,9 +85,10 @@ export type Service = {
   serviceName: string;
   quantity: number;
   notes: string;
+  isUsed: boolean;
 };
-export type ServiceType = {
-  serviceTypeName: string;
-  services: Service;
+
+export type ProvidedServices = {
+  basicHandling: number | string;
+  additionalServices?: Service[] | null;
 };
-export type ProvidedServices = Array<ServiceType>;

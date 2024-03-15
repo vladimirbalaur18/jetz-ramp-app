@@ -1,4 +1,5 @@
 import { RootState } from "@/redux/store";
+import { Flight } from "@/redux/types";
 import { createSelector } from "@reduxjs/toolkit";
 
 const selectCurrentFlightId = (state: RootState) =>
@@ -8,6 +9,6 @@ const selectAllFlights = (state: RootState) => state.flights.flightsArray;
 export const selectCurrentFlight = createSelector(
   [selectCurrentFlightId, selectAllFlights],
   (currentFlightId, allFlights) => {
-    return allFlights?.find((f) => f?.flightId === currentFlightId);
+    return allFlights.find((f) => f?.flightId === currentFlightId) as Flight;
   }
 );

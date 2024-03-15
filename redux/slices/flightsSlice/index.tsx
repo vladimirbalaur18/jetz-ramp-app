@@ -1,7 +1,7 @@
 // Import the createSlice API from Redux Toolkit
+import { Flight } from "@/redux/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
-import { Flight } from "./types";
 
 type Nullable<T> = T | undefined | null;
 

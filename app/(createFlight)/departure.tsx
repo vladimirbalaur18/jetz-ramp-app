@@ -45,7 +45,7 @@ const Form: React.FC = () => {
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: (currentFlight as Flight) || {
+    defaultValues: (currentFlight as unknown as Flight) || {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SR22",
       departure: {
