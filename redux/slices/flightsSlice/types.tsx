@@ -16,6 +16,7 @@ export type Flight = {
   mtow?: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
+  status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
   // chargeNote: Charges;
 };
 

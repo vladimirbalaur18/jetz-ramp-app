@@ -16,6 +16,7 @@ import {
   removeFlight,
   setCurrentFlightById,
 } from "@/redux/slices/flightsSlice";
+import dayjs from "dayjs";
 const FlightItem = ({ flight }: { flight: Flight }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -28,6 +29,29 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
 
   const closeMenu = () => setVisible(false);
 
+  const fieldsArray = [
+    ["DESTINATION:", <>{flight?.departure?.to || "N/A"}</>],
+    ["FLIGHT NUMBER:", <>{flight?.flightNumber}</>],
+    [
+      "ETA:",
+      <>
+        {dayjs(flight?.arrival?.arrivalDate).format("DD/MM/YYYY" || "N/A")}{" "}
+        {flight?.arrival?.arrivalTime
+          ? `${flight?.arrival?.arrivalTime?.hours}${flight?.arrival?.arrivalTime?.minutes}Z`
+          : "N/A"}
+      </>,
+    ],
+    [
+      "ETD:",
+      <>
+        {dayjs(flight?.departure?.departureDate).format("DD/MM/YYYY")}{" "}
+        {flight?.departure?.departureTime
+          ? `${flight?.departure?.departureTime?.hours}${flight?.departure?.departureTime?.minutes}Z`
+          : "N/A"}
+      </>,
+    ],
+    ["STATUS:", "TBD"],
+  ];
   return (
     <Menu
       visible={visible}
@@ -40,8 +64,8 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
             borderRadius: 25,
           }}
           onPress={() => {
-            router.navigate("/(createFlight)/arrival");
             dispatch(setCurrentFlightById(flight?.flightId as string));
+            router.navigate("/(createFlight)/arrival");
           }}
           onLongPress={() => openMenu()}
         >
@@ -52,19 +76,18 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
               elevation: 5,
             }}
           >
-            <Text
-              variant="bodySmall"
-              style={{
-                color: theme.colors.onSurfaceVariant,
-              }}
-            >
-              {flight?.arrival?.from || "N/A"}{" "}
-              <MaterialCommunityIcons name="arrow-right-thick" size={16} />{" "}
-              {flight?.departure?.to || "N/A"}
-            </Text>
-            <Text style={{ color: theme.colors.onSurfaceVariant }}>
-              {flight?.flightNumber}
-            </Text>
+            {fieldsArray?.map(([label, value]) => {
+              return (
+                <Text
+                  variant="bodySmall"
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                  }}
+                >
+                  <Text style={{ fontWeight: "900" }}>{label}</Text> {value}
+                </Text>
+              );
+            })}
           </View>
         </TouchableOpacity>
       }
@@ -82,7 +105,6 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
 const styles = StyleSheet.create({
   container: {
     gap: 10,
-    alignItems: "center",
     padding: 15,
     borderRadius: 20,
   },

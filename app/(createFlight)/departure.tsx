@@ -18,16 +18,14 @@ import {
 import { Flight } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
+import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
+import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
-
+import { updateFlight } from "@/redux/slices/flightsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { getCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 type FormData = Flight;
 
 const ERROR_MESSAGES = {
@@ -39,9 +37,15 @@ const ERROR_MESSAGES = {
 
 const Form: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const state = useSelector((state: RootState) => state);
+  const currentFlight = getCurrentFlight(state);
+  // alert(JSON.stringLUKify(currentFlight));
+
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: {
+    defaultValues: (currentFlight as Flight) || {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SR22",
       departure: {
@@ -68,6 +72,8 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: any) => {
+    if (currentFlight) dispatch(updateFlight(data));
+
     router.navigate("/(createFlight)/providedServices");
   };
   const [visible, setVisible] = React.useState(false);
@@ -130,6 +136,9 @@ const Form: React.FC = () => {
                 inputMode="start"
                 style={{ width: 200 }}
                 mode="outlined"
+                validRange={{
+                  startDate: currentFlight?.arrival?.arrivalDate,
+                }}
               />
               <HelperText type="error">
                 {errors.departure?.departureDate?.message}

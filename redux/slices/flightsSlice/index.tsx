@@ -1,13 +1,13 @@
 // Import the createSlice API from Redux Toolkit
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import dayjs from "dayjs";
+import uuid from "react-native-uuid";
 import { Flight } from "./types";
-// This is the initial state of the slice
+
 type Nullable<T> = T | undefined | null;
 
 type FlightState = {
   flightsArray: Array<Flight>;
-  currentFlight: Nullable<Flight>;
+  currentFlight: Nullable<string>;
 };
 const initialState: FlightState = {
   flightsArray: [],
@@ -19,32 +19,38 @@ export const flightsSlice = createSlice({
   initialState: initialState, // This is the initial state of the slice
   reducers: {
     setCurrentFlightById: (state, { payload }: PayloadAction<string>) => {
-      state.currentFlight = state.flightsArray.find(
-        (f) => f.flightId === payload
+      state.currentFlight = payload;
+    },
+
+    createFlight: (state, { payload }: PayloadAction<Flight>) => {
+      state.currentFlight = null;
+
+      state?.flightsArray.push({
+        ...payload,
+        flightId: payload?.flightNumber + uuid.v4(),
+      });
+      console.log(
+        "new flight created",
+        "payload:",
+        payload,
+        "redux state:",
+        state.flightsArray
       );
     },
-    pushArrivalInformation: (state, { payload }: PayloadAction<Flight>) => {
-      state.currentFlight = payload;
 
-      if (state?.currentFlight?.flightId === payload?.flightId) {
-        state.flightsArray = state?.flightsArray.map((f) => {
-          if (f.flightId === payload?.flightId) {
-            return payload;
-          }
+    updateFlight: (state, { payload }: PayloadAction<Flight>) => {
+      state.flightsArray = state.flightsArray.map((f) => {
+        if (f.flightId === payload?.flightId) {
+          return payload;
+        }
 
-          return f;
-        });
-      }
-      state.flightsArray.push({
-        ...payload,
-        flightId:
-          payload?.flightNumber +
-          "-" +
-          payload.arrival?.arrivalDate.toISOString() +
-          Date.now(),
+        return f;
       });
+
+      state.currentFlight = payload?.flightId;
     },
     removeFlight: (state, { payload }: PayloadAction<string>) => {
+      state.currentFlight = null;
       state.flightsArray = state.flightsArray.filter(
         (flight) => flight?.flightId !== payload
       );
@@ -53,8 +59,12 @@ export const flightsSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { pushArrivalInformation, removeFlight, setCurrentFlightById } =
-  flightsSlice.actions;
+export const {
+  removeFlight,
+  setCurrentFlightById,
+  createFlight,
+  updateFlight,
+} = flightsSlice.actions;
 
 // We export the reducer function so that it can be added to the store
 export default flightsSlice.reducer;
