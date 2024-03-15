@@ -7,23 +7,23 @@ type Nullable<T> = T | undefined | null;
 
 type FlightState = {
   flightsArray: Array<Flight>;
-  currentFlight: Nullable<string>;
+  currentFlightId: Nullable<string>;
 };
 const initialState: FlightState = {
   flightsArray: [],
-  currentFlight: null,
+  currentFlightId: null,
 };
 
 export const flightsSlice = createSlice({
-  name: "flights", // This is the name of the slice, we will later use this name to access the slice from the store
-  initialState: initialState, // This is the initial state of the slice
+  name: "flights",
+  initialState: initialState,
   reducers: {
     setCurrentFlightById: (state, { payload }: PayloadAction<string>) => {
-      state.currentFlight = payload;
+      state.currentFlightId = payload;
     },
 
     createFlight: (state, { payload }: PayloadAction<Flight>) => {
-      state.currentFlight = null;
+      state.currentFlightId = null;
 
       state?.flightsArray.push({
         ...payload,
@@ -47,10 +47,10 @@ export const flightsSlice = createSlice({
         return f;
       });
 
-      state.currentFlight = payload?.flightId;
+      state.currentFlightId = payload?.flightId;
     },
     removeFlight: (state, { payload }: PayloadAction<string>) => {
-      state.currentFlight = null;
+      state.currentFlightId = null;
       state.flightsArray = state.flightsArray.filter(
         (flight) => flight?.flightId !== payload
       );

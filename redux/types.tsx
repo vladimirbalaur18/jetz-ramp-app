@@ -12,6 +12,7 @@ export type Arrival = {
     hours: number;
     minutes: number;
   };
+  crewComposition: Array<Crew>;
   adultCount: number;
   minorCount: number;
   rampInspectionBeforeArrival: {
@@ -21,8 +22,17 @@ export type Arrival = {
   };
 };
 
+type Crew = {
+  name: string;
+  nationality?: string;
+  idNumber?: number;
+  idExpiry?: Date;
+};
+
 export type Departure = {
   to: string;
+  crewNumber: number;
+  crewComposition: Array<Crew>;
   departureDate: Date;
   departureTime: {
     hours: number;
@@ -46,7 +56,7 @@ export type Payment = {
 };
 
 export enum FlightSchedule {
-  NonScheduled = "NonScheduler",
+  NonScheduled = "NonScheduled",
   Other = "Other",
 }
 

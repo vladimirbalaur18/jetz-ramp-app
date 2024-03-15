@@ -25,7 +25,7 @@ import REGEX from "@/utils/regexp";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 type FormData = Flight;
 
 const ERROR_MESSAGES = {
@@ -40,7 +40,7 @@ const Form: React.FC = () => {
   const dispatch = useDispatch();
 
   const state = useSelector((state: RootState) => state);
-  const currentFlight = getCurrentFlight(state);
+  const currentFlight = selectCurrentFlight(state);
   // alert(JSON.stringLUKify(currentFlight));
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({

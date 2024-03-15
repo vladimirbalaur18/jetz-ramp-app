@@ -16,7 +16,14 @@ import {
   RadioButton,
 } from "react-native-paper";
 import { Flight } from "@/redux/types";
-import { useForm, Controller } from "react-hook-form";
+import {
+  useForm,
+  Controller,
+  useFieldArray,
+  UseFieldArrayRemove,
+  Control,
+  FieldErrors,
+} from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import {
   DatePickerInput,
@@ -37,13 +44,15 @@ const ERROR_MESSAGES = {
 import { useDispatch, useSelector } from "react-redux";
 import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
-import { getCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
-  const currentFlight = getCurrentFlight(state);
+  const currentFlight = selectCurrentFlight(state);
 
   const dispatch = useDispatch();
+
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
     defaultValues: (currentFlight as Flight) || {
@@ -68,12 +77,22 @@ const Form: React.FC = () => {
     },
   });
 
+  const {
+    fields: crewCompositionFields,
+    append: appendCrewField,
+    remove: removeCrewField,
+  } = useFieldArray({
+    control,
+    name: "arrival.crewComposition",
+  });
+
   const { errors } = formState;
 
   const submit = (data: any) => {
     if (currentFlight) dispatch(updateFlight(data));
     else dispatch(createFlight(data));
 
+    console.log(data);
     router.navigate("/(createFlight)/departure");
   };
   const [visible, setVisible] = React.useState(false);
@@ -146,7 +165,7 @@ const Form: React.FC = () => {
         <Controller
           control={control}
           name="scheduleType"
-          defaultValue={FlightSchedule.NonScheduled}
+          defaultValue={FlightSchedule.Other}
           rules={{
             required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           }}
@@ -154,8 +173,9 @@ const Form: React.FC = () => {
             <>
               <List.Section title="Schedule type">
                 <RadioButton.Group
-                  value={FlightSchedule.NonScheduled}
+                  value={value as string}
                   onValueChange={(value: string) => {
+                    alert(value);
                     onChange(value);
                   }}
                 >
@@ -282,9 +302,6 @@ const Form: React.FC = () => {
           name="mtow"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            // pattern: {
-            //   message: "Not a valid operator Name",
-            // },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -300,6 +317,38 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        <View style={styles.row}>
+          <Text variant="headlineSmall">Arrival crew members:</Text>
+        </View>
+
+        {crewCompositionFields.map((item, index) => {
+          return (
+            <>
+              <CrewMemberInputFields
+                index={index}
+                control={control}
+                remove={() => removeCrewField(index)}
+                errors={errors}
+                styles={styles}
+              />
+            </>
+          );
+        })}
+        <Button
+          uppercase={false}
+          mode="outlined"
+          style={{ flex: 1, marginVertical: 30 }}
+          onPress={() =>
+            appendCrewField({
+              name: "",
+              nationality: "",
+              idExpiry: new Date(),
+              idNumber: "1212121",
+            })
+          }
+        >
+          Add crew member
+        </Button>
         <View style={styles.row}>
           <Text variant="headlineSmall">Arrival</Text>
         </View>
@@ -561,6 +610,7 @@ const Form: React.FC = () => {
     </SafeAreaView>
   );
 };
+
 export default Form;
 
 const styles = StyleSheet.create({
