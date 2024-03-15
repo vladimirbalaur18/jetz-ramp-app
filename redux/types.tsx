@@ -86,6 +86,7 @@ export type Service = {
   quantity: number;
   notes: string;
   isUsed: boolean;
+  pricePerQty: number;
 };
 
 export type ProvidedServices = {
