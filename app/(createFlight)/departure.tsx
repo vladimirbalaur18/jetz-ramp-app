@@ -168,9 +168,9 @@ const Form: React.FC = () => {
                 }}
               >
                 <TextInput
-                  label="time"
+                  label="Departure time"
                   editable={false}
-                  style={{ ...styles.input, flex: 1 }}
+                  style={{ ...styles.input, flex: 3 }}
                   value={`${
                     value.hours < 10 ? "0" + value.hours : value.hours
                   }:${
@@ -180,12 +180,14 @@ const Form: React.FC = () => {
                 <Button
                   onPress={() => setVisible(true)}
                   uppercase={false}
+                  icon={"clock"}
                   mode="outlined"
                   style={{ flex: 1 }}
                 >
-                  Select departure time
+                  Select
                 </Button>
                 <TimePickerModal
+                  label="Select departure time"
                   locale="en-GB"
                   visible={visible}
                   onDismiss={() => setVisible(false)}

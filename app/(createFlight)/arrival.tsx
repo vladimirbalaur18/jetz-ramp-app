@@ -67,6 +67,7 @@ const Form: React.FC = () => {
         rampInspectionBeforeArrival: {
           status: true,
           FOD: true,
+          agent: { fullname: "Costea" },
         },
       },
       parkingPosition: 22,
@@ -74,6 +75,7 @@ const Form: React.FC = () => {
       operatorName: "Mama",
       orderingCompanyName: "Mama",
       scheduleType: FlightSchedule.NonScheduled,
+      mtow: 0,
     },
   });
 
@@ -166,7 +168,6 @@ const Form: React.FC = () => {
                 <RadioButton.Group
                   value={value as string}
                   onValueChange={(value: string) => {
-                    alert(value);
                     onChange(value);
                   }}
                 >
@@ -388,9 +389,9 @@ const Form: React.FC = () => {
                 }}
               >
                 <TextInput
-                  label="time"
+                  label="Arrival time:"
                   editable={false}
-                  style={{ ...styles.input, flex: 1 }}
+                  style={{ ...styles.input, flex: 3 }}
                   value={`${
                     value.hours < 10 ? "0" + value.hours : value.hours
                   }:${
@@ -401,12 +402,13 @@ const Form: React.FC = () => {
                   onPress={() => setVisible(true)}
                   uppercase={false}
                   mode="outlined"
-                  style={{ flex: 1 }}
+                  icon={"clock"}
                 >
-                  Select arrival time
+                  Select
                 </Button>
                 <TimePickerModal
                   locale="en-GB"
+                  label="Select arrival time"
                   visible={visible}
                   onDismiss={() => setVisible(false)}
                   onConfirm={(value) => {

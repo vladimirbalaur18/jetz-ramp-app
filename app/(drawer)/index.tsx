@@ -1,7 +1,7 @@
 import { Button, ScrollView, View, useColorScheme } from "react-native";
 import { Text, FAB } from "react-native-paper";
-import React, { useContext } from "react";
-import { useSelector } from "react-redux";
+import React, { useContext, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import { StyleSheet } from "react-native";
@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import { useAppTheme } from "react-native-paper/src/core/theming";
 import { Flight } from "@/redux/types";
 import { RootState } from "@/redux/store";
+import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 dayjs.extend(isToday);
 
 const FlightSection: React.FC<{
@@ -30,11 +31,11 @@ const FlightSection: React.FC<{
 };
 
 export default function Page() {
-  const flightsArr = useSelector(
-    (state: RootState) => state.flights.flightsArray
+  const { flightsArray: flightsArr, currentFlightId } = useSelector(
+    (state: RootState) => state.flights
   );
   const theme = useTheme();
-
+  const dispatch = useDispatch();
   const router = useRouter();
   let parseFlightsByDate: Record<string, Flight[]> = {};
 

@@ -22,8 +22,11 @@ export const flightsSlice = createSlice({
       state.currentFlightId = payload;
     },
 
-    createFlight: (state, { payload }: PayloadAction<Flight>) => {
+    removeCurrentFlightById: (state) => {
       state.currentFlightId = null;
+    },
+    createFlight: (state, { payload }: PayloadAction<Flight>) => {
+      state.currentFlightId = payload?.flightId;
 
       state?.flightsArray.push({
         ...payload,
@@ -46,8 +49,6 @@ export const flightsSlice = createSlice({
 
         return f;
       });
-
-      state.currentFlightId = payload?.flightId;
     },
     removeFlight: (state, { payload }: PayloadAction<string>) => {
       state.currentFlightId = null;
@@ -64,6 +65,7 @@ export const {
   setCurrentFlightById,
   createFlight,
   updateFlight,
+  removeCurrentFlightById,
 } = flightsSlice.actions;
 
 // We export the reducer function so that it can be added to the store

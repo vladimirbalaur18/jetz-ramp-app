@@ -1,5 +1,7 @@
 {
     "VAT": 20,
     "disbursementPercentage": 10,
-    "euroToMDL": 19.145
+    "euroToMDL": 19.145,
+    "conventionalUnit": "euro",
+    "fuelPricePerTon": "1034"
 }

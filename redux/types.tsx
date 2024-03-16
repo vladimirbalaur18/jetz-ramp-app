@@ -82,14 +82,34 @@ export type Flight = {
 };
 
 export type Service = {
-  serviceName: string;
-  quantity: number;
-  notes: string;
-  isUsed: boolean;
-  pricePerQty: number;
+  serviceCategoryName: string;
+  services: Array<{
+    serviceName: string;
+    quantity: number;
+    notes: string;
+    isUsed: boolean;
+    pricePerQty: number;
+  }>;
 };
 
 export type ProvidedServices = {
   basicHandling: number | string;
-  additionalServices?: Service[] | null;
+
+  supportServices: {
+    airportFee: {
+      total: number;
+    };
+    fuel: {
+      fuelLitersQuantity: number;
+      fuelDensity: number;
+    };
+    catering: {
+      total: number;
+    };
+    HOTAC: {
+      total: number;
+    };
+  };
+  remarks: string;
+  otherServices?: Service[];
 };

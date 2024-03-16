@@ -1,71 +1,89 @@
-{
-    "serviceCategoryName": "Additional services",
-    "services": [
-        {
-            "serviceName": "Documents printing and delivery",
-            "pricePerQty": 10,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Crew transportation on the apron",
-            "pricePerQty": 25,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Passenger transportation on the apron",
-            "pricePerQty": 25,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Landing permit",
-            "pricePerQty": 30,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "GPU (up to 30min)",
-            "pricePerQty": 75,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Toilet service",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Water service",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Dishwashing",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Laundry",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Meet and assist",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        },
-        {
-            "serviceName": "Hotel transportation",
-            "pricePerQty": 50,
-            "hasVAT": false,
-            "isDisbursed": false
-        }
-    ]
-}
+[
+    {
+        "serviceCategoryName": "Passenger services",
+        "services": [
+            {
+                "serviceName": "Meet & Assist",
+                "pricePerQty": 20,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Express / VIP Terminal",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            }
+        ]
+    },
+    {
+        "serviceCategoryName": "Ramp services",
+        "services": [
+            {
+                "serviceName": "Documents printing and delivery",
+                "pricePerQty": 10,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Crew transportation on the apron",
+                "pricePerQty": 25,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Passenger transportation on the apron",
+                "pricePerQty": 25,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "GPU (up to 30min)",
+                "pricePerQty": 75,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Toilet service",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Water service",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            }
+        ]
+    },
+    {
+        "serviceCategoryName": "Additional services",
+        "services": [
+            {
+                "serviceName": "Landing permit",
+                "pricePerQty": 30,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Dishwashing",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Laundry",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            },
+            {
+                "serviceName": "Hotel transportation",
+                "pricePerQty": 50,
+                "hasVAT": false,
+                "isDisbursed": false
+            }
+        ]
+    }
+]
