@@ -47,11 +47,9 @@ const SectionTitle = ({ children }: { children: ReactNode }) => {
 };
 
 const Form: React.FC = () => {
-  const router = useRouter();
   const state = useSelector((state: RootState) => state);
   console.log("ps", state);
   const currentFlight = selectCurrentFlight(state);
-  // alert(JSON.stringify(currentFlight));
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
@@ -94,20 +92,25 @@ const Form: React.FC = () => {
 
   useEffect(() => {
     //render additional services inputs
-    SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
-      append({
-        serviceCategoryName: serviceCategoryName,
-        services: services.map(({ serviceName, pricePerQty }) => {
-          return {
-            serviceName: serviceName,
-            pricePerQty: pricePerQty,
-            isUsed: false,
-            quantity: 0,
-            notes: "",
-          };
-        }),
+
+    //prevent from appending too many fields
+    const areFieldsRendered = fields?.length < SERVICES_DEFINITIONS.length;
+
+    areFieldsRendered &&
+      SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
+        append({
+          serviceCategoryName: serviceCategoryName,
+          services: services.map(({ serviceName, pricePerQty }) => {
+            return {
+              serviceName: serviceName,
+              pricePerQty: pricePerQty,
+              isUsed: false,
+              quantity: 1,
+              notes: "",
+            };
+          }),
+        });
       });
-    });
   }, [append, SERVICES_DEFINITIONS]);
   const submit = (data: any) => {
     console.log(data);
@@ -126,413 +129,321 @@ const Form: React.FC = () => {
         <SectionTitle>
           Basic Handling (MTOW: {currentFlight?.mtow}kg )
         </SectionTitle>
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.basicHandling"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Basic handling fee:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={errors.providedServices?.basicHandling && true}
-              />
-              <HelperText type="error">
-                {errors?.providedServices?.basicHandling?.message}
-              </HelperText>
-            </>
-          )}
-        />
-        <SectionTitle>Support services</SectionTitle>
-        <Text>Airport fee</Text>
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.supportServices.airportFee.total"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Total airport fee:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={
-                  errors?.providedServices?.supportServices?.airportFee
-                    ?.total && true
-                }
-              />
-              <HelperText type="error">
-                {
-                  errors?.providedServices?.supportServices?.airportFee?.total
-                    ?.message
-                }
-              </HelperText>
-            </>
-          )}
-        />
-
-        <Text>Fuel fee</Text>
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.supportServices.fuel.fuelLitersQuantity"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Fuel liters quantity:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={
-                  errors?.providedServices?.supportServices?.fuel
-                    ?.fuelLitersQuantity && true
-                }
-              />
-              <HelperText type="error">
-                {
-                  errors?.providedServices?.supportServices?.fuel
-                    ?.fuelLitersQuantity?.message
-                }
-              </HelperText>
-            </>
-          )}
-        />
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.supportServices.fuel.fuelDensity"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Fuel density:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={
-                  errors?.providedServices?.supportServices?.fuel
-                    ?.fuelDensity && true
-                }
-              />
-              <HelperText type="error">
-                {
-                  errors?.providedServices?.supportServices?.fuel?.fuelDensity
-                    ?.message
-                }
-              </HelperText>
-            </>
-          )}
-        />
-
-        <Text>Catering fee</Text>
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.supportServices.catering.total"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Catering:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={
-                  errors?.providedServices?.supportServices?.catering?.total &&
-                  true
-                }
-              />
-              <HelperText type="error">
-                {
-                  errors?.providedServices?.supportServices?.catering?.total
-                    ?.message
-                }
-              </HelperText>
-            </>
-          )}
-        />
-        <Text>HOTAC fee</Text>
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="providedServices.supportServices.HOTAC.total"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Please insert correct format",
-              value: REGEX.number,
-            },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="HOTAC:"
-                style={styles.input}
-                value={String(value)}
-                onBlur={onBlur}
-                keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
-                error={
-                  errors?.providedServices?.supportServices?.HOTAC?.total &&
-                  true
-                }
-              />
-              <HelperText type="error">
-                {
-                  errors?.providedServices?.supportServices?.HOTAC?.total
-                    ?.message
-                }
-              </HelperText>
-            </>
-          )}
-        />
-        {/* {fields.map((item, index) => {
-          return (
-            <>
-              <View style={{ ...styles.row, marginVertical: 10 }}>
-                <Text variant="bodyLarge">{item?.serviceName}</Text>
-                <Controller
-                  control={control}
-                  defaultValue={item.isUsed}
-                  name={`providedServices.additionalServices.${index}.isUsed`}
-                  render={({ field: { value, onChange } }) => (
-                    <>
-                      <Switch
-                        value={value}
-                        onValueChange={(value) => {
-                          update(index, { ...item, isUsed: value });
-                          onChange(value);
-                        }}
-                      />
-                    </>
-                  )}
+        <View>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.basicHandling"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Basic handling fee:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={errors.providedServices?.basicHandling && true}
                 />
-              </View>
-              <View>
-                {item?.isUsed === true && (
-                  <>
-                    <Controller
-                      control={control}
-                      defaultValue={1}
-                      name={`providedServices.additionalServices.${index}.quantity`}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: ERROR_MESSAGES.REQUIRED,
-                        },
-                        pattern: {
-                          message: "Please insert correct format",
-                          value: REGEX.number,
-                        },
-                      }}
-                      render={({ field: { onBlur, onChange, value } }) => (
-                        <>
-                          <TextInput
-                            label="Quantity:"
-                            style={styles.input}
-                            value={String(value)}
-                            onBlur={onBlur}
-                            keyboardType="numeric"
-                            onChangeText={(text) => onChange(text)}
-                            error={
-                              errors?.providedServices?.additionalServices &&
-                              errors.providedServices?.additionalServices[
-                                index
-                              ] &&
-                              true
-                            }
-                          />
-                          <HelperText type="error">
-                            {errors?.providedServices?.additionalServices &&
-                              errors.providedServices?.additionalServices[index]
-                                ?.message}
-                          </HelperText>
-                        </>
-                      )}
-                    />
-                    <Controller
-                      control={control}
-                      defaultValue={""}
-                      name={`providedServices.additionalServices.${index}.notes`}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: ERROR_MESSAGES.REQUIRED,
-                        },
-                        pattern: {
-                          message: "Please insert correct format",
-                          value: REGEX.number,
-                        },
-                      }}
-                      render={({ field: { onBlur, onChange, value } }) => (
-                        <>
-                          <TextInput
-                            label="notes:"
-                            style={styles.input}
-                            value={String(value)}
-                            onBlur={onBlur}
-                            keyboardType="numeric"
-                            onChangeText={(text) => onChange(text)}
-                            error={errors.arrival?.minorCount && true}
-                          />
-                          <HelperText type="error">
-                            {errors.arrival?.minorCount?.message}
-                          </HelperText>
-                        </>
-                      )}
-                    />
-                  </>
-                )}
-              </View>
-            </>
-          );
-        })} */}
-        {fields?.map((category, categoryIndex) => {
-          return (
-            <>
-              <SectionTitle>{category?.serviceCategoryName}</SectionTitle>
-              {category?.services?.map((service, serviceIndex) => {
-                const { isUsed, notes, quantity, serviceName } = service;
-                return (
-                  <>
-                    <View style={{ ...styles.row, marginVertical: 10 }}>
-                      <Text variant="bodyLarge">{serviceName}</Text>
-                      <Controller
-                        control={control}
-                        defaultValue={isUsed}
-                        name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.isUsed`}
-                        render={({ field: { value, onChange } }) => (
+                <HelperText type="error">
+                  {errors?.providedServices?.basicHandling?.message}
+                </HelperText>
+              </>
+            )}
+          />
+        </View>
+
+        <SectionTitle>Support services</SectionTitle>
+        <View>
+          <Text>Airport fee</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.supportServices.airportFee.total"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Total airport fee:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={
+                    errors?.providedServices?.supportServices?.airportFee
+                      ?.total && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.supportServices?.airportFee?.total
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+
+          <Text>Fuel fee</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.supportServices.fuel.fuelLitersQuantity"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Fuel liters quantity:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={
+                    errors?.providedServices?.supportServices?.fuel
+                      ?.fuelLitersQuantity && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.supportServices?.fuel
+                      ?.fuelLitersQuantity?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.supportServices.fuel.fuelDensity"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Fuel density:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={
+                    errors?.providedServices?.supportServices?.fuel
+                      ?.fuelDensity && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.supportServices?.fuel?.fuelDensity
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+
+          <Text>Catering fee</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.supportServices.catering.total"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Catering:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={
+                    errors?.providedServices?.supportServices?.catering
+                      ?.total && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.supportServices?.catering?.total
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+          <Text>HOTAC fee</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.supportServices.HOTAC.total"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="HOTAC:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  onChangeText={(text) => onChange(text)}
+                  error={
+                    errors?.providedServices?.supportServices?.HOTAC?.total &&
+                    true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.supportServices?.HOTAC?.total
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+        </View>
+
+        {/* RAMP CHECKLIST SERVICES */}
+        <View>
+          {fields?.map((category, categoryIndex) => {
+            return (
+              <>
+                <SectionTitle>{category?.serviceCategoryName}</SectionTitle>
+                {category?.services?.map((service, serviceIndex) => {
+                  const { isUsed, notes, quantity, serviceName } = service;
+                  return (
+                    <>
+                      <View style={{ ...styles.row, marginVertical: 10 }}>
+                        <Text variant="bodyLarge">{serviceName}</Text>
+                        <Controller
+                          control={control}
+                          defaultValue={isUsed}
+                          name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.isUsed`}
+                          render={({ field: { value, onChange } }) => (
+                            <>
+                              <Switch
+                                value={value}
+                                onValueChange={(value) => {
+                                  update(categoryIndex, {
+                                    ...category,
+                                    services: (category?.services).map(
+                                      (service, i) =>
+                                        i === serviceIndex
+                                          ? { ...service, isUsed: value }
+                                          : service
+                                    ),
+                                  });
+                                  onChange(value);
+                                }}
+                              />
+                            </>
+                          )}
+                        />
+                      </View>
+                      <View>
+                        {isUsed === true && (
                           <>
-                            <Switch
-                              value={value}
-                              onValueChange={(value) => {
-                                update(categoryIndex, {
-                                  ...category,
-                                  services: (category?.services).map(
-                                    (service, i) =>
-                                      i === serviceIndex
-                                        ? { ...service, isUsed: value }
-                                        : service
-                                  ),
-                                });
-                                onChange(value);
+                            <Controller
+                              control={control}
+                              defaultValue={1}
+                              name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.quantity`}
+                              rules={{
+                                required: {
+                                  value: true,
+                                  message: ERROR_MESSAGES.REQUIRED,
+                                },
+                                pattern: {
+                                  message: "Please insert correct format",
+                                  value: REGEX.number,
+                                },
                               }}
+                              render={({
+                                field: { onBlur, onChange, value },
+                              }) => (
+                                <>
+                                  <TextInput
+                                    label="Quantity:"
+                                    style={styles.input}
+                                    value={String(value)}
+                                    onBlur={onBlur}
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => onChange(text)}
+                                    error={
+                                      //@ts-ignore
+                                      errors?.providedServices?.otherServices[
+                                        categoryIndex
+                                      ]?.services[serviceIndex]?.quantity &&
+                                      true
+                                    }
+                                  />
+                                </>
+                              )}
+                            />
+                            <Controller
+                              control={control}
+                              defaultValue={""}
+                              name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.notes`}
+                              render={({
+                                field: { onBlur, onChange, value },
+                              }) => (
+                                <>
+                                  <TextInput
+                                    label="notes:"
+                                    style={styles.input}
+                                    value={String(value)}
+                                    onBlur={onBlur}
+                                    onChangeText={(text) => onChange(text)}
+                                  />
+                                </>
+                              )}
                             />
                           </>
                         )}
-                      />
-                    </View>
-                    <View>
-                      {isUsed === true && (
-                        <>
-                          <Controller
-                            control={control}
-                            defaultValue={1}
-                            name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.quantity`}
-                            rules={{
-                              required: {
-                                value: true,
-                                message: ERROR_MESSAGES.REQUIRED,
-                              },
-                              pattern: {
-                                message: "Please insert correct format",
-                                value: REGEX.number,
-                              },
-                            }}
-                            render={({
-                              field: { onBlur, onChange, value },
-                            }) => (
-                              <>
-                                <TextInput
-                                  label="Quantity:"
-                                  style={styles.input}
-                                  value={String(value)}
-                                  onBlur={onBlur}
-                                  keyboardType="numeric"
-                                  onChangeText={(text) => onChange(text)}
-                                  error={
-                                    //@ts-ignore
-                                    errors?.providedServices?.otherServices[
-                                      categoryIndex
-                                    ]?.services[serviceIndex]?.quantity && true
-                                  }
-                                />
-                              </>
-                            )}
-                          />
-                          <Controller
-                            control={control}
-                            defaultValue={""}
-                            name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.notes`}
-                            render={({
-                              field: { onBlur, onChange, value },
-                            }) => (
-                              <>
-                                <TextInput
-                                  label="notes:"
-                                  style={styles.input}
-                                  value={String(value)}
-                                  onBlur={onBlur}
-                                  keyboardType="numeric"
-                                  onChangeText={(text) => onChange(text)}
-                                />
-                              </>
-                            )}
-                          />
-                        </>
-                      )}
-                    </View>
-                  </>
-                );
-              })}
-            </>
-          );
-        })}
+                      </View>
+                    </>
+                  );
+                })}
+              </>
+            );
+          })}
+        </View>
 
         <View>
           <SectionTitle>Services list:</SectionTitle>
