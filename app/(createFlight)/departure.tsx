@@ -39,29 +39,25 @@ const Form: React.FC = () => {
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: (currentFlight as unknown as Flight) || {
-      aircraftRegistration: "LY-TBA",
-      aircraftType: "SR22",
-      departure: {
-        departureTime: { hours: 10, minutes: 12 },
-        departureDate: new Date(),
-        to: "LUKK",
-        adultCount: 1,
-        minorCount: 2,
-        rampInspectionBeforeDeparture: {
-          status: true,
-          FOD: true,
-          agent: {
-            fullname: "Costea Andrei",
+    defaultValues: currentFlight?.departure
+      ? currentFlight
+      : {
+          ...currentFlight,
+          departure: {
+            departureTime: { hours: 10, minutes: 12 },
+            departureDate: new Date(),
+            to: "LUKK",
+            adultCount: 1,
+            minorCount: 2,
+            rampInspectionBeforeDeparture: {
+              status: true,
+              FOD: true,
+              agent: {
+                fullname: "Costea Andrei",
+              },
+            },
           },
         },
-      },
-
-      flightNumber: "TY123",
-      operatorName: "Mama",
-      orderingCompanyName: "Mama",
-      scheduleType: FlightSchedule.NonScheduled,
-    },
   });
   const { errors } = formState;
 
@@ -80,10 +76,6 @@ const Form: React.FC = () => {
         keyboardShouldPersistTaps="always"
         alwaysBounceVertical={false}
       >
-        <View style={styles.row}>
-          <Text variant="headlineSmall">General</Text>
-        </View>
-
         <View style={styles.row}>
           <Text variant="headlineSmall">Departure</Text>
         </View>
@@ -261,7 +253,7 @@ const Form: React.FC = () => {
             Number(getValues("departure.minorCount"))}
         </Text>
         <View style={styles.row}>
-          <Text variant="headlineSmall">Ramp</Text>
+          <Text variant="headlineSmall">Departure ramp agent</Text>
         </View>
         <Controller
           control={control}

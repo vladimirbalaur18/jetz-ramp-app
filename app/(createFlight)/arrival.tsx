@@ -506,7 +506,7 @@ const Form: React.FC = () => {
           />
         </View>
         <View style={styles.row}>
-          <Text variant="headlineSmall">Ramp</Text>
+          <Text variant="headlineSmall">Arrival ramp agent</Text>
         </View>
         <Controller
           control={control}

@@ -131,7 +131,9 @@ export const getAirportFeePrice = (flight: Flight) => {
 
   alert(JSON.stringify(result));
 
-  return Object.values(result).reduce((sum, value) => sum + value, 0);
+  return Object.values(result)
+    .reduce((sum, value) => sum + value, 0)
+    .toFixed(2);
 };
 
 export const getAllServices = () => serviceDefinitions;
