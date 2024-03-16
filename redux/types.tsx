@@ -69,19 +69,20 @@ export type Flight = {
   orderingCompanyName?: string;
   aircraftType?: string;
   aircraftRegistration?: string;
-  arrival?: Arrival;
-  departure?: Departure;
+  arrival: Arrival;
+  departure: Departure;
   invoiceDate?: Date;
   mtow: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
   isLocalFlight?: boolean;
+  isCommercialFlight?: boolean;
   status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
 
   // chargeNote: Charges;
 };
 
-export type Service = {
+type Service = {
   serviceCategoryName: string;
   services: Array<{
     serviceName: string;

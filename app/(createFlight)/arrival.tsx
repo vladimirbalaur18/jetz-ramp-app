@@ -70,6 +70,7 @@ const Form: React.FC = () => {
           agent: { fullname: "Costea" },
         },
       },
+      isCommercialFlight: true,
       parkingPosition: 22,
       flightNumber: "TY123",
       operatorName: "Mama",
@@ -83,7 +84,10 @@ const Form: React.FC = () => {
 
   const submit = (data: any) => {
     if (currentFlight) dispatch(updateFlight(data));
-    else dispatch(createFlight(data));
+    else {
+      alert("creating a flight");
+      dispatch(createFlight(data));
+    }
 
     console.log(data);
     router.navigate("/(createFlight)/departure");
@@ -485,6 +489,22 @@ const Form: React.FC = () => {
           {Number(getValues("arrival.adultCount")) +
             Number(getValues("arrival.minorCount"))}
         </Text>
+        <View style={styles.row}>
+          <Text variant="bodyLarge">Is commercial flight</Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="isCommercialFlight"
+            render={({ field: { value, onChange } }) => (
+              <>
+                <Switch
+                  value={value}
+                  onValueChange={(value) => onChange(value)}
+                />
+              </>
+            )}
+          />
+        </View>
         <View style={styles.row}>
           <Text variant="headlineSmall">Ramp</Text>
         </View>

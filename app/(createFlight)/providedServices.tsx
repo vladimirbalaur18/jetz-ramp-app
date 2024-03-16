@@ -1,35 +1,19 @@
 import React, { ReactNode, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
   Button,
   Switch,
   HelperText,
-  List,
   Text,
-  RadioButton,
 } from "react-native-paper";
 import { Flight } from "@/redux/types";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
-import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import {
+  getAirportFeePrice,
   getAllServices,
   getBasicHandlingPrice,
 } from "@/services/servicesCalculator";
@@ -57,7 +41,7 @@ const Form: React.FC = () => {
       providedServices: {
         basicHandling: getBasicHandlingPrice(currentFlight) || 0,
         supportServices: {
-          airportFee: { total: 0 },
+          airportFee: { total: getAirportFeePrice(currentFlight) },
           fuel: {
             fuelDensity: 1000,
             fuelLitersQuantity: 0,

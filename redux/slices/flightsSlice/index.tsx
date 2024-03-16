@@ -26,11 +26,11 @@ export const flightsSlice = createSlice({
       state.currentFlightId = null;
     },
     createFlight: (state, { payload }: PayloadAction<Flight>) => {
-      state.currentFlightId = payload?.flightId;
-
+      const id = payload?.flightNumber + uuid.v4();
+      state.currentFlightId = id;
       state?.flightsArray.push({
         ...payload,
-        flightId: payload?.flightNumber + uuid.v4(),
+        flightId: id,
       });
       console.log(
         "new flight created",
@@ -42,6 +42,7 @@ export const flightsSlice = createSlice({
     },
 
     updateFlight: (state, { payload }: PayloadAction<Flight>) => {
+      state.currentFlightId = payload?.flightId;
       state.flightsArray = state.flightsArray.map((f) => {
         if (f.flightId === payload?.flightId) {
           return payload;

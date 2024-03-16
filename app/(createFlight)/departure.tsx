@@ -26,14 +26,8 @@ import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import ERROR_MESSAGES from "@/utils/formErrorMessages";
 type FormData = Flight;
-
-const ERROR_MESSAGES = {
-  REQUIRED: "This Field Is Required",
-  NAME_INVALID: "Not a Valid Name",
-  TERMS: "Terms Must Be Accepted To Continue",
-  EMAIL_INVALID: "Not a Valid Email",
-};
 
 const Form: React.FC = () => {
   const router = useRouter();
@@ -72,7 +66,8 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: any) => {
-    if (currentFlight) dispatch(updateFlight(data));
+    alert(JSON.stringify(data));
+    dispatch(updateFlight(data));
 
     router.navigate("/(createFlight)/providedServices");
   };

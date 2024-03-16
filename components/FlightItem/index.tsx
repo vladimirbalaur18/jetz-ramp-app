@@ -22,6 +22,17 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
   const theme = useTheme();
   const router = useRouter();
 
+  const formatFlightTime = ({
+    hours,
+    minutes,
+  }: {
+    hours: number;
+    minutes: number;
+  }) =>
+    `${hours < 10 ? "0" + hours : hours}${
+      minutes < 10 ? "0" + minutes : minutes
+    }Z`;
+
   //
   const [visible, setVisible] = useState(false);
 
@@ -37,7 +48,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
       <>
         {dayjs(flight?.arrival?.arrivalDate).format("DD/MM/YYYY" || "N/A")}{" "}
         {flight?.arrival?.arrivalTime
-          ? `${flight?.arrival?.arrivalTime?.hours}${flight?.arrival?.arrivalTime?.minutes}Z`
+          ? formatFlightTime(flight?.arrival?.arrivalTime)
           : "N/A"}
       </>,
     ],
@@ -46,7 +57,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
       <>
         {dayjs(flight?.departure?.departureDate).format("DD/MM/YYYY")}{" "}
         {flight?.departure?.departureTime
-          ? `${flight?.departure?.departureTime?.hours}${flight?.departure?.departureTime?.minutes}Z`
+          ? formatFlightTime(flight?.departure?.departureTime)
           : "N/A"}
       </>,
     ],
