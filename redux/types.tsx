@@ -89,8 +89,14 @@ type Service = {
     quantity: number;
     notes: string;
     isUsed: boolean;
-    pricePerQty: number;
+    pricingRules: PricingRule[];
   }>;
+};
+
+type PricingRule = {
+  ruleName: string;
+  currency: string;
+  amount: number;
 };
 
 export type ProvidedServices = {
@@ -111,6 +117,7 @@ export type ProvidedServices = {
       total: number;
     };
   };
+  VIPLoungeServices: { adultPax: number; minorPax: number; typeOf: string };
   remarks: string;
   otherServices?: Service[];
 };

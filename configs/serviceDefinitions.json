@@ -4,15 +4,15 @@
         "services": [
             {
                 "serviceName": "Meet & Assist",
-                "pricePerQty": 20,
                 "hasVAT": false,
-                "isDisbursed": false
-            },
-            {
-                "serviceName": "Express / VIP Terminal",
-                "pricePerQty": 50,
-                "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "ruleName": "pricePerQty",
+                        "amount": 20,
+                        "currency": "EUR"
+                    }
+                ]
             }
         ]
     },
@@ -21,39 +21,75 @@
         "services": [
             {
                 "serviceName": "Documents printing and delivery",
-                "pricePerQty": 10,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 10,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Crew transportation on the apron",
-                "pricePerQty": 25,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 25,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Passenger transportation on the apron",
-                "pricePerQty": 25,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 25,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "GPU (up to 30min)",
-                "pricePerQty": 75,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 75,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Toilet service",
-                "pricePerQty": 50,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 50,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Water service",
-                "pricePerQty": 50,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 50,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             }
         ]
     },
@@ -62,27 +98,51 @@
         "services": [
             {
                 "serviceName": "Landing permit",
-                "pricePerQty": 30,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 30,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Dishwashing",
-                "pricePerQty": 50,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 50,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Laundry",
-                "pricePerQty": 50,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 50,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             },
             {
                 "serviceName": "Hotel transportation",
-                "pricePerQty": 50,
                 "hasVAT": false,
-                "isDisbursed": false
+                "isDisbursed": false,
+                "pricingRules": [
+                    {
+                        "amount": 50,
+                        "currency": "EUR",
+                        "ruleName": "pricePerQty"
+                    }
+                ]
             }
         ]
     }

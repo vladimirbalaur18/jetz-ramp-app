@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
@@ -16,9 +16,11 @@ import {
   getAirportFeePrice,
   getAllServices,
   getBasicHandlingPrice,
+  getLoungeFeePrice,
 } from "@/services/servicesCalculator";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import DropDown from "react-native-paper-dropdown";
 
 type FormData = Flight;
 
@@ -35,19 +37,28 @@ const Form: React.FC = () => {
   console.log("ps", state);
   const currentFlight = selectCurrentFlight(state);
 
+  const [showDropDown, setShowDropDown] = useState(false);
+  const [selectedLounge, setSelectedLounge] = useState("None");
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
     defaultValues: {
       providedServices: {
         basicHandling: getBasicHandlingPrice(currentFlight) || 0,
         supportServices: {
-          airportFee: { total: getAirportFeePrice(currentFlight) },
+          airportFee: {
+            total: Number(getAirportFeePrice(currentFlight).toFixed(2)),
+          },
           fuel: {
             fuelDensity: 1000,
             fuelLitersQuantity: 0,
           },
           catering: { total: 0 },
           HOTAC: { total: 0 },
+        },
+        VIPLoungeServices: {
+          adultPax: 0,
+          minorPax: 0,
+          typeOf: "None",
         },
       },
     },
@@ -72,6 +83,7 @@ const Form: React.FC = () => {
     otherServices,
     basicHandling,
     supportServices: { HOTAC, airportFee, catering, fuel },
+    VIPLoungeServices,
   } = getValues("providedServices");
 
   useEffect(() => {
@@ -84,10 +96,10 @@ const Form: React.FC = () => {
       SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
         append({
           serviceCategoryName: serviceCategoryName,
-          services: services.map(({ serviceName, pricePerQty }) => {
+          services: services.map(({ serviceName, pricingRules }) => {
             return {
               serviceName: serviceName,
-              pricePerQty: pricePerQty,
+              pricingRules: pricingRules,
               isUsed: false,
               quantity: 1,
               notes: "",
@@ -100,7 +112,6 @@ const Form: React.FC = () => {
     console.log(data);
     // router.navigate("/(createFlight)/providedServices");
   };
-  const [visible, setVisible] = React.useState(false);
   console.log("fields", fields);
 
   return (
@@ -324,6 +335,116 @@ const Form: React.FC = () => {
           />
         </View>
 
+        <SectionTitle>VIP Lounge services</SectionTitle>
+        <Controller
+          control={control}
+          defaultValue={"None"}
+          name="providedServices.VIPLoungeServices.typeOf"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <DropDown
+                label={"VIP Lounge"}
+                mode={"outlined"}
+                visible={showDropDown}
+                showDropDown={() => setShowDropDown(true)}
+                onDismiss={() => setShowDropDown(false)}
+                value={value}
+                setValue={(value) => {
+                  onChange(value);
+                }}
+                list={[
+                  { label: "Departure", value: "Departure" },
+                  { label: "None", value: "None" },
+                  { label: "Arrival", value: "Arrival" },
+                  {
+                    label: "Departure & Arrival",
+                    value: "Departure & Arrival",
+                  },
+                ]}
+              />
+              <HelperText type="error">
+                {errors?.providedServices?.VIPLoungeServices?.typeOf?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        {VIPLoungeServices?.typeOf !== "None" && (
+          <View>
+            <Controller
+              control={control}
+              defaultValue={0}
+              name="providedServices.VIPLoungeServices.adultPax"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Please insert correct format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Adult passengers:"
+                    style={styles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(text) => {
+                      onChange(text);
+                    }}
+                    error={
+                      errors?.providedServices?.VIPLoungeServices?.adultPax &&
+                      true
+                    }
+                  />
+                  <HelperText type="error">
+                    {
+                      errors?.providedServices?.VIPLoungeServices?.adultPax
+                        ?.message
+                    }
+                  </HelperText>
+                </>
+              )}
+            />
+            <Controller
+              control={control}
+              defaultValue={0}
+              name="providedServices.VIPLoungeServices.minorPax"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Please insert correct format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Minor passengers:"
+                    style={styles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(text) => onChange(text)}
+                    error={
+                      errors?.providedServices?.VIPLoungeServices?.minorPax &&
+                      true
+                    }
+                  />
+                  <HelperText type="error">
+                    {
+                      errors?.providedServices?.VIPLoungeServices?.minorPax
+                        ?.message
+                    }
+                  </HelperText>
+                </>
+              )}
+            />
+          </View>
+        )}
         {/* RAMP CHECKLIST SERVICES */}
         <View>
           {fields?.map((category, categoryIndex) => {
@@ -435,6 +556,14 @@ const Form: React.FC = () => {
             Basic handling (MTOW: {currentFlight?.mtow}kg): {basicHandling}
             &euro;
           </Text>
+          <Text>
+            VIP Lounge ({VIPLoungeServices?.typeOf}):{" "}
+            {getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf).amount}{" "}
+            {
+              getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf)
+                .currency
+            }
+          </Text>
           {otherServices?.map(({ serviceCategoryName, services }) => {
             return (
               <>
@@ -443,7 +572,18 @@ const Form: React.FC = () => {
                   return s.isUsed ? (
                     <Text>
                       {s?.serviceName} (x{s?.quantity}):{" "}
-                      {s?.quantity * s?.pricePerQty}&euro;
+                      {((): ReactNode => {
+                        let total: any;
+
+                        for (const rule of s?.pricingRules) {
+                          if (rule?.ruleName === "pricePerQty") {
+                            total =
+                              s?.quantity * rule?.amount + " " + rule?.currency;
+                          }
+                        }
+
+                        return <>{total}</>;
+                      })()}
                     </Text>
                   ) : null;
                 })}

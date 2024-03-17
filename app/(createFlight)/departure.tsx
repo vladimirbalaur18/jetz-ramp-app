@@ -62,7 +62,7 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: any) => {
-    alert(JSON.stringify(data));
+    // alert(JSON.stringify(data));
     dispatch(updateFlight(data));
 
     router.navigate("/(createFlight)/providedServices");

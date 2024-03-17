@@ -1,7 +1,9 @@
 import { Flight } from "@/redux/types";
 import basicHandlingFees from "@/configs/basicHandlingFees.json";
 import serviceDefinitions from "@/configs/serviceDefinitions.json";
+import loungeFees from "@/configs/loungeFees.json";
 import AirportFees from "@/configs/airportFees.json";
+import generalConfigs from "@/configs/general.json";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
@@ -131,9 +133,38 @@ export const getAirportFeePrice = (flight: Flight) => {
 
   alert(JSON.stringify(result));
 
-  return Object.values(result)
-    .reduce((sum, value) => sum + value, 0)
-    .toFixed(2);
+  return Object.values(result).reduce((sum, value) => sum + value, 0);
 };
 
+export const getLoungeFeePrice = (flight: Flight, type: string) => {
+  let result = 0;
+  switch (type) {
+    case "Departure": {
+      result =
+        flight?.departure?.adultCount *
+          loungeFees.departure.pricePerAdult.amount +
+        flight?.departure?.minorCount *
+          loungeFees.departure.pricePerMinor.amount;
+      break;
+    }
+    case "Arrival": {
+      flight?.arrival?.adultCount * loungeFees.arrival.pricePerAdult.amount +
+        flight?.arrival?.minorCount * loungeFees.arrival.pricePerMinor.amount;
+      break;
+    }
+    case "Departure & Arrival": {
+      result =
+        flight?.arrival?.adultCount *
+          loungeFees.departureAndArrival.pricePerAdult.amount +
+        flight?.arrival?.minorCount *
+          loungeFees.departureAndArrival.pricePerMinor.amount;
+      break;
+    }
+  }
+
+  return {
+    amount: result * 1.2,
+    currency: "MDL",
+  };
+};
 export const getAllServices = () => serviceDefinitions;
