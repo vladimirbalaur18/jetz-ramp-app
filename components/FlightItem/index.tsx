@@ -62,6 +62,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
       </>,
     ],
     ["STATUS:", "TBD"],
+    ["HANDLING TYPE:", flight?.handlingType || "N/A"],
   ];
   return (
     <Menu
@@ -76,7 +77,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
           }}
           onPress={() => {
             dispatch(setCurrentFlightById(flight?.flightId as string));
-            router.navigate("/(createFlight)/arrival");
+            router.navigate("/(createFlight)/general");
           }}
           onLongPress={() => openMenu()}
         >

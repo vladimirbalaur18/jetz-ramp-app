@@ -67,7 +67,9 @@ const Form: React.FC = () => {
 
     router.navigate("/(createFlight)/providedServices");
   };
-  const [visible, setVisible] = React.useState(false);
+  const [departureTimerVisible, setDepartureTimerVisible] =
+    React.useState(false);
+  const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
 
   return (
     <SafeAreaView>
@@ -106,6 +108,95 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        {currentFlight?.handlingType === "Departure" && (
+          <>
+            <Controller
+              control={control}
+              defaultValue={dayjs().toDate()}
+              name="arrival.arrivalDate"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <DatePickerInput
+                    locale="en-GB"
+                    label="Arrival date"
+                    value={value}
+                    onChange={(d) => {
+                      alert(d);
+                      onChange(d);
+                    }}
+                    inputMode="start"
+                    style={{ width: 200 }}
+                    mode="outlined"
+                  />
+                  <HelperText type="error">
+                    {errors.arrival?.arrivalDate?.message}
+                  </HelperText>
+                </>
+              )}
+            />
+            <Controller
+              control={control}
+              defaultValue={{
+                hours: dayjs().get("hours"),
+                minutes: dayjs().get("minutes"),
+              }}
+              name="arrival.arrivalTime"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <View
+                    style={{
+                      justifyContent: "space-between",
+                      flex: 1,
+                      alignItems: "center",
+                      flexDirection: "row",
+                      gap: 30,
+                    }}
+                  >
+                    <TextInput
+                      label="Arrival time:"
+                      editable={false}
+                      style={{ ...styles.input, flex: 3 }}
+                      value={`${
+                        value.hours < 10 ? "0" + value.hours : value.hours
+                      }:${
+                        value.minutes < 10 ? "0" + value.minutes : value.minutes
+                      }`}
+                    />
+                    <Button
+                      onPress={() => setArrivalTimerVisible(true)}
+                      uppercase={false}
+                      mode="outlined"
+                      icon={"clock"}
+                    >
+                      Select
+                    </Button>
+                    <TimePickerModal
+                      locale="en-GB"
+                      label="Select arrival time"
+                      visible={arrivalTimerVisible}
+                      onDismiss={() => setArrivalTimerVisible(false)}
+                      onConfirm={(value) => {
+                        setArrivalTimerVisible(false);
+                        onChange(value);
+                      }}
+                    />
+                  </View>
+
+                  <HelperText type="error">
+                    {errors.arrival?.arrivalTime?.message}
+                  </HelperText>
+                </>
+              )}
+            />
+          </>
+        )}
+
         <Controller
           control={control}
           defaultValue={dayjs().toDate()}
@@ -136,8 +227,8 @@ const Form: React.FC = () => {
         <Controller
           control={control}
           defaultValue={{
-            hours: dayjs().get("hours"),
-            minutes: dayjs().get("minutes"),
+            hours: dayjs().get("hours") || 0,
+            minutes: dayjs().get("minutes") || 0,
           }}
           name="departure.departureTime"
           rules={{
@@ -165,7 +256,7 @@ const Form: React.FC = () => {
                   }`}
                 />
                 <Button
-                  onPress={() => setVisible(true)}
+                  onPress={() => setDepartureTimerVisible(true)}
                   uppercase={false}
                   icon={"clock"}
                   mode="outlined"
@@ -176,10 +267,10 @@ const Form: React.FC = () => {
                 <TimePickerModal
                   label="Select departure time"
                   locale="en-GB"
-                  visible={visible}
-                  onDismiss={() => setVisible(false)}
+                  visible={departureTimerVisible}
+                  onDismiss={() => setDepartureTimerVisible(false)}
                   onConfirm={(value) => {
-                    setVisible(false);
+                    setDepartureTimerVisible(false);
                     onChange(value);
                   }}
                 />
@@ -333,7 +424,9 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          Submit departure information
+          {currentFlight
+            ? "Save departure information"
+            : "Submit departure information"}
         </Button>
       </ScrollView>
     </SafeAreaView>

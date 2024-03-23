@@ -1,6 +1,6 @@
 import { Button, ScrollView, View, useColorScheme } from "react-native";
 import { Text, FAB } from "react-native-paper";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -37,16 +37,25 @@ export default function Page() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const router = useRouter();
-  let parseFlightsByDate: Record<string, Flight[]> = {};
+
+  let parseFlightsByDate: Record<string, Flight[]> = useMemo(() => {
+    let dateFlightsMap: Record<string, Flight[]> = {};
+
+    flightsArr.forEach((flight: Flight) => {
+      const dateOfFlight = dayjs(flight.arrival?.arrivalDate).format(
+        "YYYY-MM-DD"
+      );
+
+      if (!dateFlightsMap[dateOfFlight])
+        dateFlightsMap[dateOfFlight] = [flight];
+      else dateFlightsMap[dateOfFlight].push(flight);
+    });
+
+    return dateFlightsMap;
+  }, [flightsArr]);
 
   //agg flights by date
 
-  flightsArr.forEach((flight: Flight) => {
-    const date = dayjs(flight.arrival?.arrivalDate).format("YYYY-MM-DD");
-    if (!parseFlightsByDate[date]) {
-      parseFlightsByDate[date] = [flight];
-    } else parseFlightsByDate[date].push(flight);
-  });
   return (
     <ScrollView contentContainerStyle={styles.wrapper}>
       <FAB
@@ -55,7 +64,11 @@ export default function Page() {
         style={{ ...styles.fab }}
         variant="secondary"
         label="Create a new flight"
-        onPress={() => router.navigate("/(createFlight)/arrival")}
+        onPress={() => {
+          //clear leftover flight
+          dispatch(removeCurrentFlightById());
+          router.navigate("/(createFlight)/general");
+        }}
       />
       {Object.entries(parseFlightsByDate).map(([date, flights], index) => {
         return (

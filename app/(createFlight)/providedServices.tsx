@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import { View, ScrollView, SafeAreaView } from "react-native";
+import formStyles from "@/styles/formStyles";
 import {
   TextInput,
   Button,
@@ -21,24 +22,15 @@ import {
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import DropDown from "react-native-paper-dropdown";
+import SectionTitle from "@/components/FormUtils/SectionTitle";
 
 type FormData = Flight;
 
-const SectionTitle = ({ children }: { children: ReactNode }) => {
-  return (
-    <View style={styles.row}>
-      <Text variant="headlineSmall">{children}</Text>
-    </View>
-  );
-};
-
 const Form: React.FC = () => {
   const state = useSelector((state: RootState) => state);
-  console.log("ps", state);
   const currentFlight = selectCurrentFlight(state);
 
   const [showDropDown, setShowDropDown] = useState(false);
-  const [selectedLounge, setSelectedLounge] = useState("None");
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
     defaultValues: {
@@ -117,7 +109,7 @@ const Form: React.FC = () => {
   return (
     <SafeAreaView>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={formStyles.container}
         keyboardShouldPersistTaps="always"
         alwaysBounceVertical={false}
       >
@@ -140,7 +132,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="Basic handling fee:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -173,7 +165,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="Total airport fee:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -209,7 +201,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="Fuel liters quantity:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -243,7 +235,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="Fuel density:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -279,7 +271,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="Catering:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -314,7 +306,7 @@ const Form: React.FC = () => {
               <>
                 <TextInput
                   label="HOTAC:"
-                  style={styles.input}
+                  style={formStyles.input}
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
@@ -388,7 +380,7 @@ const Form: React.FC = () => {
                 <>
                   <TextInput
                     label="Adult passengers:"
-                    style={styles.input}
+                    style={formStyles.input}
                     value={String(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
@@ -424,7 +416,7 @@ const Form: React.FC = () => {
                 <>
                   <TextInput
                     label="Minor passengers:"
-                    style={styles.input}
+                    style={formStyles.input}
                     value={String(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
@@ -455,7 +447,7 @@ const Form: React.FC = () => {
                   const { isUsed, notes, quantity, serviceName } = service;
                   return (
                     <>
-                      <View style={{ ...styles.row, marginVertical: 10 }}>
+                      <View style={{ ...formStyles.row, marginVertical: 10 }}>
                         <Text variant="bodyLarge">{serviceName}</Text>
                         <Controller
                           control={control}
@@ -505,7 +497,7 @@ const Form: React.FC = () => {
                                 <>
                                   <TextInput
                                     label="Quantity:"
-                                    style={styles.input}
+                                    style={formStyles.input}
                                     value={String(value)}
                                     onBlur={onBlur}
                                     keyboardType="numeric"
@@ -531,7 +523,7 @@ const Form: React.FC = () => {
                                 <>
                                   <TextInput
                                     label="notes:"
-                                    style={styles.input}
+                                    style={formStyles.input}
                                     value={String(value)}
                                     onBlur={onBlur}
                                     onChangeText={(text) => onChange(text)}
@@ -607,18 +599,3 @@ const Form: React.FC = () => {
 };
 
 export default Form;
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    marginHorizontal: 30,
-    paddingVertical: 30,
-  },
-  input: { marginVertical: 5 },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    marginVertical: 20,
-    justifyContent: "space-between",
-  },
-});

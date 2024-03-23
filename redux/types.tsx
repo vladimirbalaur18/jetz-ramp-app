@@ -59,6 +59,7 @@ export enum FlightSchedule {
   NonScheduled = "NonScheduled",
   Other = "Other",
 }
+export type HandlingTypes = "Arrival" | "Departure" | "FULL";
 
 export type Flight = {
   flightId?: string;
@@ -69,6 +70,7 @@ export type Flight = {
   orderingCompanyName?: string;
   aircraftType?: string;
   aircraftRegistration?: string;
+  handlingType: HandlingTypes;
   arrival: Arrival;
   departure: Departure;
   invoiceDate?: Date;

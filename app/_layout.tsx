@@ -84,24 +84,31 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
             <Stack.Screen
+              name="(createFlight)/general"
+              options={{
+                headerShown: true,
+                title: "General flight information",
+              }}
+            />
+            <Stack.Screen
               name="(createFlight)/arrival"
               options={{
                 headerShown: true,
-                title: "Stage 1 of 3 (Arrival)",
+                title: "Arrival information",
               }}
             />
             <Stack.Screen
               name="(createFlight)/departure"
               options={{
                 headerShown: true,
-                title: "Stage 2 of 3 (Departure)",
+                title: "Departure information",
               }}
             />
             <Stack.Screen
               name="(createFlight)/providedServices"
               options={{
                 headerShown: true,
-                title: "Stage 3 of 3 (Provided services)",
+                title: "Provided services",
               }}
             />
           </Stack>
