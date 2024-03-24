@@ -16,8 +16,8 @@ export const getFuelFeeData = () => ({
 });
 export const getLandingFees = (flight: Flight): number => {
   if (flight?.handlingType === "Departure") return 0;
-  const { arrivalDate, arrivalTime } = flight?.arrival;
 
+  const { arrivalDate, arrivalTime } = flight?.arrival;
   const fullArrivalDateTime = getParsedDateTime(arrivalDate, arrivalTime);
   const mtowTons = getFlightMTOWinTons(flight);
 

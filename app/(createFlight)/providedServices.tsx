@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { View, ScrollView, SafeAreaView } from "react-native";
+import { View, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import formStyles from "@/styles/formStyles";
 import {
   TextInput,
@@ -31,42 +31,35 @@ const Form: React.FC = () => {
   const state = useSelector((state: RootState) => state);
   const currentFlight = selectCurrentFlight(state);
 
-  const [showDropDown, setShowDropDown] = useState(false);
-  const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
-    defaultValues: {
-      providedServices: {
-        basicHandling: getBasicHandlingPrice(currentFlight) || 0,
-        supportServices: {
-          airportFee: {
-            total: Number(
-              getTotalAirportFeesPrice(currentFlight).total.toFixed(2)
-            ),
+  const [showVIPDropdown, setShowVIPDropdown] = useState(false);
+
+  const { control, formState, handleSubmit, getValues, resetField } =
+    useForm<FormData>({
+      mode: "all",
+      defaultValues: {
+        providedServices: {
+          basicHandling: getBasicHandlingPrice(currentFlight) || 0,
+          supportServices: {
+            airportFee: {
+              total: Number(
+                getTotalAirportFeesPrice(currentFlight).total.toFixed(2)
+              ),
+            },
+            fuel: {
+              fuelDensity: 1000,
+              fuelLitersQuantity: 0,
+            },
+            catering: { total: 0 },
+            HOTAC: { total: 0 },
           },
-          fuel: {
-            fuelDensity: 1000,
-            fuelLitersQuantity: 0,
+          VIPLoungeServices: {
+            typeOf: "None",
           },
-          catering: { total: 0 },
-          HOTAC: { total: 0 },
-        },
-        VIPLoungeServices: {
-          typeOf: "None",
         },
       },
-    },
-  });
-  const {
-    fields,
-    append,
-    prepend,
-    remove,
-    swap,
-    move,
-    insert,
-    replace,
-    update,
-  } = useFieldArray({
+    });
+
+  const { fields, append, update } = useFieldArray({
     control,
     name: "providedServices.otherServices",
   });
@@ -101,10 +94,15 @@ const Form: React.FC = () => {
     VIPLoungeServices,
   } = getValues("providedServices");
 
+  const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
+    getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf);
   const { pricePerKg, density } = getFuelFeeData();
+  const [uncompletedInput, setCurrentUncompletedInput] = useState<
+    string | null
+  >("");
 
   const totalFuelPrice = (
-    (fuel.fuelDensity * fuel.fuelLitersQuantity * pricePerKg) /
+    (fuel?.fuelDensity * fuel?.fuelLitersQuantity * pricePerKg) /
     density
   ).toFixed(2);
 
@@ -203,17 +201,6 @@ const Form: React.FC = () => {
                       ?.total && true
                   }
                 />
-                <Button
-                  onPress={() => {
-                    alert(
-                      JSON.stringify(
-                        getTotalAirportFeesPrice(currentFlight).fees
-                      )
-                    );
-                  }}
-                >
-                  Nigga
-                </Button>
                 <HelperText type="error">
                   {
                     errors?.providedServices?.supportServices?.airportFee?.total
@@ -236,13 +223,19 @@ const Form: React.FC = () => {
                 value: REGEX.number,
               },
             }}
-            render={({ field: { onBlur, onChange, value } }) => (
+            render={({ field: { onBlur, onChange, value, name } }) => (
               <>
                 <TextInput
                   label="Fuel liters quantity:"
                   style={formStyles.input}
                   value={String(value)}
-                  onBlur={onBlur}
+                  onFocus={() => setCurrentUncompletedInput(name)}
+                  onBlur={(e) => {
+                    if (value) {
+                      setCurrentUncompletedInput(null);
+                    }
+                    onBlur();
+                  }}
                   keyboardType="numeric"
                   onChangeText={(text) => onChange(text)}
                   error={
@@ -379,9 +372,9 @@ const Form: React.FC = () => {
               <DropDown
                 label={"VIP Lounge"}
                 mode={"outlined"}
-                visible={showDropDown}
-                showDropDown={() => setShowDropDown(true)}
-                onDismiss={() => setShowDropDown(false)}
+                visible={showVIPDropdown}
+                showDropDown={() => setShowVIPDropdown(true)}
+                onDismiss={() => setShowVIPDropdown(false)}
                 value={value}
                 setValue={(value) => {
                   onChange(value);
@@ -468,7 +461,6 @@ const Form: React.FC = () => {
             />
           </View>
         )}
-        {/* RAMP CHECKLIST SERVICES */}
         <View>
           {fields?.map((category, categoryIndex) => {
             return (
@@ -489,6 +481,15 @@ const Form: React.FC = () => {
                               <Switch
                                 value={value}
                                 onValueChange={(value) => {
+                                  //if there is at least oen erroneous field, dont' allow selecting dynamic fields
+                                  //this causees race conditions
+                                  if (
+                                    Object.entries(errors).some(
+                                      ([key, value]) => value
+                                    )
+                                  )
+                                    return;
+
                                   update(categoryIndex, {
                                     ...category,
                                     services: (category?.services).map(
@@ -575,22 +576,20 @@ const Form: React.FC = () => {
 
         <View>
           <SectionTitle>Services list:</SectionTitle>
-          <Text variant="titleMedium">
+          <Text style={styles.serviceListItem} variant="titleMedium">
             Basic handling (MTOW: {currentFlight?.mtow}kg): {basicHandling}
             &euro;
           </Text>
-          <Text variant="titleMedium">
-            VIP Lounge ({VIPLoungeServices?.typeOf}):{" "}
-            {getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf).amount}{" "}
-            {
-              getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf)
-                .currency
-            }
+          <Text style={styles.serviceListItem} variant="titleMedium">
+            VIP Lounge ({VIPLoungeServices?.typeOf}): {loungeFeeAmount}{" "}
+            {loungeFeeCurrency}
           </Text>
           {otherServices?.map(({ serviceCategoryName, services }) => {
             return (
               <>
-                <Text variant="titleMedium">{serviceCategoryName}:</Text>
+                <Text style={styles.serviceListItem} variant="titleMedium">
+                  {serviceCategoryName}:
+                </Text>
                 {services?.map((s) => {
                   return s.isUsed ? (
                     <Text>
@@ -614,19 +613,19 @@ const Form: React.FC = () => {
               </>
             );
           })}
-          <Text variant="titleMedium">
+          <Text style={styles.serviceListItem} variant="titleMedium">
             Airport fees: {airportFee.total || 0}&euro;
           </Text>
-          <Text variant="titleMedium">
+          <Text style={styles.serviceListItem} variant="titleMedium">
             HOTAC fees: {HOTAC.total || 0}&euro;
           </Text>
-          <Text variant="titleMedium">
+          <Text style={styles.serviceListItem} variant="titleMedium">
             Catering fees: {catering.total || 0}&euro;
           </Text>
-          <Text variant="titleMedium">
+          <Text style={styles.serviceListItem} variant="titleMedium">
             Fuel fee: {totalFuelPrice || 0}&euro;
           </Text>
-          <Text style={{ marginVertical: 20 }} variant="titleLarge">
+          <Text style={styles.serviceListItem} variant="titleLarge">
             Total: {totalFuelPrice || 0}&euro;
           </Text>
         </View>
@@ -646,3 +645,9 @@ const Form: React.FC = () => {
 };
 
 export default Form;
+
+const styles = StyleSheet.create({
+  serviceListItem: {
+    marginVertical: 10,
+  },
+});

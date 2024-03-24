@@ -1,15 +1,7 @@
-import {
-  Pressable,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  TouchableHighlight,
-  useColorScheme,
-} from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import { Icon, useTheme, Text, Menu } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { useTheme, Text, Menu } from "react-native-paper";
+import { useRouter } from "expo-router";
 import { Flight } from "@/redux/types";
 import { useDispatch } from "react-redux";
 import {
@@ -37,7 +29,6 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
-
   const closeMenu = () => setVisible(false);
 
   const fieldsArray = [
