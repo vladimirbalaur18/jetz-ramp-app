@@ -73,15 +73,18 @@ const Form: React.FC = () => {
 
   const { errors } = formState;
 
-  const submit = (data: any) => {
+  const submit = (data: Flight) => {
     if (currentFlight) dispatch(updateFlight(data));
     else {
       alert("creating a flight");
       dispatch(createFlight(data));
     }
 
-    console.log(data);
-    router.navigate("/(createFlight)/departure");
+    router.navigate(
+      data?.handlingType === "Arrival"
+        ? "/(createFlight)/providedServices"
+        : "/(createFlight)/departure"
+    );
   };
   const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
 
