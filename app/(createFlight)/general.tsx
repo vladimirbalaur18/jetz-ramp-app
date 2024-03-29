@@ -95,7 +95,7 @@ const Form: React.FC = () => {
         keyboardShouldPersistTaps="always"
         alwaysBounceVertical={false}
       >
-        <SectionTitle>General</SectionTitle>
+        <SectionTitle>General {currentFlight?.flightId}</SectionTitle>
         <Controller
           control={control}
           defaultValue={"FULL"}
@@ -109,7 +109,10 @@ const Form: React.FC = () => {
                 label={"Handling type"}
                 mode={"outlined"}
                 visible={handleTypeDropdownVisible}
-                showDropDown={() => setHandleTypeDropdownVisible(true)}
+                showDropDown={() =>
+                  !currentFlight?.handlingType &&
+                  setHandleTypeDropdownVisible(true)
+                }
                 onDismiss={() => setHandleTypeDropdownVisible(false)}
                 value={value}
                 setValue={(value) => {

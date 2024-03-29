@@ -92,7 +92,6 @@ const Form: React.FC = () => {
     <SafeAreaView>
       <ScrollView
         contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="always"
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>

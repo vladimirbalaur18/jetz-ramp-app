@@ -47,6 +47,7 @@ export const getTakeOffFees = (flight: Flight): number => {
           AirportFees.nonCommercial.takeoffFee.perTon *
           (isNightTime(fullDepartureDateTime) ? 1.2 : 1);
 };
+
 export const getPassengersFee = (flight: Flight): number => {
   const feePerPax = flight.isCommercialFlight
     ? AirportFees.commercial.passengerFee.perPax

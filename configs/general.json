@@ -3,5 +3,6 @@
     "disbursementPercentage": 10,
     "euroToMDL": 19.145,
     "conventionalUnit": "euro",
-    "fuelPricePerTon": "1034"
+    "fuelPricePerTon": "1034",
+    "defaultAirport": "LUKK"
 }

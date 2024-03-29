@@ -483,9 +483,17 @@ const Form: React.FC = () => {
                                 onValueChange={(value) => {
                                   //if there is at least oen erroneous field, dont' allow selecting dynamic fields
                                   //this causees race conditions
+                                  console.log(errors);
                                   if (
                                     Object.entries(errors).some(
-                                      ([key, value]) => value
+                                      ([key, value]) => {
+                                        if (value) {
+                                          alert(
+                                            "Please complete the erroneous fields first"
+                                          );
+                                          return value;
+                                        }
+                                      }
                                     )
                                   )
                                     return;
@@ -590,26 +598,32 @@ const Form: React.FC = () => {
                 <Text style={styles.serviceListItem} variant="titleMedium">
                   {serviceCategoryName}:
                 </Text>
-                {services?.map((s) => {
-                  return s.isUsed ? (
-                    <Text>
-                      {" "}
-                      {s?.serviceName} (x{s?.quantity}):{" "}
-                      {((): ReactNode => {
-                        let total: any;
+                {!services.some((service) => service.isUsed) ? (
+                  <Text>None</Text>
+                ) : (
+                  services?.map((s) => {
+                    return s.isUsed ? (
+                      <Text>
+                        {" "}
+                        {s?.serviceName} (x{s?.quantity}):{" "}
+                        {((): ReactNode => {
+                          let total: any;
 
-                        for (const rule of s?.pricingRules) {
-                          if (rule?.ruleName === "pricePerQty") {
-                            total =
-                              s?.quantity * rule?.amount + " " + rule?.currency;
+                          for (const rule of s?.pricingRules) {
+                            if (rule?.ruleName === "pricePerQty") {
+                              total =
+                                s?.quantity * rule?.amount +
+                                " " +
+                                rule?.currency;
+                            }
                           }
-                        }
 
-                        return <>{total}</>;
-                      })()}
-                    </Text>
-                  ) : null;
-                })}
+                          return <>{total}</>;
+                        })()}
+                      </Text>
+                    ) : null;
+                  })
+                )}
               </>
             );
           })}
@@ -649,5 +663,6 @@ export default Form;
 const styles = StyleSheet.create({
   serviceListItem: {
     marginVertical: 10,
+    fontWeight: "600",
   },
 });

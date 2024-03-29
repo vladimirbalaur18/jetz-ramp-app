@@ -1,19 +1,27 @@
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useTheme, Text, Menu } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Flight } from "@/redux/types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   removeFlight,
   setCurrentFlightById,
 } from "@/redux/slices/flightsSlice";
 import dayjs from "dayjs";
+import { RootState } from "@/redux/store";
+
+type Field = [
+  label: ReactNode,
+  value: ReactNode,
+  displayField?: boolean | undefined | null
+];
 const FlightItem = ({ flight }: { flight: Flight }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
-
+  const configs = useSelector((state: RootState) => state.general);
+  const baseAirport = configs.defaultAirport;
   const formatFlightTime = ({
     hours,
     minutes,
@@ -30,9 +38,21 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
+  const parseRouteString = () => {
+    if (flight?.handlingType === "FULL")
+      return `${flight?.arrival?.from}-${baseAirport}-${flight?.departure?.to}`;
 
-  const fieldsArray = [
-    ["DESTINATION:", <>{flight?.departure?.to || "N/A"}</>],
+    if (flight?.handlingType === "Arrival") {
+      return `${flight?.arrival?.from} - ${baseAirport}`;
+    }
+
+    if (flight?.handlingType === "Departure") {
+      return ` ${baseAirport} - ${flight?.departure?.to}`;
+    }
+  };
+
+  const fieldsArray: Array<Field> = [
+    ["ROUTE:", <>{parseRouteString() || "N/A"}</>],
     ["FLIGHT NUMBER:", <>{flight?.flightNumber}</>],
     [
       "ETA:",
@@ -51,6 +71,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
           ? formatFlightTime(flight?.departure?.departureTime)
           : "N/A"}
       </>,
+      flight.handlingType !== "Arrival",
     ],
     ["STATUS:", "TBD"],
     ["HANDLING TYPE:", flight?.handlingType || "N/A"],
@@ -79,18 +100,20 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
               elevation: 5,
             }}
           >
-            {fieldsArray?.map(([label, value]) => {
-              return (
-                <Text
-                  variant="bodySmall"
-                  style={{
-                    color: theme.colors.onSurfaceVariant,
-                  }}
-                >
-                  <Text style={{ fontWeight: "900" }}>{label}</Text> {value}
-                </Text>
-              );
-            })}
+            {fieldsArray
+              ?.filter(([label, value, display]) => display !== false)
+              .map(([label, value]) => {
+                return (
+                  <Text
+                    variant="bodySmall"
+                    style={{
+                      color: theme.colors.onSurfaceVariant,
+                    }}
+                  >
+                    <Text style={{ fontWeight: "900" }}>{label}</Text> {value}
+                  </Text>
+                );
+              })}
           </View>
         </TouchableOpacity>
       }
@@ -98,9 +121,35 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
       <Menu.Item
         onPress={() => {
           dispatch(removeFlight(flight?.flightId as string));
+          closeMenu();
         }}
         title="Remove flight"
       />
+      {(flight.handlingType === "Arrival" ||
+        flight.handlingType === "FULL") && (
+        <Menu.Item
+          onPress={() => {
+            dispatch(setCurrentFlightById(flight?.flightId as string));
+
+            // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+            router.navigate("/(createFlight)/arrival");
+            closeMenu();
+          }}
+          title="Go to Arrival"
+        />
+      )}
+      {(flight.handlingType === "Departure" ||
+        flight.handlingType === "FULL") && (
+        <Menu.Item
+          onPress={() => {
+            // dispatch(removeFlight(flight?.flightId as string));
+            dispatch(setCurrentFlightById(flight?.flightId as string));
+            router.navigate("/(createFlight)/departure");
+            closeMenu();
+          }}
+          title="Go to Departure"
+        />
+      )}
     </Menu>
   );
 };

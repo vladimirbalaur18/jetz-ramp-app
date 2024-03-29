@@ -14,18 +14,18 @@ import {
   MD3DarkTheme,
   adaptNavigationTheme,
 } from "react-native-paper";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import merge from "deepmerge";
 import { useColorScheme } from "@/components/useColorScheme";
 import { store } from "@/redux/store";
-import { Text } from "react-native";
-
+import { useAppDispatch } from "@/redux/store";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
 import { enGB, registerTranslation } from "react-native-paper-dates";
+import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -69,51 +69,58 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <Provider store={store}>
+      <RootLayoutNav />
+    </Provider>
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(initializeConfigsAsync());
+  }, [dispatch]);
 
   return (
-    <Provider store={store}>
-      <PaperProvider theme={themeBase}>
-        <ThemeProvider value={themeBase}>
-          <Stack>
-            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(createFlight)/general"
-              options={{
-                headerShown: true,
-                title: "General flight information",
-              }}
-            />
-            <Stack.Screen
-              name="(createFlight)/arrival"
-              options={{
-                headerShown: true,
-                title: "Arrival information",
-              }}
-            />
-            <Stack.Screen
-              name="(createFlight)/departure"
-              options={{
-                headerShown: true,
-                title: "Departure information",
-              }}
-            />
-            <Stack.Screen
-              name="(createFlight)/providedServices"
-              options={{
-                headerShown: true,
-                title: "Provided services",
-              }}
-            />
-          </Stack>
-        </ThemeProvider>
-      </PaperProvider>
-    </Provider>
+    <PaperProvider theme={themeBase}>
+      <ThemeProvider value={themeBase}>
+        <Stack>
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(createFlight)/general"
+            options={{
+              headerShown: true,
+              title: "General flight information",
+            }}
+          />
+          <Stack.Screen
+            name="(createFlight)/arrival"
+            options={{
+              headerShown: true,
+              title: "Arrival information",
+            }}
+          />
+          <Stack.Screen
+            name="(createFlight)/departure"
+            options={{
+              headerShown: true,
+              title: "Departure information",
+            }}
+          />
+          <Stack.Screen
+            name="(createFlight)/providedServices"
+            options={{
+              headerShown: true,
+              title: "Provided services",
+            }}
+          />
+        </Stack>
+      </ThemeProvider>
+    </PaperProvider>
   );
 }
