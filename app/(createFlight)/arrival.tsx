@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight } from "@/redux/types";
+import { Flight, ProvidedServices } from "@/redux/types";
 import {
   useForm,
   Controller,
@@ -46,6 +46,7 @@ import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
+import _ from "lodash";
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
@@ -74,8 +75,17 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: Flight) => {
-    if (currentFlight) dispatch(updateFlight(data));
-    else {
+    //nullyfy services if we update new data
+    if (currentFlight) {
+      if (!_.isEqual(currentFlight, data)) {
+        dispatch(
+          updateFlight({
+            ...data,
+            providedServices: null as unknown as ProvidedServices,
+          })
+        );
+      } else dispatch(updateFlight({ ...currentFlight, ...data }));
+    } else {
       alert("creating a flight");
       dispatch(createFlight(data));
     }

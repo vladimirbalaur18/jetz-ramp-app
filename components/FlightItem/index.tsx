@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import { ReactNode, useState } from "react";
 import { useTheme, Text, Menu } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -120,8 +120,25 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
     >
       <Menu.Item
         onPress={() => {
-          dispatch(removeFlight(flight?.flightId as string));
-          closeMenu();
+          Alert.alert(
+            "Remove flight?",
+            `Are you sure you want to remove flight ${flight?.flightNumber}?`,
+            [
+              {
+                text: "Confirm",
+                onPress: () =>
+                  dispatch(removeFlight(flight?.flightId as string)),
+                style: "destructive",
+              },
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+            ],
+            {
+              cancelable: true,
+            }
+          );
         }}
         title="Remove flight"
       />
@@ -159,6 +176,9 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 15,
     borderRadius: 20,
+  },
+  removeButton: {
+    color: "red",
   },
 });
 

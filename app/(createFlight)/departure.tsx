@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight } from "@/redux/types";
+import { Flight, ProvidedServices } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import _ from "lodash";
 type FormData = Flight;
 
 const Form: React.FC = () => {
@@ -63,7 +64,17 @@ const Form: React.FC = () => {
 
   const submit = (data: any) => {
     // alert(JSON.stringify(data));
-    dispatch(updateFlight(data));
+    //nullyfy services if we update new data
+
+    if (!_.isEqual(currentFlight, data)) {
+      alert("Nullyfind services");
+      dispatch(
+        updateFlight({
+          ...data,
+          providedServices: null as unknown as ProvidedServices,
+        })
+      );
+    } else dispatch(updateFlight({ ...currentFlight, ...data }));
 
     router.navigate("/(createFlight)/providedServices");
   };

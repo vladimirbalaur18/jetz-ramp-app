@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight } from "@/redux/types";
+import { Flight, ProvidedServices } from "@/redux/types";
 import {
   useForm,
   Controller,
@@ -48,6 +48,7 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import DropDown from "react-native-paper-dropdown";
+import _ from "lodash";
 
 const Form: React.FC = () => {
   const router = useRouter();
@@ -73,8 +74,19 @@ const Form: React.FC = () => {
   });
   const { errors } = formState;
   const submit = (data: Flight) => {
-    if (currentFlight) dispatch(updateFlight(data));
-    else {
+    //nullyfy services if we update new data
+
+    if (currentFlight) {
+      if (!_.isEqual(currentFlight, data)) {
+        alert("Arrival entries are equal");
+        dispatch(
+          updateFlight({
+            ...data,
+            providedServices: null as unknown as ProvidedServices,
+          })
+        );
+      } else updateFlight(data);
+    } else {
       alert("creating a flight");
       dispatch(createFlight(data));
     }
@@ -212,6 +224,22 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        <View style={styles.row}>
+          <Text variant="bodyLarge">Is local (MD only) flight</Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="isLocalFlight"
+            render={({ field: { value, onChange } }) => (
+              <>
+                <Switch
+                  value={value}
+                  onValueChange={(value) => onChange(value)}
+                />
+              </>
+            )}
+          />
+        </View>
         <View style={styles.row}>
           <Text variant="bodyLarge">Is Commercial flight</Text>
           <Controller

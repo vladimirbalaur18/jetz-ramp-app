@@ -12,7 +12,7 @@ import { Flight } from "@/redux/types";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import REGEX from "@/utils/regexp";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { RootState, useAppDispatch } from "@/redux/store";
 import {
   getTotalAirportFeesPrice,
   getAllServices,
@@ -24,20 +24,22 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import DropDown from "react-native-paper-dropdown";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { getFuelFeeData } from "@/services/AirportFeesManager";
-
+import { updateFlight } from "@/redux/slices/flightsSlice";
+import { useRouter } from "expo-router";
 type FormData = Flight;
 
 const Form: React.FC = () => {
   const state = useSelector((state: RootState) => state);
   const currentFlight = selectCurrentFlight(state);
-
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
 
   const { control, formState, handleSubmit, getValues, resetField } =
     useForm<FormData>({
       mode: "all",
       defaultValues: {
-        providedServices: {
+        providedServices: currentFlight?.providedServices || {
           basicHandling: getBasicHandlingPrice(currentFlight) || 0,
           supportServices: {
             airportFee: {
@@ -129,8 +131,13 @@ const Form: React.FC = () => {
       });
   }, [append, SERVICES_DEFINITIONS]);
   const submit = (data: any) => {
-    console.log(data);
-    // router.navigate("/(createFlight)/providedServices");
+    dispatch(
+      updateFlight({
+        ...currentFlight,
+        providedServices: data.providedServices,
+      })
+    );
+    router.navigate("/general");
   };
   return (
     <SafeAreaView>
@@ -628,13 +635,13 @@ const Form: React.FC = () => {
             );
           })}
           <Text style={styles.serviceListItem} variant="titleMedium">
-            Airport fees: {airportFee.total || 0}&euro;
+            Airport fees: {airportFee?.total || 0}&euro;
           </Text>
           <Text style={styles.serviceListItem} variant="titleMedium">
-            HOTAC fees: {HOTAC.total || 0}&euro;
+            HOTAC fees: {HOTAC?.total || 0}&euro;
           </Text>
           <Text style={styles.serviceListItem} variant="titleMedium">
-            Catering fees: {catering.total || 0}&euro;
+            Catering fees: {catering?.total || 0}&euro;
           </Text>
           <Text style={styles.serviceListItem} variant="titleMedium">
             Fuel fee: {totalFuelPrice || 0}&euro;
