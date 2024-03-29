@@ -17,6 +17,8 @@ dayjs.extend(isBetween);
 dayjs.extend(utc);
 
 export const getBasicHandlingPrice = (flight: Flight) => {
+  if (flight?.mtow > basicHandlingFees[basicHandlingFees.length - 1].maxMTOW)
+    return basicHandlingFees[basicHandlingFees.length - 1].pricePerQty;
   for (let { minMTOW, maxMTOW, pricePerQty } of basicHandlingFees) {
     if (flight.mtow >= minMTOW && flight.mtow <= maxMTOW) {
       return pricePerQty;

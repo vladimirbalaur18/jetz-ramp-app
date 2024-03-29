@@ -35,15 +35,15 @@ const Form: React.FC = () => {
   const dispatch = useDispatch();
 
   const state = useSelector((state: RootState) => state);
-  const currentFlight = selectCurrentFlight(state);
+  const existingFlight = selectCurrentFlight(state);
   // alert(JSON.stringLUKify(currentFlight));
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: currentFlight?.departure
-      ? currentFlight
+    defaultValues: existingFlight?.departure
+      ? existingFlight
       : {
-          ...currentFlight,
+          ...existingFlight,
           departure: {
             departureTime: { hours: 10, minutes: 12 },
             departureDate: new Date(),
@@ -66,7 +66,7 @@ const Form: React.FC = () => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
 
-    if (!_.isEqual(currentFlight, data)) {
+    if (!_.isEqual(existingFlight, data)) {
       alert("Nullyfind services");
       dispatch(
         updateFlight({
@@ -74,7 +74,7 @@ const Form: React.FC = () => {
           providedServices: null as unknown as ProvidedServices,
         })
       );
-    } else dispatch(updateFlight({ ...currentFlight, ...data }));
+    } else dispatch(updateFlight(data));
 
     router.navigate("/(createFlight)/providedServices");
   };
@@ -118,7 +118,7 @@ const Form: React.FC = () => {
             </>
           )}
         />
-        {currentFlight?.handlingType === "Departure" && (
+        {existingFlight?.handlingType === "Departure" && (
           <>
             <Controller
               control={control}
@@ -225,7 +225,7 @@ const Form: React.FC = () => {
                 style={{ width: 200 }}
                 mode="outlined"
                 validRange={{
-                  startDate: currentFlight?.arrival?.arrivalDate,
+                  startDate: existingFlight?.arrival?.arrivalDate,
                 }}
               />
               <HelperText type="error">
@@ -434,7 +434,7 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {currentFlight
+          {existingFlight
             ? "Save departure information"
             : "Submit departure information"}
         </Button>

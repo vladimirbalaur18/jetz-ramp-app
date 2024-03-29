@@ -30,7 +30,7 @@ type FormData = Flight;
 
 const Form: React.FC = () => {
   const state = useSelector((state: RootState) => state);
-  const currentFlight = selectCurrentFlight(state);
+  const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
@@ -39,12 +39,12 @@ const Form: React.FC = () => {
     useForm<FormData>({
       mode: "all",
       defaultValues: {
-        providedServices: currentFlight?.providedServices || {
-          basicHandling: getBasicHandlingPrice(currentFlight) || 0,
+        providedServices: existingFlight?.providedServices || {
+          basicHandling: getBasicHandlingPrice(existingFlight) || 0,
           supportServices: {
             airportFee: {
               total: Number(
-                getTotalAirportFeesPrice(currentFlight).total.toFixed(2)
+                getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
               ),
             },
             fuel: {
@@ -68,12 +68,12 @@ const Form: React.FC = () => {
   const SERVICES_DEFINITIONS = getAllServices();
 
   const VIPLoungeOptions =
-    currentFlight?.handlingType === "Departure"
+    existingFlight?.handlingType === "Departure"
       ? [
           { label: "None", value: "None" },
           { label: "Departure", value: "Departure" },
         ]
-      : currentFlight?.handlingType === "Arrival"
+      : existingFlight?.handlingType === "Arrival"
       ? [
           { label: "None", value: "None" },
           { label: "Arrival", value: "Arrival" },
@@ -97,7 +97,7 @@ const Form: React.FC = () => {
   } = getValues("providedServices");
 
   const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
-    getLoungeFeePrice(currentFlight, VIPLoungeServices?.typeOf);
+    getLoungeFeePrice(existingFlight, VIPLoungeServices?.typeOf);
   const { pricePerKg, density } = getFuelFeeData();
   const [uncompletedInput, setCurrentUncompletedInput] = useState<
     string | null
@@ -112,9 +112,10 @@ const Form: React.FC = () => {
     //render additional services inputs
 
     //prevent from appending too many fields
-    const areFieldsRendered = fields?.length < SERVICES_DEFINITIONS.length;
+    const areThereFieldsLeftToRender =
+      fields?.length < SERVICES_DEFINITIONS.length;
 
-    areFieldsRendered &&
+    areThereFieldsLeftToRender &&
       SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
         append({
           serviceCategoryName: serviceCategoryName,
@@ -133,11 +134,11 @@ const Form: React.FC = () => {
   const submit = (data: any) => {
     dispatch(
       updateFlight({
-        ...currentFlight,
+        ...existingFlight,
         providedServices: data.providedServices,
       })
     );
-    router.navigate("/general");
+    router.navigate("/");
   };
   return (
     <SafeAreaView>
@@ -147,7 +148,7 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <SectionTitle>
-          Basic Handling (MTOW: {currentFlight?.mtow}kg )
+          Basic Handling (MTOW: {existingFlight?.mtow}kg )
         </SectionTitle>
         <View>
           <Controller
@@ -592,7 +593,7 @@ const Form: React.FC = () => {
         <View>
           <SectionTitle>Services list:</SectionTitle>
           <Text style={styles.serviceListItem} variant="titleMedium">
-            Basic handling (MTOW: {currentFlight?.mtow}kg): {basicHandling}
+            Basic handling (MTOW: {existingFlight?.mtow}kg): {basicHandling}
             &euro;
           </Text>
           <Text style={styles.serviceListItem} variant="titleMedium">

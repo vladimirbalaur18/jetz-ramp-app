@@ -50,13 +50,13 @@ import _ from "lodash";
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
-  const currentFlight = selectCurrentFlight(state);
+  const existingFlight = selectCurrentFlight(state);
 
   const dispatch = useDispatch();
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: (currentFlight as unknown as Flight) || {
+    defaultValues: (existingFlight as unknown as Flight) || {
       arrival: {
         arrivalTime: { hours: 10, minutes: 12 },
         arrivalDate: new Date(),
@@ -76,15 +76,15 @@ const Form: React.FC = () => {
 
   const submit = (data: Flight) => {
     //nullyfy services if we update new data
-    if (currentFlight) {
-      if (!_.isEqual(currentFlight, data)) {
+    if (existingFlight) {
+      if (!_.isEqual(existingFlight, data)) {
         dispatch(
           updateFlight({
             ...data,
             providedServices: null as unknown as ProvidedServices,
           })
         );
-      } else dispatch(updateFlight({ ...currentFlight, ...data }));
+      } else dispatch(updateFlight(data));
     } else {
       alert("creating a flight");
       dispatch(createFlight(data));
@@ -105,7 +105,9 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">Arrival {currentFlight?.flightId}</Text>
+          <Text variant="headlineSmall">
+            Arrival {existingFlight?.flightId}
+          </Text>
         </View>
         <Controller
           control={control}
@@ -376,7 +378,7 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {currentFlight
+          {existingFlight
             ? "Save arrival information"
             : "Submit arrival information"}
         </Button>

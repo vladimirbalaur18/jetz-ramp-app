@@ -43,13 +43,15 @@ export const flightsSlice = createSlice({
 
     updateFlight: (state, { payload }: PayloadAction<Flight>) => {
       state.currentFlightId = payload?.flightId;
-      state.flightsArray = state.flightsArray.map((f) => {
-        if (f.flightId === payload?.flightId) {
-          return payload;
-        }
+      state.flightsArray = [
+        ...state.flightsArray.map((f) => {
+          if (f.flightId === payload?.flightId) {
+            return { ...state, ...payload };
+          }
 
-        return f;
-      });
+          return f;
+        }),
+      ];
     },
     removeFlight: (state, { payload }: PayloadAction<string>) => {
       state.currentFlightId = null;
