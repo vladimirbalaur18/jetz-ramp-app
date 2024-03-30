@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { View, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import formStyles from "@/styles/formStyles";
+
 import {
   TextInput,
   Button,
@@ -26,16 +27,18 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { getFuelFeeData } from "@/services/AirportFeesManager";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useRouter } from "expo-router";
+import TotalServicesSection from "@/components/TotalServicesSection";
 type FormData = Flight;
 
 const Form: React.FC = () => {
+  const SERVICES_DEFINITIONS = getAllServices();
+
   const state = useSelector((state: RootState) => state);
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
-
-  const { control, formState, handleSubmit, getValues, resetField } =
+  const { control, formState, handleSubmit, getValues, resetField, watch } =
     useForm<FormData>({
       mode: "all",
       defaultValues: {
@@ -60,12 +63,12 @@ const Form: React.FC = () => {
         },
       },
     });
+  const { errors } = formState;
 
   const { fields, append, update } = useFieldArray({
     control,
     name: "providedServices.otherServices",
   });
-  const SERVICES_DEFINITIONS = getAllServices();
 
   const VIPLoungeOptions =
     existingFlight?.handlingType === "Departure"
@@ -88,25 +91,13 @@ const Form: React.FC = () => {
           },
         ];
 
-  const { errors } = formState;
-  const {
-    otherServices,
-    basicHandling,
-    supportServices: { HOTAC, airportFee, catering, fuel },
-    VIPLoungeServices,
-  } = getValues("providedServices");
+  //MISC
+  let providedServicesObj = watch("providedServices");
 
-  const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
-    getLoungeFeePrice(existingFlight, VIPLoungeServices?.typeOf);
-  const { pricePerKg, density } = getFuelFeeData();
+  // Lifecycle and states
   const [uncompletedInput, setCurrentUncompletedInput] = useState<
     string | null
   >("");
-
-  const totalFuelPrice = (
-    (fuel?.fuelDensity * fuel?.fuelLitersQuantity * pricePerKg) /
-    density
-  ).toFixed(2);
 
   useEffect(() => {
     //render additional services inputs
@@ -131,6 +122,8 @@ const Form: React.FC = () => {
         });
       });
   }, [append, SERVICES_DEFINITIONS]);
+
+  // HELPERS
   const submit = (data: any) => {
     dispatch(
       updateFlight({
@@ -140,6 +133,7 @@ const Form: React.FC = () => {
     );
     router.navigate("/");
   };
+
   return (
     <SafeAreaView>
       <ScrollView
@@ -395,7 +389,7 @@ const Form: React.FC = () => {
             </>
           )}
         />
-        {VIPLoungeServices?.typeOf !== "None" && (
+        {providedServicesObj.VIPLoungeServices?.typeOf !== "None" && (
           <View>
             <Controller
               control={control}
@@ -590,67 +584,10 @@ const Form: React.FC = () => {
           })}
         </View>
 
-        <View>
-          <SectionTitle>Services list:</SectionTitle>
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            Basic handling (MTOW: {existingFlight?.mtow}kg): {basicHandling}
-            &euro;
-          </Text>
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            VIP Lounge ({VIPLoungeServices?.typeOf}): {loungeFeeAmount}{" "}
-            {loungeFeeCurrency}
-          </Text>
-          {otherServices?.map(({ serviceCategoryName, services }) => {
-            return (
-              <>
-                <Text style={styles.serviceListItem} variant="titleMedium">
-                  {serviceCategoryName}:
-                </Text>
-                {!services.some((service) => service.isUsed) ? (
-                  <Text>None</Text>
-                ) : (
-                  services?.map((s) => {
-                    return s.isUsed ? (
-                      <Text>
-                        {" "}
-                        {s?.serviceName} (x{s?.quantity}):{" "}
-                        {((): ReactNode => {
-                          let total: any;
-
-                          for (const rule of s?.pricingRules) {
-                            if (rule?.ruleName === "pricePerQty") {
-                              total =
-                                s?.quantity * rule?.amount +
-                                " " +
-                                rule?.currency;
-                            }
-                          }
-
-                          return <>{total}</>;
-                        })()}
-                      </Text>
-                    ) : null;
-                  })
-                )}
-              </>
-            );
-          })}
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            Airport fees: {airportFee?.total || 0}&euro;
-          </Text>
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            HOTAC fees: {HOTAC?.total || 0}&euro;
-          </Text>
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            Catering fees: {catering?.total || 0}&euro;
-          </Text>
-          <Text style={styles.serviceListItem} variant="titleMedium">
-            Fuel fee: {totalFuelPrice || 0}&euro;
-          </Text>
-          <Text style={styles.serviceListItem} variant="titleLarge">
-            Total: {totalFuelPrice || 0}&euro;
-          </Text>
-        </View>
+        <TotalServicesSection
+          providedServices={providedServicesObj}
+          existingFlight={existingFlight}
+        />
 
         <View style={{ marginVertical: 20 }}>
           <Button
@@ -667,10 +604,3 @@ const Form: React.FC = () => {
 };
 
 export default Form;
-
-const styles = StyleSheet.create({
-  serviceListItem: {
-    marginVertical: 10,
-    fontWeight: "600",
-  },
-});

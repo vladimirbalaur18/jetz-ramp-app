@@ -327,7 +327,7 @@ const Form: React.FC = () => {
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
-              message: "Please insert correct format",
+              message: "Must be a valid number",
               value: REGEX.number,
             },
           }}
