@@ -109,7 +109,7 @@ const TotalServicesSection: React.FC<{
                         }
                       }
 
-                      return <>{total}</>;
+                      return <>{Number(total).toFixed(2)}</>;
                     })()}
                   </Text>
                 ) : null;

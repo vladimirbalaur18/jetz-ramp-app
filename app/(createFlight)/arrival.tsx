@@ -105,9 +105,7 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">
-            Arrival {existingFlight?.flightId}
-          </Text>
+          <Text variant="headlineSmall">Arrival</Text>
         </View>
         <Controller
           control={control}
@@ -278,8 +276,9 @@ const Form: React.FC = () => {
         />
         <Text variant="bodyLarge">
           Total passengers:
-          {Number(getValues("arrival.adultCount") || 0) +
-            Number(getValues("arrival.minorCount") || 0)}
+          {Number(getValues("arrival.adultCount")) ||
+            0 + Number(getValues("arrival.minorCount")) ||
+            0}
         </Text>
         <View style={styles.row}>
           <Text variant="bodyLarge">Is commercial flight</Text>

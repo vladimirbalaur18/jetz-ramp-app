@@ -14,10 +14,10 @@ import {
   MD3DarkTheme,
   adaptNavigationTheme,
 } from "react-native-paper";
-import { Provider, useDispatch } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import merge from "deepmerge";
 import { useColorScheme } from "@/components/useColorScheme";
-import { store } from "@/redux/store";
+import { RootState, store } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,6 +26,7 @@ export {
 
 import { enGB, registerTranslation } from "react-native-paper-dates";
 import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -81,6 +82,13 @@ function RootLayoutNav() {
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
   const dispatch = useAppDispatch();
+  const currentFlightNumber = selectCurrentFlight(
+    useSelector((state: RootState) => state)
+  )?.flightNumber;
+
+  const FlightNumberIndicator = currentFlightNumber
+    ? `(${currentFlightNumber})`
+    : "";
 
   useEffect(() => {
     dispatch(initializeConfigsAsync());
@@ -102,21 +110,21 @@ function RootLayoutNav() {
             name="(createFlight)/arrival"
             options={{
               headerShown: true,
-              title: "Arrival information",
+              title: `Arrival information`,
             }}
           />
           <Stack.Screen
             name="(createFlight)/departure"
             options={{
               headerShown: true,
-              title: "Departure information",
+              title: `Departure information ${FlightNumberIndicator}`,
             }}
           />
           <Stack.Screen
             name="(createFlight)/providedServices"
             options={{
               headerShown: true,
-              title: "Provided services",
+              title: `Provided services ${FlightNumberIndicator}`,
             }}
           />
         </Stack>

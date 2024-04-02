@@ -28,6 +28,7 @@ import { getFuelFeeData } from "@/services/AirportFeesManager";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useRouter } from "expo-router";
 import TotalServicesSection from "@/components/TotalServicesSection";
+import DynamicServicesFields from "@/components/DynamicServicesFields";
 type FormData = Flight;
 
 const Form: React.FC = () => {
@@ -38,31 +39,38 @@ const Form: React.FC = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
-  const { control, formState, handleSubmit, getValues, resetField, watch } =
-    useForm<FormData>({
-      mode: "all",
-      defaultValues: {
-        providedServices: existingFlight?.providedServices || {
-          basicHandling: getBasicHandlingPrice(existingFlight) || 0,
-          supportServices: {
-            airportFee: {
-              total: Number(
-                getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
-              ),
-            },
-            fuel: {
-              fuelDensity: 1000,
-              fuelLitersQuantity: 0,
-            },
-            catering: { total: 0 },
-            HOTAC: { total: 0 },
+  const {
+    control,
+    formState,
+    handleSubmit,
+    getValues,
+    resetField,
+    watch,
+    setValue,
+  } = useForm<FormData>({
+    mode: "all",
+    defaultValues: {
+      providedServices: existingFlight?.providedServices || {
+        basicHandling: getBasicHandlingPrice(existingFlight) || 0,
+        supportServices: {
+          airportFee: {
+            total: Number(
+              getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
+            ),
           },
-          VIPLoungeServices: {
-            typeOf: "None",
+          fuel: {
+            fuelDensity: 1000,
+            fuelLitersQuantity: 0,
           },
+          catering: { total: 0 },
+          HOTAC: { total: 0 },
+        },
+        VIPLoungeServices: {
+          typeOf: "None",
         },
       },
-    });
+    },
+  });
   const { errors } = formState;
 
   const { fields, append, update } = useFieldArray({
@@ -99,29 +107,29 @@ const Form: React.FC = () => {
     string | null
   >("");
 
-  useEffect(() => {
-    //render additional services inputs
+  // useEffect(() => {
+  //   //render additional services inputs
 
-    //prevent from appending too many fields
-    const areThereFieldsLeftToRender =
-      fields?.length < SERVICES_DEFINITIONS.length;
+  //   //prevent from appending too many fields
+  //   const areThereFieldsLeftToRender =
+  //     fields?.length < SERVICES_DEFINITIONS.length;
 
-    areThereFieldsLeftToRender &&
-      SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
-        append({
-          serviceCategoryName: serviceCategoryName,
-          services: services.map(({ serviceName, pricingRules }) => {
-            return {
-              serviceName: serviceName,
-              pricingRules: pricingRules,
-              isUsed: false,
-              quantity: 1,
-              notes: "",
-            };
-          }),
-        });
-      });
-  }, [append, SERVICES_DEFINITIONS]);
+  //   areThereFieldsLeftToRender &&
+  //     SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
+  //       append({
+  //         serviceCategoryName: serviceCategoryName,
+  //         services: services.map(({ serviceName, pricingRules }) => {
+  //           return {
+  //             serviceName: serviceName,
+  //             pricingRules: pricingRules,
+  //             isUsed: false,
+  //             quantity: 1,
+  //             notes: "",
+  //           };
+  //         }),
+  //       });
+  //     });
+  // }, [append, SERVICES_DEFINITIONS]);
 
   // HELPERS
   const submit = (data: any) => {
@@ -153,7 +161,7 @@ const Form: React.FC = () => {
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
                 message: "Please insert correct format",
-                value: REGEX.number,
+                value: REGEX.price,
               },
             }}
             render={({ field: { onBlur, onChange, value } }) => (
@@ -186,7 +194,7 @@ const Form: React.FC = () => {
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
                 message: "Please insert correct format",
-                value: REGEX.number,
+                value: REGEX.price,
               },
             }}
             render={({ field: { onBlur, onChange, value } }) => (
@@ -231,15 +239,18 @@ const Form: React.FC = () => {
                   label="Fuel liters quantity:"
                   style={formStyles.input}
                   value={String(value)}
-                  onFocus={() => setCurrentUncompletedInput(name)}
                   onBlur={(e) => {
-                    if (value) {
-                      setCurrentUncompletedInput(null);
-                    }
+                    if (!value) onChange(0);
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
                   error={
                     errors?.providedServices?.supportServices?.fuel
                       ?.fuelLitersQuantity && true
@@ -265,15 +276,24 @@ const Form: React.FC = () => {
                 value: REGEX.number,
               },
             }}
-            render={({ field: { onBlur, onChange, value } }) => (
+            render={({ field: { onBlur, onChange, value, name } }) => (
               <>
                 <TextInput
                   label="Fuel density:"
                   style={formStyles.input}
                   value={String(value)}
-                  onBlur={onBlur}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
                   error={
                     errors?.providedServices?.supportServices?.fuel
                       ?.fuelDensity && true
@@ -298,18 +318,27 @@ const Form: React.FC = () => {
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
                 message: "Please insert correct format",
-                value: REGEX.number,
+                value: REGEX.price,
               },
             }}
-            render={({ field: { onBlur, onChange, value } }) => (
+            render={({ field: { onBlur, onChange, value, name } }) => (
               <>
                 <TextInput
                   label="Catering:"
                   style={formStyles.input}
                   value={String(value)}
-                  onBlur={onBlur}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
                   error={
                     errors?.providedServices?.supportServices?.catering
                       ?.total && true
@@ -336,15 +365,24 @@ const Form: React.FC = () => {
                 value: REGEX.number,
               },
             }}
-            render={({ field: { onBlur, onChange, value } }) => (
+            render={({ field: { onBlur, onChange, value, name } }) => (
               <>
                 <TextInput
                   label="HOTAC:"
                   style={formStyles.input}
                   value={String(value)}
-                  onBlur={onBlur}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
                   error={
                     errors?.providedServices?.supportServices?.HOTAC?.total &&
                     true
@@ -402,16 +440,23 @@ const Form: React.FC = () => {
                   value: REGEX.number,
                 },
               }}
-              render={({ field: { onBlur, onChange, value } }) => (
+              render={({ field: { onBlur, onChange, value, name } }) => (
                 <>
                   <TextInput
                     label="Adult passengers:"
                     style={formStyles.input}
                     value={String(value)}
-                    onBlur={onBlur}
+                    onBlur={(e) => {
+                      if (!value) onChange(0);
+                      onBlur();
+                    }}
                     keyboardType="numeric"
                     onChangeText={(text) => {
-                      onChange(text);
+                      if (text) {
+                        onChange(text.replace(/[^0-9]/g, ""));
+                      } else {
+                        setValue(name, "" as any); //prevent throwing undefined errors
+                      }
                     }}
                     error={
                       errors?.providedServices?.VIPLoungeServices?.adultPax &&
@@ -438,15 +483,24 @@ const Form: React.FC = () => {
                   value: REGEX.number,
                 },
               }}
-              render={({ field: { onBlur, onChange, value } }) => (
+              render={({ field: { onBlur, onChange, value, name } }) => (
                 <>
                   <TextInput
                     label="Minor passengers:"
                     style={formStyles.input}
                     value={String(value)}
-                    onBlur={onBlur}
+                    onBlur={(e) => {
+                      if (!value) onChange(0);
+                      onBlur();
+                    }}
                     keyboardType="numeric"
-                    onChangeText={(text) => onChange(text)}
+                    onChangeText={(text) => {
+                      if (text) {
+                        onChange(text.replace(/[^0-9]/g, ""));
+                      } else {
+                        setValue(name, "" as any); //prevent throwing undefined errors
+                      }
+                    }}
                     error={
                       errors?.providedServices?.VIPLoungeServices?.minorPax &&
                       true
@@ -463,7 +517,7 @@ const Form: React.FC = () => {
             />
           </View>
         )}
-        <View>
+        {/* <View>
           {fields?.map((category, categoryIndex) => {
             return (
               <>
@@ -582,7 +636,8 @@ const Form: React.FC = () => {
               </>
             );
           })}
-        </View>
+        </View> */}
+        <DynamicServicesFields control={control} formState={formState} />
 
         <TotalServicesSection
           providedServices={providedServicesObj}

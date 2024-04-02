@@ -1,6 +1,7 @@
 export default {
   name: /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u,
   number: /^[0-9]*$/,
+  price: /^(\d+(?:[\.\,]\d{2})?)$/,
   airfield: /^[A-Z]{4}$/,
   operatorName: /^[a-z ,.'-]+$/i,
   aircraftRegistration:
