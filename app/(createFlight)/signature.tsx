@@ -1,17 +1,24 @@
 import formStyles from "@/styles/formStyles";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import React, { useState, useRef } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Text, Button, useTheme } from "react-native-paper";
 //@ts-expect-error
 import ExpoDraw from "expo-draw";
 import { captureRef as takeSnapshotAsync } from "react-native-view-shot";
 
-const DrawSignatureScreen = () => {
+interface IDrawSignatureScreenProps {
+  handleSignatureSave: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
+  handleSignatureSave,
+}) => {
   const signatureRef = useRef<any>(null);
-  const [filePath, setFilePath] = useState("");
   async function clearCanvas() {
     signatureRef?.current?.clear();
   }
+  const theme = useTheme();
 
   async function saveCanvas() {
     try {
@@ -22,7 +29,7 @@ const DrawSignatureScreen = () => {
         width: 400,
       });
       // Here you can handle the captured signature image, e.g., upload it to a server
-      setFilePath(signatureResult);
+      handleSignatureSave(signatureResult);
       console.log("signature file", signatureResult);
     } catch (error) {
       console.log(error);
@@ -30,71 +37,66 @@ const DrawSignatureScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {filePath && (
-        <Image source={{ uri: filePath }} width={300} height={300} />
-      )}
-      <Text>Enter your signature here</Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginVertical: 15,
+      }}
+    >
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ExpoDraw
-          strokes={[]}
-          ref={signatureRef}
-          containerStyle={{
-            backgroundColor: "rgba(0,0,0,0.01)",
-            height: 300,
-            width: 500,
+        <View
+          style={{ borderWidth: 1, backgroundColor: "rgba(255,255,255,1) " }}
+        >
+          <ExpoDraw
+            strokes={[]}
+            ref={signatureRef}
+            containerStyle={{
+              backgroundColor: "rgba(255,255,255,0.0001)",
+              height: 300,
+              width: 400,
+            }}
+            rewind={(undo: any) => console.log("undo", undo)}
+            clear={(clear: any) => console.log("clear", clear)}
+            color={"#000000"}
+            strokeWidth={4}
+            enabled={true}
+            onChangeStrokes={(strokes: any) => console.log(strokes)}
+          />
+        </View>
+        <View
+          style={{
+            justifyContent: "space-between",
+            flexDirection: "row",
+            marginVertical: 10,
+            alignItems: "center",
           }}
-          rewind={(undo: any) => console.log("undo", undo)}
-          clear={(clear: any) => console.log("clear", clear)}
-          color={"#000000"}
-          strokeWidth={4}
-          enabled={true}
-          onChangeStrokes={(strokes: any) => console.log(strokes)}
-        />
-        <View style={{ justifyContent: "space-evenly", marginTop: 20 }}>
-          <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 10,
-              left: 10,
-              padding: 10,
-              height: 50,
-              borderRadius: 10,
-              backgroundColor: "green",
-              alignItems: "center",
-            }}
-            onPress={clearCanvas}
-          >
-            <Text style={{ fontSize: 18, color: "white" }}>Reset</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 10,
-              right: 10,
-              padding: 10,
-              height: 50,
-              borderRadius: 10,
-              backgroundColor: "green",
-              alignItems: "center",
-            }}
-            onPress={() => saveCanvas()}
-          >
-            <Text style={{ fontSize: 18, color: "white" }}>Sign</Text>
-          </TouchableOpacity>
+        >
+          <Button onPress={clearCanvas}>Reset</Button>
+          <Button mode="contained" onPress={() => saveCanvas()}>
+            Sign
+          </Button>
         </View>
       </View>
     </View>
   );
 };
 const SignaturePage = () => {
+  const [picSignatureBase64, setPICSignatureBase64] = useState<string>("");
+  const [rampSignatureBase64, setRampSignatureBase64] = useState<string>("");
+
   return (
-    <View style={{ ...formStyles.container, flex: 1 }}>
+    <ScrollView contentContainerStyle={{ ...formStyles.container, flex: 1 }}>
       <View style={{ ...styles.signatureContainer }}>
         <SectionTitle>Pilot in command signature:</SectionTitle>
-        <DrawSignatureScreen />
+        <DrawSignatureScreen handleSignatureSave={setPICSignatureBase64} />
       </View>
-    </View>
+      <View style={{ ...styles.signatureContainer }}>
+        <SectionTitle>Ramp agent signature:</SectionTitle>
+        <DrawSignatureScreen handleSignatureSave={setRampSignatureBase64} />
+      </View>
+    </ScrollView>
   );
 };
 
