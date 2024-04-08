@@ -9,11 +9,29 @@ import {
 } from "./utils";
 import isNightTime from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
+import { store } from "@/redux/store";
 
-export const getFuelFeeData = () => ({
-  pricePerKg: FuelFees.pricePerKg,
-  density: FuelFees.density,
-});
+export const getFuelFeeAmount = ({
+  fuelDensity,
+  fuelLitersQuantity,
+  flight,
+}: {
+  fuelDensity: number;
+  fuelLitersQuantity: number;
+  flight: Flight;
+}) => {
+  const state = store.getState();
+  //OPEN QUESTION: Should VAT apply for fuel?
+  const VAT = state.general.VAT / 100 + 1;
+  const VATRateMultiplier = flight?.departure?.isLocalFlight ? VAT : 1;
+  return (
+    VATRateMultiplier *
+    Number(
+      (fuelDensity * fuelLitersQuantity * FuelFees.pricePerKg) /
+        FuelFees.density
+    )
+  );
+};
 export const getLandingFees = (flight: Flight): number => {
   if (flight?.handlingType === "Departure") return 0;
 

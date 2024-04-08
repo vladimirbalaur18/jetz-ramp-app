@@ -142,31 +142,32 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
         }}
         title="Remove flight"
       />
-      {(flight.handlingType === "Arrival" ||
-        flight.handlingType === "FULL") && (
-        <Menu.Item
-          onPress={() => {
-            dispatch(setCurrentFlightById(flight?.flightId as string));
+      {(flight.handlingType === "Arrival" || flight.handlingType === "FULL") &&
+        flight?.arrival && (
+          <Menu.Item
+            onPress={() => {
+              dispatch(setCurrentFlightById(flight?.flightId as string));
 
-            // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-            router.navigate("/(createFlight)/arrival");
-            closeMenu();
-          }}
-          title="Go to Arrival"
-        />
-      )}
+              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+              router.navigate("/(createFlight)/arrival");
+              closeMenu();
+            }}
+            title="Go to Arrival"
+          />
+        )}
       {(flight.handlingType === "Departure" ||
-        flight.handlingType === "FULL") && (
-        <Menu.Item
-          onPress={() => {
-            // dispatch(removeFlight(flight?.flightId as string));
-            dispatch(setCurrentFlightById(flight?.flightId as string));
-            router.navigate("/(createFlight)/departure");
-            closeMenu();
-          }}
-          title="Go to Departure"
-        />
-      )}
+        flight.handlingType === "FULL") &&
+        flight?.departure && (
+          <Menu.Item
+            onPress={() => {
+              // dispatch(removeFlight(flight?.flightId as string));
+              dispatch(setCurrentFlightById(flight?.flightId as string));
+              router.navigate("/(createFlight)/departure");
+              closeMenu();
+            }}
+            title="Go to Departure"
+          />
+        )}
     </Menu>
   );
 };

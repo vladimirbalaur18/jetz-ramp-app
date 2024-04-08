@@ -118,6 +118,22 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        <View style={styles.row}>
+          <Text variant="bodyLarge">Is local (MD only) leg?</Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="departure.isLocalFlight"
+            render={({ field: { value, onChange } }) => (
+              <>
+                <Switch
+                  value={value}
+                  onValueChange={(value) => onChange(value)}
+                />
+              </>
+            )}
+          />
+        </View>
         {existingFlight?.handlingType === "Departure" && (
           <>
             <Controller
@@ -362,10 +378,6 @@ const Form: React.FC = () => {
           name="departure.rampInspectionBeforeDeparture.agent.fullname"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "The name inserted is not in the correct format",
-              value: REGEX.name,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>

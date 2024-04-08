@@ -24,11 +24,10 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import DropDown from "react-native-paper-dropdown";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
-import { getFuelFeeData } from "@/services/AirportFeesManager";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useRouter } from "expo-router";
 import TotalServicesSection from "@/components/TotalServicesSection";
-import DynamicServicesFields from "@/components/DynamicServicesFields";
+import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 type FormData = Flight;
 
 const Form: React.FC = () => {
@@ -38,6 +37,10 @@ const Form: React.FC = () => {
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  useEffect(() => {
+    dispatch(initializeConfigsAsync());
+  }, [dispatch]);
+
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
   const {
     control,
@@ -107,29 +110,30 @@ const Form: React.FC = () => {
     string | null
   >("");
 
-  // useEffect(() => {
-  //   //render additional services inputs
+  useEffect(() => {
+    //render additional services inputs
 
-  //   //prevent from appending too many fields
-  //   const areThereFieldsLeftToRender =
-  //     fields?.length < SERVICES_DEFINITIONS.length;
+    //prevent from appending too many fields
+    const areThereFieldsLeftToRender =
+      fields?.length < SERVICES_DEFINITIONS.length;
 
-  //   areThereFieldsLeftToRender &&
-  //     SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
-  //       append({
-  //         serviceCategoryName: serviceCategoryName,
-  //         services: services.map(({ serviceName, pricingRules }) => {
-  //           return {
-  //             serviceName: serviceName,
-  //             pricingRules: pricingRules,
-  //             isUsed: false,
-  //             quantity: 1,
-  //             notes: "",
-  //           };
-  //         }),
-  //       });
-  //     });
-  // }, [append, SERVICES_DEFINITIONS]);
+    areThereFieldsLeftToRender &&
+      SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
+        append({
+          serviceCategoryName: serviceCategoryName,
+          services: services.map(({ serviceName, pricingRules, hasVAT }) => {
+            return {
+              serviceName: serviceName,
+              pricingRules: pricingRules,
+              isUsed: false,
+              quantity: 1,
+              notes: "",
+              hasVAT,
+            };
+          }),
+        });
+      });
+  }, [append, SERVICES_DEFINITIONS]);
 
   // HELPERS
   const submit = (data: any) => {
@@ -139,7 +143,7 @@ const Form: React.FC = () => {
         providedServices: data.providedServices,
       })
     );
-    router.navigate("/");
+    router.navigate("/signature");
   };
 
   return (
@@ -517,7 +521,7 @@ const Form: React.FC = () => {
             />
           </View>
         )}
-        {/* <View>
+        <View>
           {fields?.map((category, categoryIndex) => {
             return (
               <>
@@ -539,7 +543,6 @@ const Form: React.FC = () => {
                                 onValueChange={(value) => {
                                   //if there is at least oen erroneous field, dont' allow selecting dynamic fields
                                   //this causees race conditions
-                                  console.log(errors);
                                   if (
                                     Object.entries(errors).some(
                                       ([key, value]) => {
@@ -636,8 +639,7 @@ const Form: React.FC = () => {
               </>
             );
           })}
-        </View> */}
-        <DynamicServicesFields control={control} formState={formState} />
+        </View>
 
         <TotalServicesSection
           providedServices={providedServicesObj}

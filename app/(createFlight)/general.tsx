@@ -224,22 +224,7 @@ const Form: React.FC = () => {
             </>
           )}
         />
-        <View style={styles.row}>
-          <Text variant="bodyLarge">Is local (MD only) flight</Text>
-          <Controller
-            control={control}
-            defaultValue={false}
-            name="isLocalFlight"
-            render={({ field: { value, onChange } }) => (
-              <>
-                <Switch
-                  value={value}
-                  onValueChange={(value) => onChange(value)}
-                />
-              </>
-            )}
-          />
-        </View>
+
         <View style={styles.row}>
           <Text variant="bodyLarge">Is Commercial flight</Text>
           <Controller
@@ -315,10 +300,6 @@ const Form: React.FC = () => {
           name="aircraftRegistration"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Aircraft registration format is not valid",
-              value: REGEX.aircraftRegistration,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>

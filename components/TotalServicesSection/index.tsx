@@ -6,7 +6,7 @@ import { Flight, ProvidedServices } from "@/redux/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLoungeFeePrice } from "@/services/servicesCalculator";
-import { getFuelFeeData } from "@/services/AirportFeesManager";
+import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 
 const TotalServicesSection: React.FC<{
   providedServices: ProvidedServices;
@@ -19,17 +19,19 @@ const TotalServicesSection: React.FC<{
     VIPLoungeServices,
   } = providedServices;
   const generalConfig = useSelector((state: RootState) => state.general);
+  console.log("genCOnfig", generalConfig);
 
   const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
     getLoungeFeePrice(existingFlight, VIPLoungeServices?.typeOf);
-  const { pricePerKg, density } = getFuelFeeData();
-  const totalFuelPrice = Number(
-    (
-      (fuel?.fuelDensity * fuel?.fuelLitersQuantity * pricePerKg) /
-      density
-    ).toFixed(2)
-  );
+
+  const totalFuelPrice = getFuelFeeAmount({
+    fuelDensity: fuel?.fuelDensity,
+    fuelLitersQuantity: fuel?.fuelLitersQuantity,
+    flight: existingFlight,
+  }).toFixed(2);
+
   const totalAmountOfServices = useMemo(() => {
+    //GENERAL CONFIG FOR SOME REASON DOESNT INITIALIZE
     const rateMDLtoEUR = generalConfig.euroToMDL || 20;
     const calculateOtherServicesTotal = () => {
       let total = 0;
@@ -39,7 +41,11 @@ const TotalServicesSection: React.FC<{
           if (s.isUsed) {
             for (const rule of s?.pricingRules) {
               if (rule?.ruleName === "pricePerQty") {
-                total += s?.quantity * rule?.amount;
+                const servicePriceTotal = s?.quantity * rule?.amount;
+                const VATMultiplier = generalConfig?.VAT / 100 + 1;
+                total += s?.hasVAT
+                  ? servicePriceTotal * VATMultiplier
+                  : servicePriceTotal;
               }
             }
           }
@@ -101,15 +107,24 @@ const TotalServicesSection: React.FC<{
                     {s?.serviceName} (x{s?.quantity}):{" "}
                     {((): ReactNode => {
                       let total: any;
+                      let totalWithVAT: number;
 
                       for (const rule of s?.pricingRules) {
                         if (rule?.ruleName === "pricePerQty") {
-                          total =
-                            s?.quantity * rule?.amount + " " + rule?.currency;
+                          total = s?.quantity * rule?.amount;
                         }
                       }
 
-                      return <>{Number(total).toFixed(2)}</>;
+                      if (s?.hasVAT) {
+                        totalWithVAT = total * (generalConfig?.VAT / 100 + 1);
+
+                        return (
+                          <>
+                            {Number(total).toFixed(2)} x {generalConfig?.VAT}% ={" "}
+                            {totalWithVAT}
+                          </>
+                        );
+                      } else return <>{Number(total).toFixed(2)}</>;
                     })()}
                   </Text>
                 ) : null;
@@ -131,7 +146,7 @@ const TotalServicesSection: React.FC<{
         Fuel fee: {totalFuelPrice || 0}&euro;
       </Text>
       <Text style={styles.serviceListItem} variant="titleLarge">
-        Total: {totalAmountOfServices}&euro;
+        Total: {totalAmountOfServices.toFixed(2)}&euro;
       </Text>
     </View>
   );

@@ -6,23 +6,23 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import GeneralConfigs from "@/configs/general.json";
 export const initializeConfigsAsync = createAsyncThunk(
   "/general/fetchConfigs",
-  () => {
+  async () => {
     //get configs
-    return GeneralConfigs;
+    return { ...GeneralConfigs };
   }
 );
 type GeneralConfigState = {
   VAT: number;
   disbursementPercentage: number;
   euroToMDL: number | null;
-  conventionalUnit: "euro" | "MDL";
-  fuelPricePerTon: number;
+  conventionalUnit: string;
+  fuelPricePerTon: string | number;
   defaultAirport: string;
 };
 
 const initialState: GeneralConfigState = {
-  VAT: 0,
-  disbursementPercentage: 0,
+  VAT: 20,
+  disbursementPercentage: 10,
   euroToMDL: null,
   conventionalUnit: "euro",
   fuelPricePerTon: 0,
@@ -39,7 +39,8 @@ export const generalConfigSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initializeConfigsAsync.fulfilled, (state, { payload }) => {
-      state = payload as any;
+      state = { ...payload };
+      console.log("payload", payload);
     });
   },
 });

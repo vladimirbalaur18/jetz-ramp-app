@@ -7,6 +7,7 @@ export type Ramp = {
 
 export type Arrival = {
   from: string;
+  isLocalFlight: boolean;
   arrivalDate: Date;
   arrivalTime: {
     hours: number;
@@ -31,6 +32,7 @@ type Crew = {
 
 export type Departure = {
   to: string;
+  isLocalFlight: boolean;
   crewNumber: number;
   crewComposition: Array<Crew>;
   departureDate: Date;
@@ -77,7 +79,6 @@ export type Flight = {
   mtow: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
-  isLocalFlight?: boolean;
   isCommercialFlight?: boolean;
   status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
 
@@ -92,6 +93,7 @@ type Service = {
     notes: string;
     isUsed: boolean;
     pricingRules: PricingRule[];
+    hasVAT: boolean;
   }>;
 };
 

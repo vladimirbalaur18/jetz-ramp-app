@@ -5,6 +5,7 @@ import loungeFees from "@/configs/loungeFees.json";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
+import { store } from "@/redux/store";
 import {
   getLandingFees,
   getParkingFee,
@@ -42,6 +43,7 @@ export const getTotalAirportFeesPrice = (flight: Flight) => {
 };
 
 export const getLoungeFeePrice = (flight: Flight, type: string) => {
+  const VATMultiplier = store.getState().general.VAT / 100 + 1;
   let result = 0;
   switch (type) {
     case "Departure": {
@@ -69,7 +71,7 @@ export const getLoungeFeePrice = (flight: Flight, type: string) => {
   }
 
   return {
-    amount: result * 1.2,
+    amount: result * VATMultiplier,
     currency: "MDL",
   };
 };

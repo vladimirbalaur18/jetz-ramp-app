@@ -4,7 +4,7 @@
         "services": [
             {
                 "serviceName": "Meet & Assist",
-                "hasVAT": false,
+                "hasVAT": true,
                 "isDisbursed": false,
                 "pricingRules": [
                     {
@@ -134,7 +134,7 @@
             },
             {
                 "serviceName": "Hotel transportation",
-                "hasVAT": false,
+                "hasVAT": true,
                 "isDisbursed": false,
                 "pricingRules": [
                     {

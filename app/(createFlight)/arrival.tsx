@@ -23,6 +23,7 @@ import {
   UseFieldArrayRemove,
   Control,
   FieldErrors,
+  useWatch,
 } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import {
@@ -54,23 +55,27 @@ const Form: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
-    defaultValues: (existingFlight as unknown as Flight) || {
-      arrival: {
-        arrivalTime: { hours: 10, minutes: 12 },
-        arrivalDate: new Date(),
-        from: "LUKK",
-        adultCount: 1,
-        minorCount: 2,
-        rampInspectionBeforeArrival: {
-          status: true,
-          FOD: true,
-          agent: { fullname: "Costea" },
+  const { control, formState, handleSubmit, getValues, watch } =
+    useForm<FormData>({
+      mode: "onChange",
+      defaultValues: (existingFlight as unknown as Flight) || {
+        arrival: {
+          arrivalTime: { hours: 10, minutes: 12 },
+          arrivalDate: new Date(),
+          from: "LUKK",
+          adultCount: 1,
+          minorCount: 2,
+          rampInspectionBeforeArrival: {
+            status: true,
+            FOD: true,
+            agent: { fullname: "Costea" },
+          },
         },
       },
-    },
-  });
+    });
+
+  const adultPassengersCount = watch("arrival.adultCount");
+  const minorPassengersCount = watch("arrival.minorCount");
 
   const { errors } = formState;
 
@@ -134,6 +139,22 @@ const Form: React.FC = () => {
             </>
           )}
         />
+        <View style={styles.row}>
+          <Text variant="bodyLarge">Is local (MD only) leg?</Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="arrival.isLocalFlight"
+            render={({ field: { value, onChange } }) => (
+              <>
+                <Switch
+                  value={value}
+                  onValueChange={(value) => onChange(value)}
+                />
+              </>
+            )}
+          />
+        </View>
         <Controller
           control={control}
           defaultValue={dayjs().toDate()}
@@ -276,9 +297,7 @@ const Form: React.FC = () => {
         />
         <Text variant="bodyLarge">
           Total passengers:
-          {Number(getValues("arrival.adultCount")) ||
-            0 + Number(getValues("arrival.minorCount")) ||
-            0}
+          {Number(adultPassengersCount) + Number(minorPassengersCount)}
         </Text>
         <View style={styles.row}>
           <Text variant="bodyLarge">Is commercial flight</Text>
@@ -305,10 +324,6 @@ const Form: React.FC = () => {
           name="arrival.rampInspectionBeforeArrival.agent.fullname"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "The name inserted is not in the correct format",
-              value: REGEX.name,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>

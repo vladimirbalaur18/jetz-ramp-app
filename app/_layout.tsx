@@ -17,7 +17,7 @@ import {
 import { Provider, useDispatch, useSelector } from "react-redux";
 import merge from "deepmerge";
 import { useColorScheme } from "@/components/useColorScheme";
-import { RootState, store } from "@/redux/store";
+import { AppDispatch, RootState, store } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
 export {
   // Catch any errors thrown by the Layout component.
@@ -81,7 +81,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const currentFlightNumber = selectCurrentFlight(
     useSelector((state: RootState) => state)
   )?.flightNumber;
@@ -110,7 +110,7 @@ function RootLayoutNav() {
             name="(createFlight)/arrival"
             options={{
               headerShown: true,
-              title: `Arrival information`,
+              title: `Arrival information ${FlightNumberIndicator}`,
             }}
           />
           <Stack.Screen
@@ -125,6 +125,13 @@ function RootLayoutNav() {
             options={{
               headerShown: true,
               title: `Provided services ${FlightNumberIndicator}`,
+            }}
+          />
+          <Stack.Screen
+            name="(createFlight)/signature"
+            options={{
+              headerShown: true,
+              title: `Signature ${FlightNumberIndicator}`,
             }}
           />
         </Stack>
