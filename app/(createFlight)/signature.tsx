@@ -1,100 +1,130 @@
 import formStyles from "@/styles/formStyles";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Text, Button, useTheme } from "react-native-paper";
-//@ts-expect-error
-import ExpoDraw from "expo-draw";
-import { captureRef as takeSnapshotAsync } from "react-native-view-shot";
+import { TextInput, HelperText, Button } from "react-native-paper";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { Flight } from "@/redux/types";
+import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import DrawSignatureScreen from "@/components/DrawSignatureScreen";
+import { Stack } from "expo-router";
 
-interface IDrawSignatureScreenProps {
-  handleSignatureSave: React.Dispatch<React.SetStateAction<string>>;
-}
+const SignaturePage = () => {
+  const { control, formState, handleSubmit, getValues, watch } =
+    useForm<Flight>({
+      mode: "onChange",
+    });
+  const { errors, isValid } = formState;
 
-const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
-  handleSignatureSave,
-}) => {
-  const signatureRef = useRef<any>(null);
-  async function clearCanvas() {
-    signatureRef?.current?.clear();
-  }
-  const theme = useTheme();
+  const submit = (data: Partial<Flight>) => {
+    console.log("submitted data", data);
+  };
 
-  async function saveCanvas() {
-    try {
-      const signatureResult = await takeSnapshotAsync(signatureRef.current, {
-        format: "png",
-        result: "base64",
-        height: 400,
-        width: 400,
-      });
-      // Here you can handle the captured signature image, e.g., upload it to a server
-      handleSignatureSave(signatureResult);
-      console.log("signature file", signatureResult);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginVertical: 15,
-      }}
-    >
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <View
-          style={{ borderWidth: 1, backgroundColor: "rgba(255,255,255,1) " }}
-        >
-          <ExpoDraw
-            strokes={[]}
-            ref={signatureRef}
-            containerStyle={{
-              backgroundColor: "rgba(255,255,255,0.0001)",
-              height: 300,
-              width: 400,
-            }}
-            rewind={(undo: any) => console.log("undo", undo)}
-            clear={(clear: any) => console.log("clear", clear)}
-            color={"#000000"}
-            strokeWidth={4}
-            enabled={true}
-            onChangeStrokes={(strokes: any) => console.log(strokes)}
-          />
-        </View>
-        <View
-          style={{
-            justifyContent: "space-between",
-            flexDirection: "row",
-            marginVertical: 10,
-            alignItems: "center",
-          }}
-        >
-          <Button onPress={clearCanvas}>Reset</Button>
-          <Button mode="contained" onPress={() => saveCanvas()}>
-            Sign
-          </Button>
-        </View>
-      </View>
+  const _GenerateInvoiceButton: React.FC = () => (
+    <View>
+      <Button
+        disabled={!isValid}
+        icon={"clipboard-list"}
+        onPress={handleSubmit(submit)}
+      >
+        Generate invoice
+      </Button>
     </View>
   );
-};
-const SignaturePage = () => {
-  const [picSignatureBase64, setPICSignatureBase64] = useState<string>("");
-  const [rampSignatureBase64, setRampSignatureBase64] = useState<string>("");
-
   return (
     <ScrollView contentContainerStyle={{ ...formStyles.container, flex: 1 }}>
-      <View style={{ ...styles.signatureContainer }}>
-        <SectionTitle>Pilot in command signature:</SectionTitle>
-        <DrawSignatureScreen handleSignatureSave={setPICSignatureBase64} />
-      </View>
+      <Stack.Screen
+        options={{ headerRight: () => <_GenerateInvoiceButton /> }}
+      />
+
       <View style={{ ...styles.signatureContainer }}>
         <SectionTitle>Ramp agent signature:</SectionTitle>
-        <DrawSignatureScreen handleSignatureSave={setRampSignatureBase64} />
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="ramp.name"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Ramp agent name"
+                style={formStyles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                keyboardType="default"
+                onChangeText={(text) => onChange(text)}
+                error={errors.ramp?.name && true}
+              />
+              <HelperText type="error">{errors.ramp?.name?.message}</HelperText>
+            </>
+          )}
+        />
+
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="ramp.signature"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <DrawSignatureScreen
+                signatureBase64={value}
+                handleSignatureSave={onChange}
+                handleSignatureReset={() => onChange("")}
+              />
+
+              {/* <HelperText type="error">{errors.ramp?.name?.message}</HelperText> */}
+            </>
+          )}
+        />
+      </View>
+      <View style={{ ...styles.signatureContainer }}>
+        <SectionTitle>Pilot in command signature:</SectionTitle>
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="crew.name"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="PIC name"
+                style={formStyles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                keyboardType="default"
+                onChangeText={(text) => onChange(text)}
+                error={errors.crew?.name && true}
+              />
+              <HelperText type="error">{errors.crew?.name?.message}</HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="crew.signature"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <DrawSignatureScreen
+                signatureBase64={value}
+                handleSignatureSave={onChange}
+                handleSignatureReset={() => onChange("")}
+              />
+
+              {/* <HelperText type="error">{errors.ramp?.name?.message}</HelperText> */}
+            </>
+          )}
+        />
       </View>
     </ScrollView>
   );

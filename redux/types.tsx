@@ -79,6 +79,8 @@ export type Flight = {
   mtow: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
+  crew: { signature: string; name: string };
+  ramp: { signature: string; name: string };
   isCommercialFlight?: boolean;
   status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
 
