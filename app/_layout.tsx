@@ -134,6 +134,13 @@ function RootLayoutNav() {
               title: `Signature ${FlightNumberIndicator}`,
             }}
           />
+          <Stack.Screen
+            name="(createFlight)/preview"
+            options={{
+              headerShown: true,
+              title: `Provided services ${FlightNumberIndicator}`,
+            }}
+          />
         </Stack>
       </ThemeProvider>
     </PaperProvider>
