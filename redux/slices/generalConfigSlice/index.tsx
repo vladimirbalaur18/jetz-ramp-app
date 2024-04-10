@@ -23,7 +23,7 @@ type GeneralConfigState = {
 const initialState: GeneralConfigState = {
   VAT: 20,
   disbursementPercentage: 10,
-  euroToMDL: null,
+  euroToMDL: 19.145,
   conventionalUnit: "euro",
   fuelPricePerTon: 0,
   defaultAirport: "LUKK",
