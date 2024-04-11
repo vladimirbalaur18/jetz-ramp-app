@@ -6,6 +6,7 @@ import convertCurrency from "./convertCurrency";
 import { store } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 export default function chargeNoteTemplateHTML(flight: Flight) {
+  const config = store.getState().general;
   const basicHandling =
     Number(flight?.providedServices?.basicHandling).toFixed(2) || 0;
 
@@ -42,11 +43,9 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   };
 
   const thirdPartyServiceProvidersRenderHTML = () => {
-    const config = store.getState().general;
-    const VIPTerminalPrice = getLoungeFeePrice(
-      flight,
-      flight?.handlingType
-    ).amount;
+    const VIPTerminalPrice = getLoungeFeePrice({
+      ...flight?.providedServices?.VIPLoungeServices,
+    }).amount;
     return `<tr height="19" style="height:14.4pt">
   <td height="19" class="xl139" style="height:14.4pt">&nbsp;</td>
   <td class="xl140" colspan="2" style="mso-ignore:colspan">Express/VIP Terminal</td>
@@ -2619,7 +2618,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="3" height="19" class="xl176" style="height:14.4pt">Services with VAT
-  20%</td>
+  ${config?.VAT}%</td>
   <td class="xl178" style="border-top:none">&nbsp;</td>
   <td class="xl178" style="border-top:none">&nbsp;</td>
   <td class="xl179" style="border-top:none">&nbsp;</td>

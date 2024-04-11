@@ -107,7 +107,13 @@ type PricingRule = {
 
 export type ProvidedServices = {
   basicHandling: number | string;
-
+  disbursementFees: {
+    airportFee: number;
+    fuelFee: number;
+    cateringFee: number;
+    HOTACFee: number;
+    VIPLoungeFee: number;
+  };
   supportServices: {
     airportFee: {
       total: number;

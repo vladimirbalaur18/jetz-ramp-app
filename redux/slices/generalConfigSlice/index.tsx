@@ -14,7 +14,7 @@ export const initializeConfigsAsync = createAsyncThunk(
 type GeneralConfigState = {
   VAT: number;
   disbursementPercentage: number;
-  euroToMDL: number | null;
+  euroToMDL: number;
   conventionalUnit: string;
   fuelPricePerTon: string | number;
   defaultAirport: string;

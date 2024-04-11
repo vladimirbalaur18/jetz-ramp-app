@@ -7,6 +7,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLoungeFeePrice } from "@/services/servicesCalculator";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import convertCurrency from "@/utils/convertCurrency";
+import formatMDLPriceToEuro from "@/utils/priceFormatter";
 
 const TotalServicesSection: React.FC<{
   providedServices: ProvidedServices;
@@ -17,12 +19,13 @@ const TotalServicesSection: React.FC<{
     basicHandling,
     supportServices: { HOTAC, airportFee, catering, fuel },
     VIPLoungeServices,
+    disbursementFees,
   } = providedServices;
   const generalConfig = useSelector((state: RootState) => state.general);
   console.log("genCOnfig", generalConfig);
 
   const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
-    getLoungeFeePrice(existingFlight, VIPLoungeServices?.typeOf);
+    getLoungeFeePrice({ ...VIPLoungeServices });
 
   const totalFuelPrice = getFuelFeeAmount({
     fuelDensity: fuel?.fuelDensity,
@@ -54,11 +57,17 @@ const TotalServicesSection: React.FC<{
 
       return Number(total);
     };
+    const calculateDisbursementsTotal = () => {
+      return Object.values(disbursementFees).reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      );
+    };
     alert(
       Number(
         Number(totalFuelPrice) +
           (loungeFeeCurrency === "MDL"
-            ? Number(loungeFeeAmount / rateMDLtoEUR)
+            ? convertCurrency(loungeFeeAmount, rateMDLtoEUR)
             : Number(loungeFeeAmount)) +
           Number(catering.total) +
           Number(HOTAC.total) +
@@ -70,26 +79,34 @@ const TotalServicesSection: React.FC<{
     return Number(
       Number(totalFuelPrice) +
         (loungeFeeCurrency === "MDL"
-          ? Number(loungeFeeAmount / rateMDLtoEUR)
+          ? convertCurrency(loungeFeeAmount, rateMDLtoEUR)
           : Number(loungeFeeAmount)) +
         Number(catering.total) +
         Number(HOTAC.total) +
         Number(airportFee.total) +
         Number(basicHandling) +
-        calculateOtherServicesTotal()
+        calculateOtherServicesTotal() +
+        calculateDisbursementsTotal()
     );
   }, [JSON.stringify(providedServices)]);
 
+  const renderBasicHandlingVAT = basicHandling;
   return (
     <View>
       <SectionTitle>Services list:</SectionTitle>
       <Text style={styles.serviceListItem} variant="titleMedium">
-        Basic handling (MTOW: {existingFlight?.mtow}kg): {basicHandling}
+        Basic handling (MTOW: {existingFlight?.mtow}kg):{" "}
+        {renderBasicHandlingVAT}
         &euro;
       </Text>
       <Text style={styles.serviceListItem} variant="titleMedium">
-        VIP Lounge ({VIPLoungeServices?.typeOf}): {loungeFeeAmount}{" "}
-        {loungeFeeCurrency}
+        VIP Lounge ({VIPLoungeServices?.typeOf}):{" "}
+        {
+          formatMDLPriceToEuro({
+            amount: loungeFeeAmount,
+            currency: loungeFeeCurrency,
+          }).displayedString
+        }
       </Text>
       {otherServices?.map(({ serviceCategoryName, services }) => {
         return (
@@ -120,8 +137,8 @@ const TotalServicesSection: React.FC<{
 
                         return (
                           <>
-                            {Number(total).toFixed(2)} x {generalConfig?.VAT}% ={" "}
-                            {totalWithVAT}
+                            {Number(total).toFixed(2)} x {generalConfig?.VAT}%
+                            VAT = {totalWithVAT.toFixed(2)}
                           </>
                         );
                       } else return <>{Number(total).toFixed(2)}</>;
@@ -145,7 +162,21 @@ const TotalServicesSection: React.FC<{
       <Text style={styles.serviceListItem} variant="titleMedium">
         Fuel fee: {totalFuelPrice || 0}&euro;
       </Text>
-      <Text style={styles.serviceListItem} variant="titleLarge">
+      <Text style={styles.serviceListItem} variant="titleMedium">
+        Disbursement fees:
+      </Text>
+      <Text>
+        Airport fees: {disbursementFees.airportFee.toFixed(2) || 0}
+        &euro;
+      </Text>
+      <Text>HOTAC fees: {disbursementFees.HOTACFee.toFixed(2) || 0}&euro;</Text>
+      <Text>
+        Catering fees: {disbursementFees.cateringFee.toFixed(2) || 0}
+        &euro;
+      </Text>
+      <Text>Fuel fee: {disbursementFees.fuelFee.toFixed(2) || 0}&euro;</Text>
+      <Text>Express/VIP Lounge fee: {disbursementFees.VIPLoungeFee}&euro;</Text>
+      <Text variant="titleLarge">
         Total: {totalAmountOfServices.toFixed(2)}&euro;
       </Text>
     </View>

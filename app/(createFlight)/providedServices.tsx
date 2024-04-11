@@ -28,12 +28,15 @@ import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useRouter } from "expo-router";
 import TotalServicesSection from "@/components/TotalServicesSection";
 import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
+import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import convertCurrency from "@/utils/convertCurrency";
 type FormData = Flight;
 
 const Form: React.FC = () => {
   const SERVICES_DEFINITIONS = getAllServices();
 
   const state = useSelector((state: RootState) => state);
+  const { general } = state;
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -55,6 +58,13 @@ const Form: React.FC = () => {
     defaultValues: {
       providedServices: existingFlight?.providedServices || {
         basicHandling: getBasicHandlingPrice(existingFlight) || 0,
+        disbursementFees: {
+          airportFee: 0,
+          cateringFee: 0,
+          fuelFee: 0,
+          HOTACFee: 0,
+          VIPLoungeFee: 0,
+        },
         supportServices: {
           airportFee: {
             total: Number(
@@ -102,13 +112,39 @@ const Form: React.FC = () => {
           },
         ];
 
-  //MISC
   let providedServicesObj = watch("providedServices");
 
-  // Lifecycle and states
-  const [uncompletedInput, setCurrentUncompletedInput] = useState<
-    string | null
-  >("");
+  //disbursement calculation
+  useEffect(() => {
+    const disbursementFeeMultplier = general?.disbursementPercentage / 100;
+    const disbursementFees = {
+      airportFee:
+        providedServicesObj.supportServices.airportFee.total *
+        disbursementFeeMultplier,
+      fuelFee:
+        getFuelFeeAmount({
+          ...providedServicesObj.supportServices.fuel,
+          flight: existingFlight,
+        }) * disbursementFeeMultplier,
+      cateringFee:
+        providedServicesObj.supportServices.catering.total *
+        disbursementFeeMultplier,
+      HOTACFee:
+        providedServicesObj.supportServices.HOTAC.total *
+        disbursementFeeMultplier,
+      VIPLoungeFee:
+        getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices }).amount *
+        disbursementFeeMultplier,
+    };
+
+    setValue("providedServices.disbursementFees", disbursementFees);
+  }, [
+    providedServicesObj.supportServices.HOTAC.total,
+    providedServicesObj.supportServices.catering.total,
+    JSON.stringify(providedServicesObj.supportServices.fuel),
+    providedServicesObj.supportServices.airportFee.total,
+    JSON.stringify(providedServicesObj.VIPLoungeServices),
+  ]);
 
   useEffect(() => {
     //render additional services inputs

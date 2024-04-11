@@ -18,13 +18,17 @@ dayjs.extend(isBetween);
 dayjs.extend(utc);
 
 export const getBasicHandlingPrice = (flight: Flight) => {
+  let total = 0;
   if (flight?.mtow > basicHandlingFees[basicHandlingFees.length - 1].maxMTOW)
-    return basicHandlingFees[basicHandlingFees.length - 1].pricePerQty;
-  for (let { minMTOW, maxMTOW, pricePerQty } of basicHandlingFees) {
-    if (flight.mtow >= minMTOW && flight.mtow <= maxMTOW) {
-      return pricePerQty;
+    total += basicHandlingFees[basicHandlingFees.length - 1].pricePerQty;
+  else
+    for (let { minMTOW, maxMTOW, pricePerQty } of basicHandlingFees) {
+      if (flight.mtow >= minMTOW && flight.mtow <= maxMTOW) {
+        total += pricePerQty;
+      }
     }
-  }
+
+  if (flight?.handlingType !== "FULL") return total / 2;
 };
 
 export const getTotalAirportFeesPrice = (flight: Flight) => {
@@ -42,30 +46,31 @@ export const getTotalAirportFeesPrice = (flight: Flight) => {
   };
 };
 
-export const getLoungeFeePrice = (flight: Flight, type: string) => {
+export const getLoungeFeePrice = ({
+  minorPax = 0,
+  adultPax = 0,
+  type = "",
+}) => {
   const VATMultiplier = store.getState().general.VAT / 100 + 1;
   let result = 0;
   switch (type) {
     case "Departure": {
       result =
-        flight?.departure?.adultCount *
-          loungeFees.departure.pricePerAdult.amount +
-        flight?.departure?.minorCount *
-          loungeFees.departure.pricePerMinor.amount;
+        adultPax ||
+        0 * loungeFees.departure.pricePerAdult.amount + minorPax ||
+        0 * loungeFees.departure.pricePerMinor.amount;
       break;
     }
     case "Arrival": {
       result =
-        flight?.arrival?.adultCount * loungeFees.arrival.pricePerAdult.amount +
-        flight?.arrival?.minorCount * loungeFees.arrival.pricePerMinor.amount;
+        adultPax * loungeFees.arrival.pricePerAdult.amount +
+        minorPax * loungeFees.arrival.pricePerMinor.amount;
       break;
     }
     case "Departure & Arrival": {
       result =
-        flight?.arrival?.adultCount *
-          loungeFees.departureAndArrival.pricePerAdult.amount +
-        flight?.arrival?.minorCount *
-          loungeFees.departureAndArrival.pricePerMinor.amount;
+        adultPax * loungeFees.departureAndArrival.pricePerAdult.amount +
+        minorPax * loungeFees.departureAndArrival.pricePerMinor.amount;
       break;
     }
   }
