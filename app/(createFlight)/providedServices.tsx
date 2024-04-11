@@ -30,6 +30,7 @@ import TotalServicesSection from "@/components/TotalServicesSection";
 import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import convertCurrency from "@/utils/convertCurrency";
+import formatMDLPriceToEuro from "@/utils/priceFormatter";
 type FormData = Flight;
 
 const Form: React.FC = () => {
@@ -133,8 +134,9 @@ const Form: React.FC = () => {
         providedServicesObj.supportServices.HOTAC.total *
         disbursementFeeMultplier,
       VIPLoungeFee:
-        getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices }).amount *
-        disbursementFeeMultplier,
+        formatMDLPriceToEuro(
+          getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices })
+        ).amountEuro * disbursementFeeMultplier,
     };
 
     setValue("providedServices.disbursementFees", disbursementFees);

@@ -175,7 +175,10 @@ const TotalServicesSection: React.FC<{
         &euro;
       </Text>
       <Text>Fuel fee: {disbursementFees.fuelFee.toFixed(2) || 0}&euro;</Text>
-      <Text>Express/VIP Lounge fee: {disbursementFees.VIPLoungeFee}&euro;</Text>
+      <Text>
+        Express/VIP Lounge fee {providedServices.VIPLoungeServices.adultPax}:{" "}
+        {disbursementFees.VIPLoungeFee.toFixed(2)}&euro;
+      </Text>
       <Text variant="titleLarge">
         Total: {totalAmountOfServices.toFixed(2)}&euro;
       </Text>

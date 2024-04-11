@@ -49,16 +49,15 @@ export const getTotalAirportFeesPrice = (flight: Flight) => {
 export const getLoungeFeePrice = ({
   minorPax = 0,
   adultPax = 0,
-  type = "",
+  typeOf = "",
 }) => {
   const VATMultiplier = store.getState().general.VAT / 100 + 1;
   let result = 0;
-  switch (type) {
+  switch (typeOf) {
     case "Departure": {
       result =
-        adultPax ||
-        0 * loungeFees.departure.pricePerAdult.amount + minorPax ||
-        0 * loungeFees.departure.pricePerMinor.amount;
+        adultPax * loungeFees.departure.pricePerAdult.amount +
+        minorPax * loungeFees.departure.pricePerMinor.amount;
       break;
     }
     case "Arrival": {
@@ -75,6 +74,7 @@ export const getLoungeFeePrice = ({
     }
   }
 
+  console.log("type: ", typeOf);
   return {
     amount: result * VATMultiplier,
     currency: "MDL",
