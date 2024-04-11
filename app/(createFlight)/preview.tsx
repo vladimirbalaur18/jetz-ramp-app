@@ -14,6 +14,7 @@ import { shareAsync } from "expo-sharing";
 import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
 import { useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { RootState } from "@/redux/store";
 
 export default function App() {
   const [selectedPrinter, setSelectedPrinter] = React.useState<any>();
@@ -22,7 +23,7 @@ export default function App() {
 
   const printToFile = async (html: string) => {
     // On iOS/android prints the given html. On web prints the HTML from the current page.
-    const { uri } = await Print.printToFileAsync({ html });
+    const { uri } = await Print.printToFileAsync({ html, height: 892 });
     console.log("File has been saved to:", uri);
 
     try {
@@ -57,7 +58,7 @@ export default function App() {
       />
       <Button
         title="Generate something else"
-        onPress={() => printToFile("<h1>LOG</h1>")}
+        onPress={() => printToFile(`<h1>hehe</h1>`)}
       />
       {Platform.OS === "ios" && (
         <>
