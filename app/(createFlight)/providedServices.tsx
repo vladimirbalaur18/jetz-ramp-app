@@ -50,6 +50,7 @@ const Form: React.FC = () => {
     control,
     formState,
     handleSubmit,
+    getFieldState,
     getValues,
     resetField,
     watch,
@@ -165,13 +166,32 @@ const Form: React.FC = () => {
               pricingRules: pricingRules,
               isUsed: false,
               quantity: 1,
+              isPriceOverriden: false,
               notes: "",
-              hasVAT,
+
+              hasVAT:
+                existingFlight?.departure?.isLocalFlight ||
+                existingFlight?.arrival?.isLocalFlight
+                  ? hasVAT
+                  : false,
             };
           }),
         });
       });
   }, [append, SERVICES_DEFINITIONS]);
+
+  const renderBasicHandlingVATString = () => {
+    if (
+      existingFlight?.departure?.isLocalFlight &&
+      existingFlight?.arrival?.isLocalFlight
+    ) {
+      return `*${general?.VAT}% VAT applied`;
+    } else if (existingFlight?.departure?.isLocalFlight) {
+      return `*${general?.VAT}% VAT applied on departure leg`;
+    } else if (existingFlight?.arrival?.isLocalFlight) {
+      return `*${general?.VAT}% VAT applied on arrival leg`;
+    }
+  };
 
   // HELPERS
   const submit = (data: any) => {
@@ -201,10 +221,6 @@ const Form: React.FC = () => {
             name="providedServices.basicHandling"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-              pattern: {
-                message: "Please insert correct format",
-                value: REGEX.price,
-              },
             }}
             render={({ field: { onBlur, onChange, value } }) => (
               <>
@@ -217,9 +233,15 @@ const Form: React.FC = () => {
                   onChangeText={(text) => onChange(text)}
                   error={errors.providedServices?.basicHandling && true}
                 />
+                {/* <Text>{renderBasicHandlingVATString()}</Text> */}
                 <HelperText type="error">
                   {errors?.providedServices?.basicHandling?.message}
                 </HelperText>
+                {!getFieldState("providedServices.basicHandling").isDirty ? (
+                  <Text>{renderBasicHandlingVATString()}</Text>
+                ) : (
+                  <Text>*Price has been manually overriden</Text>
+                )}
               </>
             )}
           />
@@ -565,11 +587,20 @@ const Form: React.FC = () => {
               <>
                 <SectionTitle>{category?.serviceCategoryName}</SectionTitle>
                 {category?.services?.map((service, serviceIndex) => {
-                  const { isUsed, notes, quantity, serviceName } = service;
+                  const {
+                    isUsed,
+                    notes,
+                    quantity,
+                    serviceName,
+                    hasVAT,
+                    isPriceOverriden,
+                  } = service;
                   return (
                     <>
                       <View style={{ ...formStyles.row, marginVertical: 10 }}>
-                        <Text variant="bodyLarge">{serviceName}</Text>
+                        <Text variant="bodyLarge">
+                          {serviceName} {hasVAT && `(with VAT)`}
+                        </Text>
                         <Controller
                           control={control}
                           defaultValue={isUsed}
@@ -668,6 +699,72 @@ const Form: React.FC = () => {
                                 </>
                               )}
                             />
+                            <View style={{ ...formStyles.row }}>
+                              <Controller
+                                control={control}
+                                defaultValue={isUsed}
+                                name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.isPriceOverriden`}
+                                render={({ field: { value, onChange } }) => (
+                                  <>
+                                    <Text>Override price</Text>
+                                    <Switch
+                                      value={value}
+                                      onValueChange={(value) => {
+                                        //if there is at least oen erroneous field, dont' allow selecting dynamic fields
+                                        //this causees race conditions
+                                        if (
+                                          Object.entries(errors).some(
+                                            ([key, value]) => {
+                                              if (value) {
+                                                alert(
+                                                  "Please complete the erroneous fields first"
+                                                );
+                                                return value;
+                                              }
+                                            }
+                                          )
+                                        )
+                                          return;
+
+                                        update(categoryIndex, {
+                                          ...category,
+                                          services: (category?.services).map(
+                                            (service, i) =>
+                                              i === serviceIndex
+                                                ? {
+                                                    ...service,
+                                                    isPriceOverriden: value,
+                                                  }
+                                                : service
+                                          ),
+                                        });
+                                        onChange(value);
+                                      }}
+                                    />
+                                  </>
+                                )}
+                              />
+                            </View>
+                            {isPriceOverriden && (
+                              <Controller
+                                control={control}
+                                defaultValue={0}
+                                name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.totalPriceOverride`}
+                                render={({
+                                  field: { onBlur, onChange, value },
+                                }) => (
+                                  <>
+                                    <TextInput
+                                      label="Manual price override:"
+                                      style={formStyles.input}
+                                      value={String(value)}
+                                      onBlur={onBlur}
+                                      onChangeText={(text) => onChange(text)}
+                                    />
+                                  </>
+                                )}
+                              />
+                            )}
                           </>
                         )}
                       </View>

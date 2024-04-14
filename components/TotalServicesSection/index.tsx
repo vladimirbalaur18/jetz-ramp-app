@@ -9,6 +9,7 @@ import { getLoungeFeePrice } from "@/services/servicesCalculator";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import convertCurrency from "@/utils/convertCurrency";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
+import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 
 const TotalServicesSection: React.FC<{
   providedServices: ProvidedServices;
@@ -21,6 +22,7 @@ const TotalServicesSection: React.FC<{
     VIPLoungeServices,
     disbursementFees,
   } = providedServices;
+
   const generalConfig = useSelector((state: RootState) => state.general);
   console.log("genCOnfig", generalConfig);
 
@@ -42,15 +44,19 @@ const TotalServicesSection: React.FC<{
       otherServices?.forEach(({ serviceCategoryName, services }) => {
         services?.forEach((s) => {
           if (s.isUsed) {
-            for (const rule of s?.pricingRules) {
-              if (rule?.ruleName === "pricePerQty") {
-                const servicePriceTotal = s?.quantity * rule?.amount;
-                const VATMultiplier = generalConfig?.VAT / 100 + 1;
-                total += s?.hasVAT
-                  ? servicePriceTotal * VATMultiplier
-                  : servicePriceTotal;
+            if (s.isPriceOverriden && s?.totalPriceOverride) {
+              total += s?.hasVAT
+                ? Number(s?.totalPriceOverride) * getVATMultiplier()
+                : Number(s?.totalPriceOverride);
+            } else
+              for (const rule of s?.pricingRules) {
+                if (rule?.ruleName === "pricePerQty") {
+                  const servicePriceTotal = s?.quantity * rule?.amount;
+                  total += s?.hasVAT
+                    ? servicePriceTotal * getVATMultiplier()
+                    : servicePriceTotal;
+                }
               }
-            }
           }
         });
       });
@@ -121,16 +127,22 @@ const TotalServicesSection: React.FC<{
                 return s.isUsed ? (
                   <Text>
                     {" "}
-                    {s?.serviceName} (x{s?.quantity}):{" "}
+                    {s?.isPriceOverriden &&
+                      s?.totalPriceOverride &&
+                      " **manual price "}
+                    {s?.serviceName} (x{s?.quantity}) :{" "}
                     {((): ReactNode => {
                       let total: any;
                       let totalWithVAT: number;
 
-                      for (const rule of s?.pricingRules) {
-                        if (rule?.ruleName === "pricePerQty") {
-                          total = s?.quantity * rule?.amount;
+                      if (s?.isPriceOverriden && s?.totalPriceOverride) {
+                        total = s.totalPriceOverride;
+                      } else
+                        for (const rule of s?.pricingRules) {
+                          if (rule?.ruleName === "pricePerQty") {
+                            total = s?.quantity * rule?.amount;
+                          }
                         }
-                      }
 
                       if (s?.hasVAT) {
                         totalWithVAT = total * (generalConfig?.VAT / 100 + 1);
@@ -176,8 +188,7 @@ const TotalServicesSection: React.FC<{
       </Text>
       <Text>Fuel fee: {disbursementFees.fuelFee.toFixed(2) || 0}&euro;</Text>
       <Text>
-        Express/VIP Lounge fee {providedServices.VIPLoungeServices.adultPax}:{" "}
-        {disbursementFees.VIPLoungeFee.toFixed(2)}&euro;
+        Express/VIP Lounge fee: {disbursementFees.VIPLoungeFee.toFixed(2)}&euro;
       </Text>
       <Text variant="titleLarge">
         Total: {totalAmountOfServices.toFixed(2)}&euro;

@@ -87,16 +87,30 @@ export type Flight = {
   // chargeNote: Charges;
 };
 
+type ServiceManualPriceOverride = {
+  isPriceOverriden: boolean;
+} & (
+  | {
+      isPriceOverriden: true;
+      totalPriceOverride?: number;
+    }
+  | {
+      isPriceOverriden: false;
+    }
+);
+
 type Service = {
   serviceCategoryName: string;
-  services: Array<{
-    serviceName: string;
-    quantity: number;
-    notes: string;
-    isUsed: boolean;
-    pricingRules: PricingRule[];
-    hasVAT: boolean;
-  }>;
+  services: Array<
+    {
+      serviceName: string;
+      quantity: number;
+      notes: string;
+      isUsed: boolean;
+      pricingRules: PricingRule[];
+      hasVAT: boolean;
+    } & ServiceManualPriceOverride
+  >;
 };
 
 type PricingRule = {

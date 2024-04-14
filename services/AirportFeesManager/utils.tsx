@@ -1,3 +1,4 @@
+import { store } from "@/redux/store";
 import { Arrival, Departure, Flight } from "@/redux/types";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import dayjs from "dayjs";
@@ -34,3 +35,6 @@ export const getDifferenceBetweenArrivalDeparture = (
     days: departureTime?.diff(arrivalTime, "days") || 1,
   };
 };
+
+export const getVATMultiplier = (): number =>
+  store.getState().general.VAT / 100 + 1;

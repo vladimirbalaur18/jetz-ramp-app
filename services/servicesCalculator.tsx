@@ -13,6 +13,7 @@ import {
   getSecurityFee,
   getTakeOffFees,
 } from "./AirportFeesManager";
+import { getVATMultiplier } from "./AirportFeesManager/utils";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -27,8 +28,23 @@ export const getBasicHandlingPrice = (flight: Flight) => {
         total += pricePerQty;
       }
     }
+  let baseTotal = total;
 
-  if (flight?.handlingType !== "FULL") return total / 2;
+  if (flight?.handlingType !== "FULL") {
+    total = baseTotal / 2;
+    return flight?.departure?.isLocalFlight || flight?.arrival?.isLocalFlight
+      ? total * getVATMultiplier()
+      : total;
+  } else {
+    if (flight?.arrival?.isLocalFlight) {
+      total += (baseTotal / 2) * getVATMultiplier();
+    }
+    if (flight?.departure?.isLocalFlight) {
+      total += (baseTotal / 2) * getVATMultiplier();
+    }
+
+    return total;
+  }
 };
 
 export const getTotalAirportFeesPrice = (flight: Flight) => {
@@ -76,7 +92,7 @@ export const getLoungeFeePrice = ({
 
   console.log("type: ", typeOf);
   return {
-    amount: result * VATMultiplier,
+    amount: result * getVATMultiplier(),
     currency: "MDL",
   };
 };
