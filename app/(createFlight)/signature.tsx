@@ -10,6 +10,10 @@ import DrawSignatureScreen from "@/components/DrawSignatureScreen";
 import { Stack, useRouter } from "expo-router";
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { updateFlight } from "@/redux/slices/flightsSlice";
+import { useSelector } from "react-redux";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 
 const html = `
 <html>
@@ -28,6 +32,9 @@ const html = `
 `;
 const SignaturePage = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const state = useSelector((state: RootState) => state);
+  const existingFlight = selectCurrentFlight(state);
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<Flight>({
       mode: "onChange",
@@ -35,7 +42,7 @@ const SignaturePage = () => {
   const { errors, isValid } = formState;
 
   const submit = (data: Partial<Flight>) => {
-    console.log("submitted data", data);
+    dispatch(updateFlight({ ...existingFlight, ...data }));
     router.navigate("/preview");
   };
 

@@ -38,3 +38,7 @@ export const getDifferenceBetweenArrivalDeparture = (
 
 export const getVATMultiplier = (): number =>
   store.getState().general.VAT / 100 + 1;
+
+export const applyVAT = (price: number) => {
+  return price * getVATMultiplier();
+};

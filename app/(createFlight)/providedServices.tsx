@@ -8,6 +8,7 @@ import {
   Switch,
   HelperText,
   Text,
+  Divider,
 } from "react-native-paper";
 import { Flight } from "@/redux/types";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
@@ -41,6 +42,7 @@ const Form: React.FC = () => {
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const basicHandlingPricePerLegs = getBasicHandlingPrice(existingFlight);
   useEffect(() => {
     dispatch(initializeConfigsAsync());
   }, [dispatch]);
@@ -59,7 +61,9 @@ const Form: React.FC = () => {
     mode: "all",
     defaultValues: {
       providedServices: existingFlight?.providedServices || {
-        basicHandling: getBasicHandlingPrice(existingFlight) || 0,
+        basicHandling:
+          basicHandlingPricePerLegs.arrival +
+          basicHandlingPricePerLegs.departure,
         disbursementFees: {
           airportFee: 0,
           cateringFee: 0,
@@ -160,10 +164,10 @@ const Form: React.FC = () => {
       SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
         append({
           serviceCategoryName: serviceCategoryName,
-          services: services.map(({ serviceName, pricingRules, hasVAT }) => {
+          services: services.map(({ serviceName, pricing, hasVAT }) => {
             return {
               serviceName: serviceName,
-              pricingRules: pricingRules,
+              pricing,
               isUsed: false,
               quantity: 1,
               isPriceOverriden: false,
@@ -597,7 +601,7 @@ const Form: React.FC = () => {
                   } = service;
                   return (
                     <>
-                      <View style={{ ...formStyles.row, marginVertical: 10 }}>
+                      <View style={{ ...formStyles.row, marginVertical: 30 }}>
                         <Text variant="bodyLarge">
                           {serviceName} {hasVAT && `(with VAT)`}
                         </Text>
@@ -699,7 +703,9 @@ const Form: React.FC = () => {
                                 </>
                               )}
                             />
-                            <View style={{ ...formStyles.row }}>
+                            <View
+                              style={{ ...formStyles.row, marginVertical: 0 }}
+                            >
                               <Controller
                                 control={control}
                                 defaultValue={isUsed}
@@ -768,6 +774,7 @@ const Form: React.FC = () => {
                           </>
                         )}
                       </View>
+                      <Divider />
                     </>
                   );
                 })}

@@ -48,15 +48,12 @@ const TotalServicesSection: React.FC<{
               total += s?.hasVAT
                 ? Number(s?.totalPriceOverride) * getVATMultiplier()
                 : Number(s?.totalPriceOverride);
-            } else
-              for (const rule of s?.pricingRules) {
-                if (rule?.ruleName === "pricePerQty") {
-                  const servicePriceTotal = s?.quantity * rule?.amount;
-                  total += s?.hasVAT
-                    ? servicePriceTotal * getVATMultiplier()
-                    : servicePriceTotal;
-                }
-              }
+            } else {
+              const servicePriceTotal = s?.quantity * s.pricing?.amount;
+              total += s?.hasVAT
+                ? servicePriceTotal * getVATMultiplier()
+                : servicePriceTotal;
+            }
           }
         });
       });
@@ -137,12 +134,7 @@ const TotalServicesSection: React.FC<{
 
                       if (s?.isPriceOverriden && s?.totalPriceOverride) {
                         total = s.totalPriceOverride;
-                      } else
-                        for (const rule of s?.pricingRules) {
-                          if (rule?.ruleName === "pricePerQty") {
-                            total = s?.quantity * rule?.amount;
-                          }
-                        }
+                      } else total = s?.quantity * s.pricing?.amount;
 
                       if (s?.hasVAT) {
                         totalWithVAT = total * (generalConfig?.VAT / 100 + 1);

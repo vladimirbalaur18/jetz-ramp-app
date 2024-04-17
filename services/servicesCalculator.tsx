@@ -7,43 +7,84 @@ import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
 import { store } from "@/redux/store";
 import {
+  getFuelFeeAmount,
   getLandingFees,
   getParkingFee,
   getPassengersFee,
   getSecurityFee,
   getTakeOffFees,
 } from "./AirportFeesManager";
-import { getVATMultiplier } from "./AirportFeesManager/utils";
+import { applyVAT, getVATMultiplier } from "./AirportFeesManager/utils";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
 
 export const getBasicHandlingPrice = (flight: Flight) => {
-  let total = 0;
+  let basePricePerLeg = 0;
+
   if (flight?.mtow > basicHandlingFees[basicHandlingFees.length - 1].maxMTOW)
-    total += basicHandlingFees[basicHandlingFees.length - 1].pricePerQty;
+    basePricePerLeg +=
+      basicHandlingFees[basicHandlingFees.length - 1].pricePerLeg;
   else
-    for (let { minMTOW, maxMTOW, pricePerQty } of basicHandlingFees) {
+    for (let { minMTOW, maxMTOW, pricePerLeg } of basicHandlingFees) {
       if (flight.mtow >= minMTOW && flight.mtow <= maxMTOW) {
-        total += pricePerQty;
+        basePricePerLeg += pricePerLeg;
       }
     }
-  let baseTotal = total;
 
-  if (flight?.handlingType !== "FULL") {
-    total = baseTotal / 2;
-    return flight?.departure?.isLocalFlight || flight?.arrival?.isLocalFlight
-      ? total * getVATMultiplier()
-      : total;
-  } else {
-    if (flight?.arrival?.isLocalFlight) {
-      total += (baseTotal / 2) * getVATMultiplier();
-    }
-    if (flight?.departure?.isLocalFlight) {
-      total += (baseTotal / 2) * getVATMultiplier();
-    }
+  switch (flight?.handlingType) {
+    case "FULL": {
+      let result = {
+        departure: 0,
+        arrival: 0,
+        vat: {
+          departure: false,
+          arrival: false,
+        },
+      };
 
-    return total;
+      if (flight?.departure?.isLocalFlight) {
+        result.departure += applyVAT(basePricePerLeg);
+        result.vat.departure = true;
+      } else result.departure += basePricePerLeg;
+
+      if (flight?.arrival?.isLocalFlight) {
+        result.arrival += applyVAT(basePricePerLeg);
+        result.vat.arrival = true;
+      } else result.arrival += basePricePerLeg;
+
+      return result;
+    }
+    case "Arrival": {
+      if (flight?.arrival?.isLocalFlight) {
+        return {
+          arrival: applyVAT(basePricePerLeg),
+          departure: 0,
+          vat: { departure: false, arrival: true },
+        };
+      }
+
+      return {
+        arrival: basePricePerLeg,
+        departure: 0,
+        vat: { departure: false, arrival: false },
+      };
+    }
+    case "Departure": {
+      if (flight?.departure?.isLocalFlight) {
+        return {
+          departure: applyVAT(basePricePerLeg),
+          arrival: 0,
+          vat: { departure: true, arrival: false },
+        };
+      }
+
+      return {
+        departure: basePricePerLeg,
+        arrival: 0,
+        vat: { departure: false, arrival: false },
+      };
+    }
   }
 };
 

@@ -1,25 +1,106 @@
 import { Flight } from "@/redux/types";
 import dayjs from "dayjs";
 import getParsedDateTime from "./getParsedDateTime";
-import { getLoungeFeePrice } from "@/services/servicesCalculator";
+import {
+  getBasicHandlingPrice,
+  getLoungeFeePrice,
+  getTotalAirportFeesPrice,
+} from "@/services/servicesCalculator";
 import convertCurrency from "./convertCurrency";
 import { store } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
+
 export default function chargeNoteTemplateHTML(flight: Flight) {
   const config = store.getState().general;
-  const basicHandling =
-    Number(flight?.providedServices?.basicHandling).toFixed(2) || 0;
+  const basicHandling = getBasicHandlingPrice(flight);
+  const basicHandlingWithoutVAT = (() => {
+    let result = 0;
+    if (!basicHandling.vat.arrival) {
+      result += basicHandling.arrival;
+    }
+
+    if (!basicHandling.vat.departure) {
+      result += basicHandling.departure;
+    }
+
+    return result;
+  })();
+  const basicHandlingWithVAT = (() => {
+    let result = 0;
+    if (basicHandling.vat.arrival) {
+      result += basicHandling.arrival;
+    }
+
+    if (basicHandling.vat.departure) {
+      result += basicHandling.departure;
+    }
+
+    return result;
+  })();
+  const totalDisbursementFeesAmount = Object.values(
+    flight?.providedServices.disbursementFees
+  ).reduce((accumulator, current) => accumulator + (current || 0), 0);
+
+  let VATServicesList = [];
+  let servicesListNoVAT: Array<{
+    serviceName: string;
+    basePrice: number;
+    totalPrice?: number;
+  }> = [];
+
+  if (basicHandlingWithVAT) {
+    VATServicesList.push({
+      serviceName: "Basic handling",
+      basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),
+      totalPrice: Number(basicHandlingWithVAT),
+    });
+  }
+
+  if (basicHandlingWithoutVAT) {
+    servicesListNoVAT.push({
+      serviceName: "Basic handling",
+      basePrice: Number(basicHandlingWithoutVAT),
+      totalPrice: Number(basicHandlingWithoutVAT),
+    });
+  }
+
+  flight?.providedServices?.otherServices?.forEach((category) => {
+    category.services.forEach((s) => {
+      if (s?.isUsed) {
+        if (!s.hasVAT) {
+          const quantity = s?.isPriceOverriden ? 1 : Number(s?.quantity);
+          const basePrice = s.pricing.amount;
+          const amount = s?.isPriceOverriden
+            ? s.totalPriceOverride
+            : basePrice || 0 * quantity;
+
+          servicesListNoVAT.push({
+            serviceName: s.serviceName,
+            basePrice: Number(s.pricing.amount),
+            totalPrice: amount,
+          });
+        } else
+          VATServicesList.push({
+            serviceName: s.serviceName,
+            basePrice: Number(s.pricing.amount),
+            totalPrice: Number(s.pricing.amount) * getVATMultiplier(),
+          });
+      }
+    });
+  });
 
   const additionalServicesRenderHTML = () => {
     let resultHTML = "";
 
     flight?.providedServices?.otherServices?.forEach((serviceCategory) => {
       serviceCategory?.services.map((s) => {
-        if (s?.isUsed) {
-          const [price] = s.pricingRules.map((rule) => {
-            if (rule?.ruleName === "pricePerQty") return rule?.amount;
-          });
-          const quantity = Number(s?.quantity);
+        if (s?.isUsed && !s?.hasVAT) {
+          const quantity = s?.isPriceOverriden ? 1 : Number(s?.quantity);
+          const basePrice = s.pricing.amount;
+          const amount = s?.isPriceOverriden
+            ? s.totalPriceOverride
+            : basePrice || 0 * quantity;
 
           resultHTML += `
  <tr height="19" style="height:14.4pt">
@@ -29,10 +110,10 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   }</td>
   <td class="xl121" style=";border-left:none">${quantity}</td>
   <td colspan="2" class="xl114" style="border-right:.5pt solid black">${
-    price?.toFixed(2) || 0
+    s?.isPriceOverriden ? Number(amount).toFixed(2) : basePrice?.toFixed(2)
   }</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-    (price || 0) * quantity
+    amount
   ).toFixed(2)}</td>
  </tr>`;
         }
@@ -41,7 +122,6 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
 
     return resultHTML;
   };
-
   const thirdPartyServiceProvidersRenderHTML = () => {
     const VIPTerminalPrice = getLoungeFeePrice({
       ...flight?.providedServices?.VIPLoungeServices,
@@ -119,7 +199,38 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   }</td>
  </tr>`;
   };
+  const VATApplicableServicesRenderHTML = () => {
+    return VATServicesList.map(({ basePrice, serviceName, totalPrice }) => {
+      return ` <tr height="20" style="height:15.0pt">
+  <td height="20" class="xl127" style="height:15.0pt;border-top:none">&nbsp;</td>
+  <td colspan="2" class="xl134">${serviceName}</td>
+  <td class="xl163" style="border-top:none">&nbsp;</td>
+  <td class="xl163" style="border-top:none">&nbsp;</td>
+  <td class="xl161" style="border-top:none">&nbsp;</td>
+  <td class="xl115" style="border-top:none">${basePrice.toFixed(2)}</td>
+  <td class="xl181" style="border-top:none">${config.VAT}%</td>
+  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice}</td>
+ </tr>`;
+    });
+  };
+  const servicesTotalAmountNoVAT =
+    servicesListNoVAT.reduce(
+      (accumulator, current) => accumulator + (current?.totalPrice || 0),
+      0
+    ) +
+    getTotalAirportFeesPrice(flight).total +
+    totalDisbursementFeesAmount;
 
+  const servicesTotalAmountWithVAT = VATServicesList.reduce(
+    (accumulator, current) => accumulator + (current?.totalPrice || 0),
+    0
+  );
+
+  console.log(
+    "not vatt",
+    servicesListNoVAT,
+    getTotalAirportFeesPrice(flight).total
+  );
   return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
@@ -2486,8 +2597,12 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
  <tr height="19" style="height:14.4pt">
   <td colspan="5" height="19" class="xl111" style="height:14.4pt">Basic Handling</td>
   <td class="xl92" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:.5pt solid black">${basicHandling}</td>
-  <td colspan="2" rowspan="2" class="xl116" style="border-right:1.0pt solid black">${basicHandling}</td>
+  <td colspan="2" class="xl114" style="border-right:.5pt solid black">${basicHandlingWithoutVAT.toFixed(
+    2
+  )}</td>
+  <td colspan="2" rowspan="2" class="xl116" style="border-right:1.0pt solid black">${basicHandlingWithoutVAT.toFixed(
+    2
+  )}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl118" style="height:14.4pt;border-top:none">&nbsp;</td>
@@ -2514,7 +2629,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   height:14.4pt">Third party service providers</td>
   <td class="xl92" style="border-left:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
-  <td class="xl115" style="border-top:none">&nbsp;</td>
+  <td class="xl115" >&nbsp;</td>
   <td class="xl116"></td>
   <td class="xl138">&nbsp;</td>
  </tr>
@@ -2536,10 +2651,14 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" colspan="2" style="mso-ignore:colspan">Airport fees</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">10%</td>
+  <td class="xl155" style="border-top:none">${
+    config.disbursementPercentage
+  }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">0.43</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    flight?.providedServices?.disbursementFees?.airportFee
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl142" style="height:14.4pt;border-top:none">&nbsp;</td>
@@ -2547,10 +2666,14 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">10%</td>
+  <td class="xl155" style="border-top:none">${
+    config.disbursementPercentage
+  }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">0.00</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    flight?.providedServices?.disbursementFees?.cateringFee
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl127" style="height:14.4pt;border-top:none">&nbsp;</td>
@@ -2558,10 +2681,14 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">10%</td>
+  <td class="xl155" style="border-top:none">${
+    config.disbursementPercentage
+  }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">0.00</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    flight?.providedServices?.disbursementFees?.fuelFee
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl156" style="height:14.4pt;border-top:none">&nbsp;</td>
@@ -2569,19 +2696,27 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl157" style="border-top:none">10%</td>
+  <td class="xl157" style="border-top:none">${
+    config.disbursementPercentage
+  }%</td>
   <td class="xl158" style="border-top:none">&nbsp;</td>
   <td class="xl159" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">0.00</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    flight?.providedServices?.disbursementFees?.HOTACFee
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl118" style="height:14.4pt;border-top:none">&nbsp;</td>
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">Express/VIP
   Terminal</td>
-  <td class="xl157" style="border-top:none">10%</td>
+  <td class="xl157" style="border-top:none">${
+    config.disbursementPercentage
+  }%</td>
   <td class="xl160" style="border-top:none">&nbsp;</td>
   <td class="xl161" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">0.00</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    flight?.providedServices?.disbursementFees?.VIPLoungeFee
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl118" style="height:14.4pt">&nbsp;</td>
@@ -2592,7 +2727,9 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl162">&nbsp;</td>
   <td class="xl163">&nbsp;</td>
   <td class="xl164" style="border-top:none">TOTAL</td>
-  <td colspan="2" class="xl165" style="border-right:1.0pt solid black">16.70</td>
+  <td colspan="2" class="xl165" style="border-right:1.0pt solid black">${servicesTotalAmountNoVAT.toFixed(
+    2
+  )}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl139" style="height:14.4pt">&nbsp;</td>
@@ -2614,7 +2751,10 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl171">&nbsp;</td>
   <td colspan="2" class="xl172" style="border-right:.5pt solid black;border-left:
   none">TOTAL MDL</td>
-  <td colspan="2" class="xl174" style="border-right:1.0pt solid black">321.19</td>
+  <td colspan="2" class="xl174" style="border-right:1.0pt solid black">${convertCurrency(
+    servicesTotalAmountNoVAT,
+    1 / config.euroToMDL
+  ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="3" height="19" class="xl176" style="height:14.4pt">Services with VAT
@@ -2627,23 +2767,16 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl178" style="border-top:none">&nbsp;</td>
   <td class="xl180" style="border-top:none">&nbsp;</td>
  </tr>
- <tr height="20" style="height:15.0pt">
-  <td height="20" class="xl127" style="height:15.0pt;border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl134">Basic Handling</td>
-  <td class="xl163" style="border-top:none">&nbsp;</td>
-  <td class="xl163" style="border-top:none">&nbsp;</td>
-  <td class="xl161" style="border-top:none">&nbsp;</td>
-  <td class="xl115" style="border-top:none">12.00</td>
-  <td class="xl181" style="border-top:none">20.00%</td>
-  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">14.40</td>
- </tr>
+${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl184" style="height:14.4pt">Billing to:</td>
   <td colspan="5" rowspan="7" class="xl185" width="320" style="border-right:1.0pt solid black;
   border-bottom:1.0pt solid black;width:240pt">PRIVATE</td>
   <td class="xl187" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl188" style="border-top:none">TOTAL:</td>
-  <td colspan="2" class="xl189" style="border-right:1.0pt solid black">14.40</td>
+  <td colspan="2" class="xl189" style="border-right:1.0pt solid black">${servicesTotalAmountWithVAT.toFixed(
+    2
+  )}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl191" style="height:14.4pt">&nbsp;</td>
@@ -2657,13 +2790,19 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td colspan="2" class="xl195" style="border-right:.5pt solid black;border-left:
   none">TOTAL MDL</td>
   <td colspan="2" class="xl197" style="border-right:1.0pt solid black;border-left:
-  none">276.91</td>
+  none">${convertCurrency(
+    servicesTotalAmountWithVAT,
+    1 / config.euroToMDL
+  ).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl199" width="64" style="height:15.0pt;width:48pt">&nbsp;</td>
   <td colspan="2" class="xl200" style="border-right:.5pt solid black;border-left:
   none">GRAND TOTAL MDL</td>
-  <td colspan="2" class="xl202" style="border-right:1.0pt solid black">598.10</td>
+  <td colspan="2" class="xl202" style="border-right:1.0pt solid black">${(
+    convertCurrency(servicesTotalAmountNoVAT, 1 / config.euroToMDL) +
+    convertCurrency(servicesTotalAmountWithVAT, 1 / config.euroToMDL)
+  ).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl199" width="64" style="height:15.0pt;width:48pt">&nbsp;</td>
@@ -2677,9 +2816,9 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td rowspan="2" class="xl207" style="border-bottom:1.0pt solid black;border-top:
   none">1 EUR =</td>
   <td rowspan="2" class="xl208" style="border-bottom:1.0pt solid black;border-top:
-  none">19.23</td>
+  none">${config.euroToMDL.toFixed(2)}</td>
   <td colspan="2" rowspan="2" class="xl209" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black">2-Apr-24</td>
+  border-bottom:1.0pt solid black">${dayjs().format("DD-MMM-YY")}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl211" width="64" style="height:15.0pt;width:48pt">&nbsp;</td>
@@ -2702,38 +2841,20 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black">Name
   and signature of Crew/Carrier representative</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="5" height="19" class="xl228" style="border-right:1.0pt solid black;
-  height:14.4pt">&nbsp;</td>
-  <td class="xl139" style="border-left:none">&nbsp;</td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl230">&nbsp;</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl231" style="height:14.4pt">&nbsp;</td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl230">&nbsp;</td>
-  <td class="xl139" style="border-left:none">&nbsp;</td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl66"></td>
-  <td class="xl230">&nbsp;</td>
- </tr>
- <tr height="20" style="height:15.0pt">
-  <td height="20" class="xl232" style="height:15.0pt">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl233">&nbsp;</td>
-  <td class="xl169" style="border-left:none">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl170">&nbsp;</td>
-  <td class="xl233">&nbsp;</td>
+
+ <tr height="19" style="height:10.4pt">
+  <td colspan="5" " class="xl228" style="border-right:1.0pt solid black;border-bottom:1.0pt solid black;
+  "><img  width="320" height="120" src="data:image/png;base64,${
+    flight?.ramp?.signature
+  }"/></td>
+  <td class="xl170" style="border-left:none"><img  width="320" height="120" src="data:image/png;base64,${
+    flight?.ramp?.signature
+  }"/></td>
+  <td class="xl170"></td>
+  <td class="xl170"></td>
+  <td class="xl170"></td>
+  <td  style="border-right:1.0pt solid black;
+  "class="xl170">&nbsp;</td>
  </tr>
  <!--[if supportMisalignedColumns]-->
  <tr height="0" style="display:none">

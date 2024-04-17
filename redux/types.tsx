@@ -107,14 +107,13 @@ type Service = {
       quantity: number;
       notes: string;
       isUsed: boolean;
-      pricingRules: PricingRule[];
+      pricing: Pricing;
       hasVAT: boolean;
     } & ServiceManualPriceOverride
   >;
 };
 
-type PricingRule = {
-  ruleName: string;
+type Pricing = {
   currency: string;
   amount: number;
 };
