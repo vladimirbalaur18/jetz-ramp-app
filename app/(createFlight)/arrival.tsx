@@ -14,6 +14,7 @@ import {
   List,
   Text,
   RadioButton,
+  Divider,
 } from "react-native-paper";
 import { Flight, ProvidedServices } from "@/redux/types";
 import {
@@ -48,6 +49,7 @@ import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
 import _ from "lodash";
+import SectionTitle from "@/components/FormUtils/SectionTitle";
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
@@ -235,6 +237,131 @@ const Form: React.FC = () => {
 
               <HelperText type="error">
                 {errors.arrival?.arrivalTime?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <SectionTitle>Arrival payload</SectionTitle>
+        <Controller
+          control={control}
+          defaultValue={0}
+          name="arrival.crewNumber"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "Please insert correct format",
+              value: REGEX.number,
+            },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Crew members count"
+                style={styles.input}
+                value={String(value)}
+                onBlur={onBlur}
+                keyboardType="numeric"
+                onChangeText={(text) => onChange(text)}
+                error={errors.arrival?.crewNumber && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.crewNumber?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue="NIL"
+          name="arrival.cargoInfo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            maxLength: 100,
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Cargo information:"
+                style={styles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.cargoInfo && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.cargoInfo?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue="NIL"
+          name="arrival.mailInfo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            maxLength: 100,
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Mail information:"
+                style={styles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.mailInfo && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.mailInfo?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue="NIL"
+          name="arrival.specialInfo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            maxLength: 100,
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Special information:"
+                style={styles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.specialInfo && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.specialInfo?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue="NIL"
+          name="arrival.remarksInfo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            maxLength: 100,
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Payload remarks:"
+                style={styles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.remarksInfo && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.remarksInfo?.message}
               </HelperText>
             </>
           )}

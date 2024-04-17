@@ -43,7 +43,7 @@ const SignaturePage = () => {
 
   const submit = (data: Partial<Flight>) => {
     dispatch(updateFlight({ ...existingFlight, ...data }));
-    router.navigate("/preview");
+    router.navigate("(tabs)/chargeNote");
   };
 
   const _GenerateInvoiceButton: React.FC = () => (

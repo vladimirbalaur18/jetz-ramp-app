@@ -99,6 +99,7 @@ function RootLayoutNav() {
       <ThemeProvider value={themeBase}>
         <Stack>
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+
           <Stack.Screen
             name="(createFlight)/general"
             options={{
@@ -135,10 +136,10 @@ function RootLayoutNav() {
             }}
           />
           <Stack.Screen
-            name="(createFlight)/preview"
+            name="(createFlight)/(tabs)"
             options={{
               headerShown: true,
-              title: `Provided services ${FlightNumberIndicator}`,
+              title: `Generate PDF files ${FlightNumberIndicator}`,
             }}
           />
         </Stack>

@@ -17,8 +17,8 @@ type ChargeListService = {
   totalPrice?: number;
 };
 export default function chargeNoteTemplateHTML(flight: Flight) {
-  const VATServicesList: Array<ChargeListService> = [];
-  const servicesListNoVAT: Array<ChargeListService> = [];
+  let VATServicesList: Array<ChargeListService> = [];
+  let servicesListNoVAT: Array<ChargeListService> = [];
 
   const config = store.getState().general;
   const basicHandling = getBasicHandlingPrice(flight);
@@ -68,7 +68,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
 
   flight?.providedServices?.otherServices?.forEach((category) => {
     category.services.forEach((s) => {
-      if (s?.isUsed) {
+      if (s?.isUsed)
         if (!s.hasVAT) {
           const quantity = s?.isPriceOverriden ? 1 : Number(s?.quantity);
           const basePrice = s.pricing.amount;
@@ -79,7 +79,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
           servicesListNoVAT.push({
             serviceName: s.serviceName,
             basePrice: Number(s.pricing.amount),
-            totalPrice: amount,
+            totalPrice: Number(amount),
           });
         } else
           VATServicesList.push({
@@ -87,7 +87,6 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
             basePrice: Number(s.pricing.amount),
             totalPrice: Number(s.pricing.amount) * getVATMultiplier(),
           });
-      }
     });
   });
 
@@ -221,17 +220,12 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
     ) +
     getTotalAirportFeesPrice(flight).total +
     totalDisbursementFeesAmount;
-
+  console.log(servicesTotalAmountNoVAT, servicesListNoVAT);
   const servicesTotalAmountWithVAT = VATServicesList.reduce(
     (accumulator, current) => accumulator + (current?.totalPrice || 0),
     0
   );
 
-  console.log(
-    "not vatt",
-    servicesListNoVAT,
-    getTotalAirportFeesPrice(flight).total
-  );
   return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
@@ -2567,7 +2561,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl98" style="height:15.0pt;border-top:none">PAID BY</td>
   <td class="xl99" style="border-top:none;border-left:none">${
-    flight?.payment?.payment || ""
+    flight?.chargeNote?.paymentType
   }</td>
   <td class="xl100" style="border-top:none">UTC</td>
   <td class="xl101" style="border-top:none">&nbsp;</td>
@@ -2764,7 +2758,9 @@ ${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl184" style="height:14.4pt">Billing to:</td>
   <td colspan="5" rowspan="7" class="xl185" width="320" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:240pt">PRIVATE</td>
+  border-bottom:1.0pt solid black;width:240pt">${
+    flight?.chargeNote?.billingTo
+  }</td>
   <td class="xl187" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl188" style="border-top:none">TOTAL:</td>
   <td colspan="2" class="xl189" style="border-right:1.0pt solid black">${servicesTotalAmountWithVAT.toFixed(
@@ -2819,7 +2815,7 @@ ${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl184" style="height:14.4pt;border-top:none">Remarks:</td>
   <td colspan="9" rowspan="3" class="xl218" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black">Domestic flights are subjected to 20% VAT</td>
+  border-bottom:1.0pt solid black">${flight?.chargeNote?.remarks}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl139" style="height:14.4pt">&nbsp;</td>

@@ -5,6 +5,14 @@ export type Ramp = {
   surname: string;
 };
 
+type PayloadData = {
+  crewNumber: number;
+  specialInfo?: string;
+  cargoInfo?: string;
+  mailInfo?: string;
+  remarksInfo?: string;
+};
+
 export type Arrival = {
   from: string;
   isLocalFlight: boolean;
@@ -13,28 +21,19 @@ export type Arrival = {
     hours: number;
     minutes: number;
   };
-  crewComposition: Array<Crew>;
   adultCount: number;
   minorCount: number;
+
   rampInspectionBeforeArrival: {
     status: boolean;
     FOD: boolean;
     agent: RampAgent;
   };
-};
-
-type Crew = {
-  name: string;
-  nationality?: string;
-  idNumber?: string;
-  idExpiry?: Date;
-};
+} & PayloadData;
 
 export type Departure = {
   to: string;
   isLocalFlight: boolean;
-  crewNumber: number;
-  crewComposition: Array<Crew>;
   departureDate: Date;
   departureTime: {
     hours: number;
@@ -47,14 +46,10 @@ export type Departure = {
     FOD: boolean;
     agent: RampAgent;
   };
-};
+} & PayloadData;
 
 export type RampAgent = {
   fullname: string;
-};
-export type Payment = {
-  payment: string;
-  paymentPercentage?: number;
 };
 
 export enum FlightSchedule {
@@ -68,14 +63,12 @@ export type Flight = {
   operatorName: string;
   flightNumber: string;
   scheduleType?: FlightSchedule;
-  payment?: Payment;
   orderingCompanyName?: string;
   aircraftType?: string;
   aircraftRegistration?: string;
   handlingType: HandlingTypes;
   arrival: Arrival;
   departure: Departure;
-  invoiceDate?: Date;
   mtow: number;
   parkingPosition?: string | number;
   providedServices: ProvidedServices;
@@ -83,6 +76,11 @@ export type Flight = {
   ramp: { signature: string; name: string };
   isCommercialFlight?: boolean;
   status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
+  chargeNote: {
+    billingTo: string;
+    remarks: string;
+    paymentType: string;
+  };
 
   // chargeNote: Charges;
 };
