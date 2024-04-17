@@ -24,10 +24,20 @@ export default function App() {
   const printToFile = async (html: string) => {
     // On iOS/android prints the given html. On web prints the HTML from the current page.
     const { uri } = await Print.printToFileAsync({ html, height: 892 });
+
+    const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${
+      existingFlight?.flightNumber
+    }_${existingFlight.aircraftRegistration}.pdf`;
+
+    // Rename the file
+    await FileSystem.moveAsync({
+      from: uri,
+      to: pdfName,
+    });
     console.log("File has been saved to:", uri);
 
     try {
-      const contentUri = await FileSystem.getContentUriAsync(uri);
+      const contentUri = await FileSystem.getContentUriAsync(pdfName);
       if (Platform.OS === "ios") {
         await shareAsync(contentUri);
       } else {
