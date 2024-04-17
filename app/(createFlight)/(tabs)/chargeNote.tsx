@@ -22,56 +22,27 @@ import { Flight } from "@/redux/types";
 import { HelperText, TextInput, Button } from "react-native-paper";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import { updateFlight } from "@/redux/slices/flightsSlice";
+import printToFile from "@/utils/printToFile";
 type FormData = Flight;
 
 export default function App() {
-  const [selectedPrinter, setSelectedPrinter] = React.useState<any>();
   const state = useSelector((state: RootState) => state);
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const submit = (data: any) => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
-    printToFile(chargeNoteTemplateHTML({ ...existingFlight, ...data }));
-  };
-
-  const printToFile = async (html: string) => {
-    // On iOS/android prints the given html. On web prints the HTML from the current page.
-    const { uri } = await Print.printToFileAsync({ html, height: 900 });
-
-    const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${
-      existingFlight?.flightNumber
-    }_${existingFlight.aircraftRegistration}.pdf`;
-
-    // Rename the file
-    await FileSystem.moveAsync({
-      from: uri,
-      to: pdfName,
+    dispatch(updateFlight({ ...existingFlight, ...data }));
+    const pdfName = `${existingFlight?.flightNumber}_${existingFlight.aircraftRegistration}`;
+    printToFile({
+      html: chargeNoteTemplateHTML({ ...existingFlight, ...data }),
+      fileName: pdfName,
     });
-    console.log("File has been saved to:", uri);
-
-    try {
-      const contentUri = await FileSystem.getContentUriAsync(pdfName);
-      if (Platform.OS === "ios") {
-        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-      } else {
-        await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-          data: contentUri,
-          flags: 1,
-          type: "application/pdf",
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
   };
 
-  const selectPrinter = async () => {
-    const printer = await Print.selectPrinterAsync(); // iOS only
-    setSelectedPrinter(printer);
-  };
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
+    defaultValues: { ...existingFlight },
   });
 
   const { errors } = formState;
