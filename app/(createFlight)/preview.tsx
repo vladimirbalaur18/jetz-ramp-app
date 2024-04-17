@@ -39,7 +39,7 @@ export default function App() {
     try {
       const contentUri = await FileSystem.getContentUriAsync(pdfName);
       if (Platform.OS === "ios") {
-        await shareAsync(contentUri);
+        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
       } else {
         await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
           data: contentUri,
@@ -50,8 +50,6 @@ export default function App() {
     } catch (e) {
       console.error(e);
     }
-
-    // await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
   };
 
   const selectPrinter = async () => {

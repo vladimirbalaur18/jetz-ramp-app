@@ -11,7 +11,15 @@ import { store } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 
+type ChargeListService = {
+  serviceName: string;
+  basePrice: number;
+  totalPrice?: number;
+};
 export default function chargeNoteTemplateHTML(flight: Flight) {
+  const VATServicesList: Array<ChargeListService> = [];
+  const servicesListNoVAT: Array<ChargeListService> = [];
+
   const config = store.getState().general;
   const basicHandling = getBasicHandlingPrice(flight);
   const basicHandlingWithoutVAT = (() => {
@@ -41,13 +49,6 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   const totalDisbursementFeesAmount = Object.values(
     flight?.providedServices.disbursementFees
   ).reduce((accumulator, current) => accumulator + (current || 0), 0);
-
-  let VATServicesList = [];
-  let servicesListNoVAT: Array<{
-    serviceName: string;
-    basePrice: number;
-    totalPrice?: number;
-  }> = [];
 
   if (basicHandlingWithVAT) {
     VATServicesList.push({
@@ -235,14 +236,6 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
 <meta name="Generator" content="Microsoft Excel 15">
-<!--[if !mso]>
-<style>
-v\:* {behavior:url(#default#VML);}
-o\:* {behavior:url(#default#VML);}
-x\:* {behavior:url(#default#VML);}
-.shape {behavior:url(#default#VML);}
-</style>
-<![endif]-->
 <link rel="Stylesheet" href="stylesheet.css">
 <style>
 <!--table
@@ -2841,6 +2834,14 @@ ${VATApplicableServicesRenderHTML()}
   <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black">Name
   and signature of Crew/Carrier representative</td>
  </tr>
+ <tr>
+ <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black">${
+   flight?.ramp.name
+ }</td>
+ <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black"">${
+   flight?.crew.name
+ }</td>
+ </tr>
 
  <tr height="19" style="height:10.4pt">
   <td colspan="5" " class="xl228" style="border-right:1.0pt solid black;border-bottom:1.0pt solid black;
@@ -2848,7 +2849,7 @@ ${VATApplicableServicesRenderHTML()}
     flight?.ramp?.signature
   }"/></td>
   <td class="xl170" style="border-left:none"><img  width="320" height="120" src="data:image/png;base64,${
-    flight?.ramp?.signature
+    flight?.crew?.signature
   }"/></td>
   <td class="xl170"></td>
   <td class="xl170"></td>
