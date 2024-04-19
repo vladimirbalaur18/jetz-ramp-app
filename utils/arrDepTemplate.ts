@@ -1,6 +1,24 @@
 import { Flight } from "@/redux/types";
+import dayjs from "dayjs";
 
 export default function ArrDepTemplateRenderHTML(flight: Flight) {
+  const arrivalDate =
+    flight?.arrival.arrivalDate &&
+    dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
+  const departureDate =
+    flight?.departure.departureDate &&
+    dayjs(flight?.departure.departureDate).format("DD-MMM-YY");
+  const {
+    operatorName,
+    aircraftRegistration,
+    aircraftType,
+    mtow,
+    flightNumber,
+    crew,
+  } = flight;
+  const arrivalRoute = `${flight?.arrival?.from}-LUKK`;
+  const departureRoute = `LUKK-${flight?.departure?.to}`;
+  const { departure, arrival } = flight;
   return `
 <html xmlns:v="urn:schemas-microsoft-com:vml"
 xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -423,7 +441,7 @@ td
 	border-top:none;
 	border-right:none;
 	border-bottom:none;
-	border-left:1.0pt solid windowtext;
+	border-left:1.0pt solid windowtext;word-wrap: break-word;
 	mso-protection:unlocked visible;}
 .xl112
 	{mso-style-parent:style0;
@@ -591,7 +609,9 @@ td
 	border-bottom:1.0pt solid windowtext;
 	border-left:none;}
 
-
+td{
+  text-wrap:wrap;
+}
 </style>
 
 </head>
@@ -599,7 +619,7 @@ td
 <body link="#0563C1" vlink="#954F72">
 
 <table border=0 cellpadding=0 cellspacing=0 width=896 style='border-collapse:
- collapse;table-layout:fixed;width:672pt'>
+ collapse;table-layout:fixed;width:772pt'>
  <col width=64 span=14 style='width:48pt'>
  <tr height=19 style='height:14.4pt'>
   <td height=19 width=64 style='height:14.4pt;width:48pt' align=left
@@ -911,119 +931,125 @@ AABdEgAAZHJzL19yZWxzL3BpY3R1cmV4bWwueG1sLnJlbHNQSwUGAAAAAAYABgCEAQAAVBMAAAAA
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>DATE</td>
   <td colspan=3 class=xl85 style='border-right:1.0pt solid black;border-left:
-  none'>2-Apr-24</td>
+  none;text-wrap:wrap'>${arrivalDate}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>DATE</td>
   <td colspan=3 class=xl85 style='border-right:1.0pt solid black;border-left:
-  none'>4-Apr-24</td>
+  none;text-wrap:wrap'>${departureDate}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>FLIGHT NO.</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>YR5644</td>
+  none;text-wrap:wrap'>${flightNumber}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>FLIGHT NO.</td>
   <td colspan=3 class=xl91 style='border-right:1.0pt solid black;border-left:
-  none'>YR5644</td>
+  none;text-wrap:wrap'>${flightNumber}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>OPERATOR</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>PRIVATE</td>
+  none;text-wrap:wrap'>${operatorName}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>OPERATOR</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>PRIVATE</td>
+  none;text-wrap:wrap'>${operatorName}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>ROUTE</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>LRIA-LUKK</td>
+  none;text-wrap:wrap'>${arrivalRoute}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>ROUTE</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>LUKK-LUKH</td>
+  none;text-wrap:wrap'>${departureRoute}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>A/C REG</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>YR-5644</td>
+  none;text-wrap:wrap'>${aircraftRegistration}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>A/C REG</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>YR-5644</td>
+  none;text-wrap:wrap'>${aircraftRegistration}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>A/C TYPE</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>ULAC</td>
+  none;text-wrap:wrap'>${aircraftType}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>A/C TYPE</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>ULAC</td>
+  none;text-wrap:wrap'>${aircraftType}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>MTOW (kg)</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>450</td>
+  none;text-wrap:wrap'>${mtow}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>MTOW (kg)</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>450</td>
+  none;text-wrap:wrap'>${mtow}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>CREW No.</td>
   <td colspan=3 class=xl90 style='border-right:1.0pt solid black;border-left:
-  none'>2</td>
+  none;text-wrap:wrap'>${arrival?.crewNumber}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>CREW No.</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>2</td>
+  none;text-wrap:wrap'>${departure?.crewNumber}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>PAX No.</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>0</td>
+  none;text-wrap:wrap'>${
+    Number(arrival?.adultCount) + Number(arrival?.minorCount)
+  }</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>PAX No.</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>0</td>
+  none;text-wrap:wrap'>${
+    Number(departure?.adultCount) + Number(departure?.minorCount)
+  }</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>CARGO</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>NIL</td>
+  none;text-wrap:wrap'>${arrival?.cargoInfo}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
   none'>CARGO</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>NIL</td>
+  none;text-wrap:wrap'>${departure?.cargoInfo}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td colspan=4 height=19 class=xl82 style='border-right:.5pt solid black;
   height:14.4pt'>MAIL</td>
   <td colspan=3 class=xl92 style='border-right:1.0pt solid black;border-left:
-  none'>NIL</td>
+  none;text-wrap:wrap'>${arrival?.mailInfo}</td>
   <td colspan=4 class=xl82 style='border-right:.5pt solid black;border-left:
-  none'>MAIL</td>
+  none;'>MAIL</td>
   <td colspan=3 class=xl95 style='border-right:1.0pt solid black;border-left:
-  none'>NIL</td>
+  none;text-wrap:wrap'>${departure?.mailInfo}</td>
  </tr>
  <tr height=20 style='height:15.0pt'>
   <td colspan=4 height=20 class=xl98 style='border-right:.5pt solid black;
   height:15.0pt'>SPECIAL</td>
   <td colspan=3 class=xl101 style='border-right:1.0pt solid black;border-left:
-  none'>NIL</td>
+  none;text-wrap:wrap;'>${arrival?.specialInfo}</td>
   <td colspan=4 class=xl98 style='border-left:none'>SPECIAL</td>
-  <td colspan=3 class=xl101 style='border-right:1.0pt solid black'>NIL</td>
+  <td colspan=3 class=xl101 style='border-right:1.0pt solid black;text-wrap:wrap;'>${
+    departure?.specialInfo
+  }</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
   <td height=19 class=xl104 style='height:14.4pt'>REMARKS</td>
@@ -1042,10 +1068,14 @@ AABdEgAAZHJzL19yZWxzL3BpY3R1cmV4bWwueG1sLnJlbHNQSwUGAAAAAAYABgCEAQAAVBMAAAAA
   <td class=xl106>&nbsp;</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
-  <td colspan=7 rowspan=6 height=115 class=xl108 style='border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;height:87.0pt'>&nbsp;</td>
   <td colspan=7 rowspan=6 class=xl111 style='border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black'>Note: Mass and balance by PIC</td>
+  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;'>${
+    arrival?.remarksInfo
+  }<div style="max-width:100%"></div></td>
+  <td colspan=7 rowspan=6 class=xl111 style='border-right:1.0pt solid black;
+  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;'>${
+    departure?.remarksInfo
+  }</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
  </tr>
@@ -1067,11 +1097,11 @@ AABdEgAAZHJzL19yZWxzL3BpY3R1cmV4bWwueG1sLnJlbHNQSwUGAAAAAAYABgCEAQAAVBMAAAAA
   <td colspan=3 rowspan=2 height=38 class=xl123 style='border-bottom:.5pt solid black;
   height:28.8pt'>NAME<span style='mso-spacerun:yes'>   </span></td>
   <td colspan=4 rowspan=2 class=xl124 style='border-right:1.0pt solid black;
-  border-bottom:.5pt solid black'>NICHITA RAETCI</td>
+  border-bottom:.5pt solid black'>${crew?.name}</td>
   <td colspan=3 rowspan=2 class=xl123 style='border-bottom:.5pt solid black'>NAME<span
   style='mso-spacerun:yes'>   </span></td>
   <td colspan=4 rowspan=2 class=xl124 style='border-right:1.0pt solid black;
-  border-bottom:.5pt solid black'>NICHITA RAETCI</td>
+  border-bottom:.5pt solid black'>${crew?.name}</td>
  </tr>
  <tr height=19 style='height:14.4pt'>
  </tr>
@@ -1079,10 +1109,14 @@ AABdEgAAZHJzL19yZWxzL3BpY3R1cmV4bWwueG1sLnJlbHNQSwUGAAAAAAYABgCEAQAAVBMAAAAA
   <td colspan=2 rowspan=4 height=77 class=xl123 style='border-bottom:1.0pt solid black;
   height:58.2pt'>SIGNATURE</td>
   <td colspan=5 rowspan=4 class=xl124 style='border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black'>&nbsp;</td>
+  border-bottom:1.0pt solid black'><img  width="150" height="50" src="data:image/png;base64,${
+    flight?.crew?.signature
+  }"/></td>
   <td colspan=2 rowspan=4 class=xl123 style='border-bottom:1.0pt solid black'>SIGNATURE</td>
   <td colspan=5 rowspan=4 class=xl124 style='border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black'>&nbsp;</td>
+  border-bottom:1.0pt solid black'><img  width="150" height="50" src="data:image/png;base64,${
+    flight?.crew?.signature
+  }"/></td>
  </tr>
  <tr height=19 style='height:14.4pt'>
  </tr>

@@ -33,13 +33,14 @@ export default function Page() {
     defaultValues: { ...existingFlight },
   });
 
-  const submitArrDeparture = (data: any) => {
+  const submitArrDeparture = (data: Partial<Flight>) => {
     submit(data);
+    console.log("SIGA", data.crew?.signature);
     printToFile({
-      html: ArrDepTemplateRenderHTML(existingFlight),
+      html: ArrDepTemplateRenderHTML({ ...existingFlight, ...data }),
       fileName: `ArrDep_Information_${existingFlight?.flightNumber}_${existingFlight?.aircraftRegistration}`,
       width: 800,
-      height: 595,
+      height: 596,
     });
   };
 

@@ -4,6 +4,7 @@ import { Tabs } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { AppDispatch, RootState } from "@/redux/store";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,7 +23,11 @@ export default function TabLayout() {
           title: `Charge Note ${FlightNumberIndicator}`,
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
+            <MaterialCommunityIcons
+              name="clipboard-list"
+              size={28}
+              color={color}
+            />
           ),
         }}
       />
@@ -31,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: "Dep & Arr",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="cog" color={color} />
+            <MaterialCommunityIcons name="airport" size={28} color={color} />
           ),
         }}
       />
