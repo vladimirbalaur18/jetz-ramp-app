@@ -1,23 +1,15 @@
-import { Button, ScrollView, View, useColorScheme } from "react-native";
-import { Text, FAB } from "react-native-paper";
-import React, { useContext, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import dayjs from "dayjs";
-import isToday from "dayjs/plugin/isToday";
-import { StyleSheet } from "react-native";
-import FlightItem from "@/components/FlightItem";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import { useAppTheme } from "react-native-paper/src/core/theming";
-import { Flight } from "@/redux/types";
-import { RootState } from "@/redux/store";
-import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 import FlightSection from "@/components/FlightSection";
-dayjs.extend(isToday);
-
-export default function Page() {
-  const flightsArr = useSelector((state: RootState) =>
-    state.flights.flightsArray.filter((f) => f?.status !== "Completed")
+import { RootState } from "@/redux/store";
+import { Flight } from "@/redux/types";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Text, useTheme } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
+export default function () {
+  const completedFlightsArray = useSelector((state: RootState) =>
+    state.flights.flightsArray.filter((f) => f?.status === "Completed")
   );
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -26,7 +18,7 @@ export default function Page() {
   let parseFlightsByDate: Record<string, Flight[]> = useMemo(() => {
     let dateFlightsMap: Record<string, Flight[]> = {};
 
-    flightsArr.forEach((flight: Flight) => {
+    completedFlightsArray.forEach((flight: Flight) => {
       const dateOfFlight = dayjs(flight.arrival?.arrivalDate).format(
         "YYYY-MM-DD"
       );
@@ -37,24 +29,11 @@ export default function Page() {
     });
 
     return dateFlightsMap;
-  }, [flightsArr]);
+  }, [completedFlightsArray]);
 
   //agg flights by date
-
   return (
     <ScrollView contentContainerStyle={styles.wrapper}>
-      <FAB
-        icon="plus"
-        color={theme.colors.text}
-        style={{ ...styles.fab }}
-        variant="secondary"
-        label="Create a new flight"
-        onPress={() => {
-          //clear leftover flight
-          dispatch(removeCurrentFlightById());
-          router.navigate("/(createFlight)/general");
-        }}
-      />
       {Object.entries(parseFlightsByDate).map(([date, flights], index) => {
         return (
           <FlightSection
@@ -71,7 +50,6 @@ export default function Page() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",

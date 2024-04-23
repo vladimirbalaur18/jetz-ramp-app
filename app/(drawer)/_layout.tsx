@@ -26,6 +26,20 @@ export default function Layout() {
           }}
         />
         <Drawer.Screen
+          name="completedFlights" // This is the name of the page and must match the url from root
+          options={{
+            drawerLabel: "Completed flights",
+            title: "Completed flights",
+            drawerIcon: () => (
+              <MaterialCommunityIcons
+                name="tooltip-check-outline"
+                size={24}
+                color={iconColor}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="config" // This is the name of the page and must match the url from root
           options={{
             drawerLabel: "Configuration",

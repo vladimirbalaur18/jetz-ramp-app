@@ -7,9 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   removeFlight,
   setCurrentFlightById,
+  updateFlight,
 } from "@/redux/slices/flightsSlice";
 import dayjs from "dayjs";
 import { RootState } from "@/redux/store";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Field = [
   label: ReactNode,
@@ -140,10 +142,22 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
             }
           );
         }}
-        title="Remove flight"
+        leadingIcon={() => (
+          <MaterialCommunityIcons
+            name="trash-can"
+            color={theme?.colors?.error}
+            size={18}
+          />
+        )}
+        titleStyle={{
+          color: theme.colors.error,
+          columnGap: 3,
+        }}
+        title={"Remove flight"}
       />
       {(flight.handlingType === "Arrival" || flight.handlingType === "FULL") &&
-        flight?.arrival && (
+        flight?.arrival &&
+        flight?.status !== "Completed" && (
           <Menu.Item
             onPress={() => {
               dispatch(setCurrentFlightById(flight?.flightId as string));
@@ -152,12 +166,20 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
               router.navigate("/(createFlight)/arrival");
               closeMenu();
             }}
+            leadingIcon={() => (
+              <MaterialCommunityIcons
+                name="airplane-landing"
+                color={theme?.colors?.primary}
+                size={18}
+              />
+            )}
             title="Go to Arrival"
           />
         )}
       {(flight.handlingType === "Departure" ||
         flight.handlingType === "FULL") &&
-        flight?.departure && (
+        flight?.departure &&
+        flight?.status !== "Completed" && (
           <Menu.Item
             onPress={() => {
               // dispatch(removeFlight(flight?.flightId as string));
@@ -165,31 +187,76 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
               router.navigate("/(createFlight)/departure");
               closeMenu();
             }}
+            leadingIcon={() => (
+              <MaterialCommunityIcons
+                name="airplane-takeoff"
+                color={theme?.colors?.primary}
+                size={18}
+              />
+            )}
             title="Go to Departure"
           />
         )}
       {flight.providedServices && (
         <>
-          <Menu.Item
-            onPress={() => {
-              dispatch(setCurrentFlightById(flight?.flightId as string));
+          {flight?.status !== "Completed" && (
+            <Menu.Item
+              onPress={() => {
+                dispatch(setCurrentFlightById(flight?.flightId as string));
 
-              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-              router.navigate("/(createFlight)/providedServices");
-              closeMenu();
-            }}
-            title="Go to PDF files generation"
-          />
-          <Menu.Item
-            onPress={() => {
-              dispatch(setCurrentFlightById(flight?.flightId as string));
+                // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                router.navigate("/(createFlight)/providedServices");
+                closeMenu();
+              }}
+              leadingIcon={() => (
+                <MaterialCommunityIcons
+                  name="clipboard-list-outline"
+                  color={theme?.colors?.primary}
+                  size={18}
+                />
+              )}
+              title="Go to Provided Services"
+            />
+          )}
+          {flight?.crew && flight?.ramp && (
+            <>
+              <Menu.Item
+                onPress={() => {
+                  dispatch(setCurrentFlightById(flight?.flightId as string));
 
-              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-              router.navigate("/(createFlight)/(tabs)/chargeNote");
-              closeMenu();
-            }}
-            title="Go to Provided Services"
-          />
+                  // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                  router.navigate("/(createFlight)/(tabs)/chargeNote");
+                  closeMenu();
+                }}
+                leadingIcon={() => (
+                  <MaterialCommunityIcons
+                    name="cloud-print-outline"
+                    color={theme?.colors?.primary}
+                    size={18}
+                  />
+                )}
+                title="Go to PDF files generation"
+              />
+              {flight?.status !== "Completed" && (
+                <Menu.Item
+                  onPress={() => {
+                    dispatch(updateFlight({ ...flight, status: "Completed" }));
+                    // // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                    // router.navigate("/(createFlight)/(tabs)/chargeNote");
+                    // closeMenu();
+                  }}
+                  leadingIcon={() => (
+                    <MaterialCommunityIcons
+                      name="tooltip-check-outline"
+                      color={theme?.colors?.primary}
+                      size={18}
+                    />
+                  )}
+                  title="Mark flight as completed"
+                />
+              )}
+            </>
+          )}
         </>
       )}
     </Menu>

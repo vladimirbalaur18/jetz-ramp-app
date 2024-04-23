@@ -75,7 +75,11 @@ export type Flight = {
   crew: { signature: string; name: string };
   ramp: { signature: string; name: string };
   isCommercialFlight?: boolean;
-  status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
+  status?:
+    | "ArrivalCompleted"
+    | "DepartureCompleted"
+    | "ServicesCompleted"
+    | "Completed";
   chargeNote: {
     date: Dayjs;
     billingTo: string;
