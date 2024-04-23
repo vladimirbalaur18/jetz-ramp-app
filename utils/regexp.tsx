@@ -1,5 +1,5 @@
 export default {
-  number: /^[0-9]*$/,
+  number: /^[0-9].*$/,
   price: /^(\d+(?:[\.\,]\d{2})?)$/,
   airfield: /^[A-Z]{2}[0-9A-Z]{2}$/,
   operatorName: /^[a-z ,.'-]+$/i,

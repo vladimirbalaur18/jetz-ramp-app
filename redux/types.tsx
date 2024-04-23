@@ -77,9 +77,16 @@ export type Flight = {
   isCommercialFlight?: boolean;
   status?: "ArrivalCompleted" | "DepartureCompleted" | "ServicesCompleted";
   chargeNote: {
+    date: Dayjs;
     billingTo: string;
     remarks: string;
     paymentType: string;
+    currency: {
+      //corresponding to the date
+      date: Dayjs;
+      euroToMDL: string;
+      usdToMDL: string;
+    };
   };
 
   // chargeNote: Charges;

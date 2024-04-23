@@ -15,6 +15,7 @@ type ChargeListService = {
   serviceName: string;
   basePrice: number;
   totalPrice?: number;
+  isPriceOverriden?: boolean;
 };
 export default function chargeNoteTemplateHTML(flight: Flight) {
   let VATServicesList: Array<ChargeListService> = [];
@@ -68,27 +69,54 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
 
   flight?.providedServices?.otherServices?.forEach((category) => {
     category.services.forEach((s) => {
-      if (s?.isUsed)
-        if (!s.hasVAT) {
-          const quantity = s?.isPriceOverriden ? 1 : Number(s?.quantity);
-          const basePrice = s.pricing.amount;
-          const amount = s?.isPriceOverriden
-            ? s.totalPriceOverride
-            : basePrice || 0 * quantity;
+      if (s?.isUsed) {
+        const quantity = Number(s?.quantity);
+        const basePrice = s?.pricing?.amount;
+        const amount = s?.isPriceOverriden
+          ? s.totalPriceOverride
+          : basePrice || 0 * quantity;
 
+        if (!s.hasVAT) {
           servicesListNoVAT.push({
             serviceName: s.serviceName,
-            basePrice: Number(s.pricing.amount),
+            basePrice: Number(amount),
             totalPrice: Number(amount),
           });
         } else
           VATServicesList.push({
             serviceName: s.serviceName,
-            basePrice: Number(s.pricing.amount),
-            totalPrice: Number(s.pricing.amount) * getVATMultiplier(),
+            basePrice: Number(amount),
+            totalPrice: Number(amount) * getVATMultiplier(),
           });
+      }
     });
   });
+
+  const VIPTerminalPrice = getLoungeFeePrice({
+    ...flight?.providedServices?.VIPLoungeServices,
+  }).amount;
+  const VIPPriceToEur = Number(
+    convertCurrency(
+      VIPTerminalPrice,
+      Number(Number(flight?.chargeNote?.currency?.euroToMDL))
+    )
+  );
+  const airportFeeTotal = Number(
+    flight?.providedServices?.supportServices?.airportFee.total
+  );
+  const cateringFeeTotal = Number(
+    flight?.providedServices?.supportServices?.catering.total
+  );
+  const fuelFeeTotal = getFuelFeeAmount({
+    ...flight?.providedServices?.supportServices?.fuel,
+    flight,
+  });
+  const hotacFeeTotal = Number(
+    flight?.providedServices?.supportServices.HOTAC.total
+  );
+
+  const totalSupportServicesAmount =
+    VIPPriceToEur + cateringFeeTotal + fuelFeeTotal + hotacFeeTotal;
 
   const additionalServicesRenderHTML = () => {
     let resultHTML = "";
@@ -123,9 +151,6 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
     return resultHTML;
   };
   const thirdPartyServiceProvidersRenderHTML = () => {
-    const VIPTerminalPrice = getLoungeFeePrice({
-      ...flight?.providedServices?.VIPLoungeServices,
-    }).amount;
     return `<tr height="19" style="height:14.4pt">
   <td height="19" class="xl139" style="height:14.4pt">&nbsp;</td>
   <td class="xl140" colspan="2" style="mso-ignore:colspan">Express/VIP Terminal</td>
@@ -135,9 +160,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${
-    Number(convertCurrency(VIPTerminalPrice, Number(config.euroToMDL))).toFixed(
-      2
-    ) || 0
+    VIPPriceToEur.toFixed(2) || 0
   }</td>
  </tr>
  <tr height="19" style="height:14.4pt">
@@ -149,9 +172,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    Number(flight?.providedServices?.supportServices?.airportFee.total).toFixed(
-      2
-    ) || 0
+    airportFeeTotal.toFixed(2) || 0
   }</td>
  </tr>
  <tr height="19" style="height:14.4pt">
@@ -164,9 +185,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    Number(flight?.providedServices?.supportServices?.catering.total).toFixed(
-      2
-    ) || 0
+    cateringFeeTotal.toFixed(2) || 0
   }</td>
  </tr>
  <tr height="19" style="height:14.4pt">
@@ -179,10 +198,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl148" width="128" style="border-right:1.0pt solid black;
-  width:96pt">${getFuelFeeAmount({
-    ...flight?.providedServices?.supportServices?.fuel,
-    flight,
-  }).toFixed(2)}</td>
+  width:96pt">${fuelFeeTotal.toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl150" style="height:14.4pt;border-top:none">&nbsp;</td>
@@ -194,14 +210,14 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    Number(flight?.providedServices?.supportServices.HOTAC.total).toFixed(2) ||
-    0
+    hotacFeeTotal.toFixed(2) || 0
   }</td>
  </tr>`;
   };
   const VATApplicableServicesRenderHTML = () => {
-    return VATServicesList.map(({ basePrice, serviceName, totalPrice }) => {
-      return ` <tr height="20" style="height:15.0pt">
+    return VATServicesList.map(
+      ({ basePrice, serviceName, totalPrice, isPriceOverriden }) => {
+        return ` <tr height="20" style="height:15.0pt">
   <td height="20" class="xl127" style="height:15.0pt;border-top:none">&nbsp;</td>
   <td colspan="2" class="xl134">${serviceName}</td>
   <td class="xl163" style="border-top:none">&nbsp;</td>
@@ -211,16 +227,30 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   <td class="xl181" style="border-top:none">${config.VAT}%</td>
   <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice}</td>
  </tr>`;
-    });
+      }
+    );
   };
+
   const servicesTotalAmountNoVAT =
     servicesListNoVAT.reduce(
       (accumulator, current) => accumulator + (current?.totalPrice || 0),
       0
     ) +
     getTotalAirportFeesPrice(flight).total +
-    totalDisbursementFeesAmount;
-  console.log(servicesTotalAmountNoVAT, servicesListNoVAT);
+    totalDisbursementFeesAmount +
+    totalSupportServicesAmount;
+
+  console.log(
+    "ok",
+    servicesListNoVAT.reduce(
+      (accumulator, current) => accumulator + (current?.totalPrice || 0),
+      0
+    ),
+    getTotalAirportFeesPrice(flight).total,
+    totalDisbursementFeesAmount,
+    totalSupportServicesAmount
+  );
+
   const servicesTotalAmountWithVAT = VATServicesList.reduce(
     (accumulator, current) => accumulator + (current?.totalPrice || 0),
     0
@@ -2740,7 +2770,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   none">TOTAL MDL</td>
   <td colspan="2" class="xl174" style="border-right:1.0pt solid black">${convertCurrency(
     servicesTotalAmountNoVAT,
-    1 / config.euroToMDL
+    1 / Number(flight?.chargeNote?.currency?.euroToMDL)
   ).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
@@ -2781,7 +2811,7 @@ ${VATApplicableServicesRenderHTML()}
   <td colspan="2" class="xl197" style="border-right:1.0pt solid black;border-left:
   none">${convertCurrency(
     servicesTotalAmountWithVAT,
-    1 / config.euroToMDL
+    1 / Number(flight?.chargeNote?.currency?.euroToMDL)
   ).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
@@ -2789,8 +2819,14 @@ ${VATApplicableServicesRenderHTML()}
   <td colspan="2" class="xl200" style="border-right:.5pt solid black;border-left:
   none">GRAND TOTAL MDL</td>
   <td colspan="2" class="xl202" style="border-right:1.0pt solid black">${(
-    convertCurrency(servicesTotalAmountNoVAT, 1 / config.euroToMDL) +
-    convertCurrency(servicesTotalAmountWithVAT, 1 / config.euroToMDL)
+    convertCurrency(
+      servicesTotalAmountNoVAT,
+      1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+    ) +
+    convertCurrency(
+      servicesTotalAmountWithVAT,
+      1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+    )
   ).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
@@ -2805,7 +2841,7 @@ ${VATApplicableServicesRenderHTML()}
   <td rowspan="2" class="xl207" style="border-bottom:1.0pt solid black;border-top:
   none">1 EUR =</td>
   <td rowspan="2" class="xl208" style="border-bottom:1.0pt solid black;border-top:
-  none">${config.euroToMDL.toFixed(2)}</td>
+  none">${Number(flight?.chargeNote?.currency?.euroToMDL).toFixed(2)}</td>
   <td colspan="2" rowspan="2" class="xl209" style="border-right:1.0pt solid black;
   border-bottom:1.0pt solid black">${dayjs().format("DD-MMM-YY")}</td>
  </tr>

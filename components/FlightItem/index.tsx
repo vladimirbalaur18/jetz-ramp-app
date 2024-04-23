@@ -168,6 +168,30 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
             title="Go to Departure"
           />
         )}
+      {flight.providedServices && (
+        <>
+          <Menu.Item
+            onPress={() => {
+              dispatch(setCurrentFlightById(flight?.flightId as string));
+
+              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+              router.navigate("/(createFlight)/providedServices");
+              closeMenu();
+            }}
+            title="Go to PDF files generation"
+          />
+          <Menu.Item
+            onPress={() => {
+              dispatch(setCurrentFlightById(flight?.flightId as string));
+
+              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+              router.navigate("/(createFlight)/(tabs)/chargeNote");
+              closeMenu();
+            }}
+            title="Go to Provided Services"
+          />
+        </>
+      )}
     </Menu>
   );
 };

@@ -49,6 +49,7 @@ import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields"
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import DropDown from "react-native-paper-dropdown";
 import _ from "lodash";
+import formStyles from "@/styles/formStyles";
 
 const Form: React.FC = () => {
   const router = useRouter();
@@ -71,6 +72,11 @@ const Form: React.FC = () => {
       orderingCompanyName: "OrderingOperator",
       scheduleType: FlightSchedule.NonScheduled,
       mtow: 2417,
+      chargeNote: {
+        currency: {
+          date: dayjs(),
+        },
+      },
     },
   });
   const { errors } = formState;
@@ -366,6 +372,52 @@ const Form: React.FC = () => {
                 error={errors.mtow && true}
               />
               <HelperText type="error">{errors.mtow?.message}</HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.currency.euroToMDL"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="EURO to MDL rate"
+                style={formStyles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.currency?.euroToMDL && true}
+              />
+              <HelperText type="error">
+                {errors.chargeNote?.currency?.euroToMDL?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.currency.usdToMDL"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="USD to MDL rate"
+                style={formStyles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.currency?.usdToMDL && true}
+              />
+              <HelperText type="error">
+                {errors.chargeNote?.currency?.usdToMDL?.message}
+              </HelperText>
             </>
           )}
         />

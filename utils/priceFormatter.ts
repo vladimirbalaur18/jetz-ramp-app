@@ -3,8 +3,9 @@ import { store } from "@/redux/store";
 export default function formatMDLPriceToEuro(price: {
   amount: number;
   currency: string;
+  euroToMDL: number;
 }) {
-  const rateMDLtoEUR = store.getState().general.euroToMDL;
+  const rateMDLtoEUR = price.euroToMDL;
   if (price.currency === "EUR") {
     return { displayedString: price.amount + " EUR", amountEuro: price.amount };
   }

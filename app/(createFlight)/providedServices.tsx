@@ -9,6 +9,10 @@ import {
   HelperText,
   Text,
   Divider,
+  Modal,
+  PaperProvider,
+  Portal,
+  useTheme,
 } from "react-native-paper";
 import { Flight } from "@/redux/types";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
@@ -32,11 +36,11 @@ import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import convertCurrency from "@/utils/convertCurrency";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 type FormData = Flight;
 
 const Form: React.FC = () => {
   const SERVICES_DEFINITIONS = getAllServices();
-
   const state = useSelector((state: RootState) => state);
   const { general } = state;
   const existingFlight = selectCurrentFlight(state);
@@ -78,7 +82,6 @@ const Form: React.FC = () => {
             ),
           },
           fuel: {
-            fuelDensity: 1000,
             fuelLitersQuantity: 0,
           },
           catering: { total: 0 },
@@ -91,7 +94,8 @@ const Form: React.FC = () => {
     },
   });
   const { errors } = formState;
-
+  const [priceOverrideModalVisible, setPriceOverrideModalVisible] =
+    useState(false);
   const { fields, append, update } = useFieldArray({
     control,
     name: "providedServices.otherServices",
@@ -139,9 +143,10 @@ const Form: React.FC = () => {
         providedServicesObj.supportServices.HOTAC.total *
         disbursementFeeMultplier,
       VIPLoungeFee:
-        formatMDLPriceToEuro(
-          getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices })
-        ).amountEuro * disbursementFeeMultplier,
+        formatMDLPriceToEuro({
+          ...getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices }),
+          euroToMDL: Number(existingFlight?.chargeNote.currency.euroToMDL),
+        }).amountEuro * disbursementFeeMultplier,
     };
 
     setValue("providedServices.disbursementFees", disbursementFees);
@@ -152,7 +157,7 @@ const Form: React.FC = () => {
     providedServicesObj.supportServices.airportFee.total,
     JSON.stringify(providedServicesObj.VIPLoungeServices),
   ]);
-
+  const theme = useTheme();
   useEffect(() => {
     //render additional services inputs
 
@@ -357,7 +362,7 @@ const Form: React.FC = () => {
                   keyboardType="numeric"
                   onChangeText={(text) => {
                     if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
+                      onChange(text.replace(/[^0-9.]/g, ""));
                     } else {
                       setValue(name, "" as any); //prevent throwing undefined errors
                     }
@@ -598,12 +603,21 @@ const Form: React.FC = () => {
                     serviceName,
                     hasVAT,
                     isPriceOverriden,
+                    pricing: { amount, currency },
                   } = service;
                   return (
                     <>
                       <View style={{ ...formStyles.row, marginVertical: 30 }}>
                         <Text variant="bodyLarge">
+                          {isPriceOverriden && (
+                            <MaterialCommunityIcons
+                              name="pencil"
+                              size={14}
+                              color={theme.colors.onSurface}
+                            />
+                          )}{" "}
                           {serviceName} {hasVAT && `(with VAT)`}
+                          {"  "}
                         </Text>
                         <Controller
                           control={control}
@@ -649,109 +663,191 @@ const Form: React.FC = () => {
                       <View>
                         {isUsed === true && (
                           <>
-                            <Controller
-                              control={control}
-                              defaultValue={1}
-                              name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.quantity`}
-                              rules={{
-                                required: {
-                                  value: true,
-                                  message: ERROR_MESSAGES.REQUIRED,
-                                },
-                                pattern: {
-                                  message: "Please insert correct format",
-                                  value: REGEX.number,
-                                },
-                              }}
-                              render={({
-                                field: { onBlur, onChange, value },
-                              }) => (
-                                <>
-                                  <TextInput
-                                    label="Quantity:"
-                                    style={formStyles.input}
-                                    value={String(value)}
-                                    onBlur={onBlur}
-                                    keyboardType="numeric"
-                                    onChangeText={(text) => onChange(text)}
-                                    error={
-                                      //@ts-ignore
-                                      errors?.providedServices?.otherServices[
-                                        categoryIndex
-                                      ]?.services[serviceIndex]?.quantity &&
-                                      true
+                            {
+                              <>
+                                <Controller
+                                  control={control}
+                                  defaultValue={1}
+                                  name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.quantity`}
+                                  rules={{
+                                    required: {
+                                      value: true,
+                                      message: ERROR_MESSAGES.REQUIRED,
+                                    },
+                                    pattern: {
+                                      message: "Please insert correct format",
+                                      value: REGEX.number,
+                                    },
+                                  }}
+                                  render={({
+                                    field: { onBlur, onChange, value },
+                                  }) => (
+                                    <>
+                                      <TextInput
+                                        label="Quantity:"
+                                        style={formStyles.input}
+                                        value={String(value)}
+                                        onBlur={onBlur}
+                                        keyboardType="numeric"
+                                        onChangeText={(text) => onChange(text)}
+                                        error={
+                                          //@ts-ignore
+                                          errors?.providedServices
+                                            ?.otherServices[categoryIndex]
+                                            ?.services[serviceIndex]
+                                            ?.quantity && true
+                                        }
+                                      />
+                                    </>
+                                  )}
+                                />
+                                <Controller
+                                  control={control}
+                                  defaultValue={""}
+                                  name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.notes`}
+                                  render={({
+                                    field: { onBlur, onChange, value },
+                                  }) => (
+                                    <>
+                                      <TextInput
+                                        label="notes:"
+                                        style={formStyles.input}
+                                        value={String(value)}
+                                        onBlur={onBlur}
+                                        onChangeText={(text) => onChange(text)}
+                                      />
+                                    </>
+                                  )}
+                                />
+                                <View
+                                  style={{
+                                    ...formStyles.row,
+                                    marginVertical: 0,
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      marginVertical: 5,
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    Amount:{" "}
+                                    {isPriceOverriden
+                                      ? service?.totalPriceOverride
+                                      : quantity * amount}
+                                    {currency}
+                                  </Text>
+                                  <Button
+                                    onPress={() =>
+                                      setPriceOverrideModalVisible(true)
                                     }
-                                  />
-                                </>
-                              )}
-                            />
-                            <Controller
-                              control={control}
-                              defaultValue={""}
-                              name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.notes`}
-                              render={({
-                                field: { onBlur, onChange, value },
-                              }) => (
-                                <>
-                                  <TextInput
-                                    label="notes:"
-                                    style={formStyles.input}
-                                    value={String(value)}
-                                    onBlur={onBlur}
-                                    onChangeText={(text) => onChange(text)}
-                                  />
-                                </>
-                              )}
-                            />
-                            <View
-                              style={{ ...formStyles.row, marginVertical: 0 }}
-                            >
-                              <Controller
-                                control={control}
-                                defaultValue={isUsed}
-                                name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.isPriceOverriden`}
-                                render={({ field: { value, onChange } }) => (
-                                  <>
-                                    <Text>Override price</Text>
-                                    <Switch
-                                      value={value}
-                                      onValueChange={(value) => {
-                                        //if there is at least oen erroneous field, dont' allow selecting dynamic fields
-                                        //this causees race conditions
-                                        if (
-                                          Object.entries(errors).some(
-                                            ([key, value]) => {
-                                              if (value) {
-                                                alert(
-                                                  "Please complete the erroneous fields first"
-                                                );
-                                                return value;
-                                              }
-                                            }
-                                          )
-                                        )
-                                          return;
-
-                                        update(categoryIndex, {
-                                          ...category,
-                                          services: (category?.services).map(
-                                            (service, i) =>
-                                              i === serviceIndex
-                                                ? {
-                                                    ...service,
-                                                    isPriceOverriden: value,
-                                                  }
-                                                : service
-                                          ),
-                                        });
-                                        onChange(value);
-                                      }}
+                                  >
+                                    <MaterialCommunityIcons
+                                      name="pencil"
+                                      size={14}
                                     />
-                                  </>
-                                )}
-                              />
-                            </View>
-                            {isPriceOverriden && (
+                                  </Button>
+                                </View>
+                                <View
+                                  style={{
+                                    ...formStyles.row,
+                                    marginVertical: 0,
+                                  }}
+                                >
+                                  <PriceOverrideModal
+                                    visible={priceOverrideModalVisible}
+                                    onDismiss={() =>
+                                      setPriceOverrideModalVisible(false)
+                                    }
+                                  >
+                                    <Text variant="bodyMedium">
+                                      {serviceName}
+                                    </Text>
+                                    <Controller
+                                      control={control}
+                                      defaultValue={undefined}
+                                      name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.totalPriceOverride`}
+                                      render={({
+                                        field: { onBlur, onChange, value },
+                                      }) => (
+                                        <>
+                                          <TextInput
+                                            label="Manual price override:"
+                                            style={formStyles.input}
+                                            onBlur={onBlur}
+                                            onChangeText={(text) =>
+                                              onChange(text)
+                                            }
+                                          />
+
+                                          <View
+                                            style={{
+                                              justifyContent: "space-between",
+                                              flexDirection: "row",
+                                              marginVertical: 10,
+                                              alignItems: "center",
+                                            }}
+                                          >
+                                            <Button
+                                              onPress={() => {
+                                                update(categoryIndex, {
+                                                  ...category,
+                                                  services:
+                                                    (category?.services).map(
+                                                      (service, i) =>
+                                                        i === serviceIndex
+                                                          ? {
+                                                              ...service,
+                                                              isPriceOverriden:
+                                                                false,
+                                                            }
+                                                          : service
+                                                    ),
+                                                });
+                                                setPriceOverrideModalVisible(
+                                                  false
+                                                );
+                                              }}
+                                            >
+                                              Reset
+                                            </Button>
+                                            <Button
+                                              style={{ marginVertical: 20 }}
+                                              mode="contained"
+                                              onPress={() => {
+                                                update(categoryIndex, {
+                                                  ...category,
+                                                  services:
+                                                    (category?.services).map(
+                                                      (service, i) =>
+                                                        i === serviceIndex
+                                                          ? {
+                                                              ...service,
+                                                              isPriceOverriden:
+                                                                true,
+                                                              totalPriceOverride:
+                                                                value,
+                                                            }
+                                                          : service
+                                                    ),
+                                                });
+                                                setPriceOverrideModalVisible(
+                                                  false
+                                                );
+                                              }}
+                                            >
+                                              Submit
+                                            </Button>
+                                          </View>
+                                        </>
+                                      )}
+                                    />
+                                  </PriceOverrideModal>
+                                </View>
+                              </>
+                            }
+
+                            {/* {isPriceOverriden && (
                               <Controller
                                 control={control}
                                 defaultValue={0}
@@ -770,7 +866,7 @@ const Form: React.FC = () => {
                                   </>
                                 )}
                               />
-                            )}
+                            )} */}
                           </>
                         )}
                       </View>
@@ -799,6 +895,41 @@ const Form: React.FC = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+};
+
+const PriceOverrideModal = ({
+  //@ts-expect-error
+  children,
+  visible = false,
+  onDismiss = () => {},
+  onSubmit = () => {},
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={onDismiss}
+        contentContainerStyle={{
+          padding: 20,
+          backgroundColor: "transparent",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: theme.colors.surface,
+            height: 250,
+            padding: 30,
+            justifyContent: "center",
+            borderRadius: 15,
+          }}
+        >
+          {children}
+        </View>
+      </Modal>
+    </Portal>
   );
 };
 

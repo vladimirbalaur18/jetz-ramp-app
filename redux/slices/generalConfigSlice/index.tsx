@@ -14,18 +14,14 @@ export const initializeConfigsAsync = createAsyncThunk(
 type GeneralConfigState = {
   VAT: number;
   disbursementPercentage: number;
-  euroToMDL: number;
   conventionalUnit: string;
-  fuelPricePerTon: string | number;
   defaultAirport: string;
 };
 
 const initialState: GeneralConfigState = {
   VAT: 20,
   disbursementPercentage: 10,
-  euroToMDL: 19.145,
   conventionalUnit: "euro",
-  fuelPricePerTon: 0,
   defaultAirport: "LUKK",
 };
 

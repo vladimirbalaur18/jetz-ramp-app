@@ -37,7 +37,7 @@ const TotalServicesSection: React.FC<{
 
   const totalAmountOfServices = useMemo(() => {
     //GENERAL CONFIG FOR SOME REASON DOESNT INITIALIZE
-    const rateMDLtoEUR = generalConfig.euroToMDL || 20;
+    const rateMDLtoEUR = Number(existingFlight.chargeNote.currency.euroToMDL);
     const calculateOtherServicesTotal = () => {
       let total = 0;
 
@@ -108,6 +108,7 @@ const TotalServicesSection: React.FC<{
           formatMDLPriceToEuro({
             amount: loungeFeeAmount,
             currency: loungeFeeCurrency,
+            euroToMDL: Number(existingFlight.chargeNote.currency.euroToMDL),
           }).displayedString
         }
       </Text>
