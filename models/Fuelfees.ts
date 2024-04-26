@@ -1,10 +1,13 @@
 import Realm, { ObjectSchema } from "realm";
 
-class FuelFees extends Realm.Object<{
+export type FuelFeesState = {
   priceUSDperKG: number;
-}> {
+};
+export class FuelFees extends Realm.Object<FuelFeesState> {
+  priceUSDperKG!: number;
+
   static schema: ObjectSchema = {
-    name: "fuelFees",
+    name: "FuelFees",
     properties: {
       priceUSDperKG: { type: "float" },
     },

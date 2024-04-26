@@ -1,10 +1,10 @@
 import Realm from "realm";
-import ConfigModel from "./models/Config";
+import { DepartureArrival, LoungeFee, Price } from "./models/LoungeFees";
+import General from "./models/Config";
+import { FuelFees } from "./models/Fuelfees";
 
-const realmConfig: Realm.Configuration = {
-  schema: [ConfigModel],
+export const realmConfig: Realm.Configuration = {
+  schema: [General, DepartureArrival, LoungeFee, Price, FuelFees],
 };
 
-const realm = new Realm(realmConfig);
-
-export default realm;
+export const realmWithoutSync = new Realm(realmConfig);

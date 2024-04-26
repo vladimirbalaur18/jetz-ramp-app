@@ -10,6 +10,8 @@ import convertCurrency from "./convertCurrency";
 import { store } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
+import { useQuery } from "@realm/react";
+import { GeneralConfigState } from "@/models/Config";
 
 type ChargeListService = {
   serviceName: string;
@@ -22,7 +24,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
-  const config = store.getState().general;
+  const [config] = useQuery<GeneralConfigState>("General");
   const basicHandling = getBasicHandlingPrice(flight);
 
   const basicHandlingWithoutVAT = (() => {

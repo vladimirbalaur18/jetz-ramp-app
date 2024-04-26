@@ -1,6 +1,5 @@
 import { Flight } from "@/redux/types";
 import AirportFees from "@/configs/airportFees.json";
-import FuelFees from "@/configs/fuelFees.json";
 import {
   getDifferenceBetweenArrivalDeparture,
   getFlightMTOWinTons,
@@ -11,6 +10,9 @@ import isNightTime from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import { store } from "@/redux/store";
 import convertCurrency from "@/utils/convertCurrency";
+import { realmWithoutSync } from "@/realm";
+import { GeneralConfigState } from "@/models/Config";
+import { FuelFeesState } from "@/models/Fuelfees";
 
 export const getFuelFeeAmount = ({
   fuelDensity,
@@ -21,8 +23,10 @@ export const getFuelFeeAmount = ({
   fuelLitersQuantity: number;
   flight: Flight;
 }) => {
-  const state = store.getState();
-  const VAT = state.general.VAT / 100 + 1;
+  const [general] = realmWithoutSync.objects<GeneralConfigState>("General");
+  const [FuelFees] = realmWithoutSync.objects<FuelFeesState>("FuelFees");
+
+  const VAT = general.VAT / 100 + 1;
   const VATRateMultiplier = flight?.departure?.isLocalFlight ? VAT : 1;
 
   const priceEURPerTon = convertCurrency(

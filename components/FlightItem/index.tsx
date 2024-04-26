@@ -12,6 +12,8 @@ import {
 import dayjs from "dayjs";
 import { RootState } from "@/redux/store";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useQuery } from "@realm/react";
+import { GeneralConfigState } from "@/models/Config";
 
 type Field = [
   label: ReactNode,
@@ -22,7 +24,7 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
-  const configs = useSelector((state: RootState) => state.general);
+  const [configs] = useQuery<GeneralConfigState>("General");
   const baseAirport = configs.defaultAirport;
   const formatFlightTime = ({
     hours,

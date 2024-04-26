@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import {
@@ -18,15 +18,15 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import merge from "deepmerge";
 import { useColorScheme } from "@/components/useColorScheme";
 import { AppDispatch, RootState, store } from "@/redux/store";
-import { useAppDispatch } from "@/redux/store";
+import { RealmProvider, useQuery, useRealm } from "@realm/react";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
 import { enGB, registerTranslation } from "react-native-paper-dates";
-import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { realmConfig, realmWithoutSync } from "@/realm";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -71,28 +71,33 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider store={store}>
-      <RootLayoutNav />
-    </Provider>
+    <RealmProvider schema={realmConfig.schema}>
+      <Provider store={store}>
+        <RootLayoutNav />
+      </Provider>
+    </RealmProvider>
   );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const realm = useRealm();
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
   const dispatch = useDispatch<AppDispatch>();
   const currentFlightNumber = selectCurrentFlight(
     useSelector((state: RootState) => state)
   )?.flightNumber;
-
+  const [configs] = realmWithoutSync.objects("General");
   const FlightNumberIndicator = currentFlightNumber
     ? `(${currentFlightNumber})`
     : "";
 
   useEffect(() => {
-    dispatch(initializeConfigsAsync());
-  }, [dispatch]);
+    if (!configs) {
+      router.navigate("/(drawer)/config");
+    }
+  }, []);
 
   return (
     <PaperProvider theme={themeBase}>

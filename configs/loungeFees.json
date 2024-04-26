@@ -18,15 +18,5 @@
             "amount": 550,
             "currency": "MDL"
         }
-    },
-    "departureAndArrival": {
-        "pricePerAdult": {
-            "amount": 2420,
-            "currency": "MDL"
-        },
-        "pricePerMinor": {
-            "amount": 1210,
-            "currency": "MDL"
-        }
     }
 }

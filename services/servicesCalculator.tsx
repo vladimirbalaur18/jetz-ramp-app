@@ -15,6 +15,8 @@ import {
   getTakeOffFees,
 } from "./AirportFeesManager";
 import { applyVAT, getVATMultiplier } from "./AirportFeesManager/utils";
+import { realmWithoutSync } from "@/realm";
+import { GeneralConfigState } from "@/models/Config";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -108,7 +110,8 @@ export const getLoungeFeePrice = ({
   adultPax = 0,
   typeOf = "",
 }) => {
-  const VATMultiplier = store.getState().general.VAT / 100 + 1;
+  const [general] = realmWithoutSync.objects<GeneralConfigState>("General");
+  const VATMultiplier = general.VAT / 100 + 1;
   let result = 0;
   switch (typeOf) {
     case "Departure": {

@@ -10,6 +10,8 @@ import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import convertCurrency from "@/utils/convertCurrency";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
+import { useQuery } from "@realm/react";
+import { GeneralConfigState } from "@/models/Config";
 
 const TotalServicesSection: React.FC<{
   providedServices: ProvidedServices;
@@ -23,7 +25,7 @@ const TotalServicesSection: React.FC<{
     disbursementFees,
   } = providedServices;
 
-  const generalConfig = useSelector((state: RootState) => state.general);
+  const [generalConfig] = useQuery<GeneralConfigState>("General");
   console.log("genCOnfig", generalConfig);
 
   const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =

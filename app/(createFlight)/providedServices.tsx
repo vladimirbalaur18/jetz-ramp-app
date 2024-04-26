@@ -32,24 +32,22 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useRouter } from "expo-router";
 import TotalServicesSection from "@/components/TotalServicesSection";
-import { initializeConfigsAsync } from "@/redux/slices/generalConfigSlice";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import convertCurrency from "@/utils/convertCurrency";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useQuery } from "@realm/react";
+import { GeneralConfigState } from "@/models/Config";
 type FormData = Flight;
 
 const Form: React.FC = () => {
   const SERVICES_DEFINITIONS = getAllServices();
   const state = useSelector((state: RootState) => state);
-  const { general } = state;
+  const [general] = useQuery<GeneralConfigState>("General");
   const existingFlight = selectCurrentFlight(state);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const basicHandlingPricePerLegs = getBasicHandlingPrice(existingFlight);
-  useEffect(() => {
-    dispatch(initializeConfigsAsync());
-  }, [dispatch]);
 
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
   const {

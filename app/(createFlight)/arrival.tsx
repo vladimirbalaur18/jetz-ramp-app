@@ -1,55 +1,30 @@
-import React, { useLayoutEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
+import React from "react";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
   Button,
   Switch,
   HelperText,
-  List,
   Text,
-  RadioButton,
-  Divider,
 } from "react-native-paper";
 import { Flight, ProvidedServices } from "@/redux/types";
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-  UseFieldArrayRemove,
-  Control,
-  FieldErrors,
-  useWatch,
-} from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
-import { useLocalSearchParams, useRouter } from "expo-router";
-type FormData = Flight;
+import { useForm, Controller } from "react-hook-form";
+import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
+import { useDispatch, useSelector } from "react-redux";
+import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
+import { RootState } from "@/redux/store";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import _ from "lodash";
+type FormData = Flight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
-import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
-import _ from "lodash";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
