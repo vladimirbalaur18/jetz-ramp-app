@@ -1,4 +1,5 @@
-import { store } from "@/redux/store";
+import { GeneralConfigState } from "@/models/Config";
+import { realmWithoutSync } from "@/realm";
 import { Arrival, Departure, Flight } from "@/redux/types";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import dayjs from "dayjs";
@@ -36,8 +37,10 @@ export const getDifferenceBetweenArrivalDeparture = (
   };
 };
 
-export const getVATMultiplier = (): number =>
-  store.getState().general.VAT / 100 + 1;
+export const getVATMultiplier = (): number => {
+  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
+  return config.VAT / 100 + 1;
+};
 
 export const applyVAT = (price: number) => {
   return price * getVATMultiplier();

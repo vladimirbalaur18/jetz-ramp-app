@@ -3,8 +3,6 @@ import * as FileSystem from "expo-file-system";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
-import { Flight } from "@/redux/types";
-type FormData = Flight;
 
 const printToFile = async ({
   html = "",
@@ -17,7 +15,6 @@ const printToFile = async ({
   width?: number;
   height?: number;
 }) => {
-  // On iOS/android prints the given html. On web prints the HTML from the current page.
   const { uri } = await Print.printToFileAsync({ html, height, width });
 
   const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${fileName}.pdf`;

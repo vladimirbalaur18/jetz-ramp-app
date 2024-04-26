@@ -12,6 +12,7 @@ import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
+import { realmWithoutSync } from "@/realm";
 
 type ChargeListService = {
   serviceName: string;
@@ -24,7 +25,7 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
-  const [config] = useQuery<GeneralConfigState>("General");
+  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
   const basicHandling = getBasicHandlingPrice(flight);
 
   const basicHandlingWithoutVAT = (() => {
@@ -2812,7 +2813,7 @@ ${VATApplicableServicesRenderHTML()}
   <td class="xl187" style="border-left:none">&nbsp;</td>
   <td class="xl188">&nbsp;</td>
   <td colspan="2" class="xl194" style="border-right:1.0pt solid black;border-left:
-  none">VAT = 20%</td>
+  none">VAT = ${config.VAT}%</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl139" style="height:15.0pt">&nbsp;</td>

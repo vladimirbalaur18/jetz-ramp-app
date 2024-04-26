@@ -68,10 +68,16 @@ const Form: React.FC = () => {
         }
 
         if (fuelFee) {
+          const isPriceDifferent =
+            Number(data?.priceUSDperKG) !== Number(fuelFee?.priceUSDperKG);
           fuelFee.priceUSDperKG = Number(data.priceUSDperKG);
+          fuelFee.lastUpdated = isPriceDifferent
+            ? new Date()
+            : fuelFee.lastUpdated;
         } else {
           realm.create("FuelFees", {
             priceUSDperKG: Number(data.priceUSDperKG),
+            lastUpdated: new Date(),
           });
         }
       });
@@ -180,6 +186,13 @@ const Form: React.FC = () => {
                 onChangeText={(value) => onChange(value)}
                 error={errors?.priceUSDperKG && true}
               />
+              <Text variant="labelSmall">
+                {fuelFee &&
+                  "Last update: " +
+                    dayjs(fuelFee?.lastUpdated).format(
+                      "YYYY-MM-DDTHH:mm:ssZ[Z]"
+                    )}
+              </Text>
               <HelperText type="error">
                 {errors?.priceUSDperKG?.message}
               </HelperText>

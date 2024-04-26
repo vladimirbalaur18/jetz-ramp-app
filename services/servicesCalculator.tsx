@@ -126,12 +126,6 @@ export const getLoungeFeePrice = ({
         minorPax * loungeFees.arrival.pricePerMinor.amount;
       break;
     }
-    case "Departure & Arrival": {
-      result =
-        adultPax * loungeFees.departureAndArrival.pricePerAdult.amount +
-        minorPax * loungeFees.departureAndArrival.pricePerMinor.amount;
-      break;
-    }
   }
 
   console.log("type: ", typeOf);

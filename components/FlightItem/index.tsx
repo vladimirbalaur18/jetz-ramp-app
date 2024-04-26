@@ -92,8 +92,10 @@ const FlightItem = ({ flight }: { flight: Flight }) => {
             borderRadius: 25,
           }}
           onPress={() => {
-            dispatch(setCurrentFlightById(flight?.flightId as string));
-            router.navigate("/(createFlight)/general");
+            if (flight?.status !== "Completed") {
+              dispatch(setCurrentFlightById(flight?.flightId as string));
+              router.navigate("/(createFlight)/general");
+            }
           }}
           onLongPress={() => openMenu()}
         >
