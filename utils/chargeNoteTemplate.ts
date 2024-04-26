@@ -16,6 +16,7 @@ type ChargeListService = {
   basePrice: number;
   totalPrice?: number;
   isPriceOverriden?: boolean;
+  quantity?: number;
 };
 export default function chargeNoteTemplateHTML(flight: Flight) {
   let VATServicesList: Array<ChargeListService> = [];
@@ -23,8 +24,13 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
 
   const config = store.getState().general;
   const basicHandling = getBasicHandlingPrice(flight);
+
   const basicHandlingWithoutVAT = (() => {
     let result = 0;
+
+    if (flight?.providedServices?.basicHandling?.isPriceOverriden)
+      return Number(flight?.providedServices?.basicHandling?.total);
+
     if (!basicHandling.vat.arrival) {
       result += basicHandling.arrival;
     }
@@ -36,6 +42,9 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
     return result;
   })();
   const basicHandlingWithVAT = (() => {
+    if (flight?.providedServices?.basicHandling?.isPriceOverriden)
+      return Number(flight?.providedServices?.basicHandling?.total);
+
     let result = 0;
     if (basicHandling.vat.arrival) {
       result += basicHandling.arrival;
@@ -51,11 +60,15 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
     flight?.providedServices.disbursementFees
   ).reduce((accumulator, current) => accumulator + (current || 0), 0);
 
-  if (basicHandlingWithVAT) {
+  if (
+    basicHandlingWithVAT &&
+    !flight?.providedServices.basicHandling?.isPriceOverriden
+  ) {
     VATServicesList.push({
       serviceName: "Basic handling",
       basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),
       totalPrice: Number(basicHandlingWithVAT),
+      quantity: 1,
     });
   }
 
@@ -64,29 +77,32 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
       serviceName: "Basic handling",
       basePrice: Number(basicHandlingWithoutVAT),
       totalPrice: Number(basicHandlingWithoutVAT),
+      quantity: 1,
     });
   }
 
   flight?.providedServices?.otherServices?.forEach((category) => {
     category.services.forEach((s) => {
       if (s?.isUsed) {
-        const quantity = Number(s?.quantity);
+        const quantity = Number(s?.quantity) || 0;
         const basePrice = s?.pricing?.amount;
         const amount = s?.isPriceOverriden
-          ? s.totalPriceOverride
-          : basePrice || 0 * quantity;
+          ? s.totalPriceOverride || 0
+          : basePrice || 0;
 
         if (!s.hasVAT) {
           servicesListNoVAT.push({
             serviceName: s.serviceName,
             basePrice: Number(amount),
-            totalPrice: Number(amount),
+            totalPrice: Number(amount * quantity),
+            quantity: Number(quantity),
           });
         } else
           VATServicesList.push({
             serviceName: s.serviceName,
             basePrice: Number(amount),
-            totalPrice: Number(amount) * getVATMultiplier(),
+            totalPrice: Number(amount * quantity) * getVATMultiplier(),
+            quantity: Number(quantity),
           });
       }
     });
@@ -121,31 +137,23 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   const additionalServicesRenderHTML = () => {
     let resultHTML = "";
 
-    flight?.providedServices?.otherServices?.forEach((serviceCategory) => {
-      serviceCategory?.services.map((s) => {
-        if (s?.isUsed && !s?.hasVAT) {
-          const quantity = s?.isPriceOverriden ? 1 : Number(s?.quantity);
-          const basePrice = s.pricing.amount;
-          const amount = s?.isPriceOverriden
-            ? s.totalPriceOverride
-            : basePrice || 0 * quantity;
-
-          resultHTML += `
+    servicesListNoVAT.map((s) => {
+      resultHTML += `
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl118" style="height:14.4pt;">&nbsp;</td>
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">${
     s?.serviceName
   }</td>
-  <td class="xl121" style=";border-left:none">${quantity}</td>
+  <td class="xl121" style=";border-left:none">${s?.quantity}</td>
   <td colspan="2" class="xl114" style="border-right:.5pt solid black">${
-    s?.isPriceOverriden ? Number(amount).toFixed(2) : basePrice?.toFixed(2)
+    s?.isPriceOverriden
+      ? Number(s?.totalPrice).toFixed(2)
+      : s?.basePrice?.toFixed(2)
   }</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-    amount
+    s?.totalPrice
   ).toFixed(2)}</td>
  </tr>`;
-        }
-      });
     });
 
     return resultHTML;

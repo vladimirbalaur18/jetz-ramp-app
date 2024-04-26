@@ -65,9 +65,12 @@ const Form: React.FC = () => {
     mode: "all",
     defaultValues: {
       providedServices: existingFlight?.providedServices || {
-        basicHandling:
-          basicHandlingPricePerLegs.arrival +
-          basicHandlingPricePerLegs.departure,
+        basicHandling: {
+          total:
+            basicHandlingPricePerLegs.arrival +
+            basicHandlingPricePerLegs.departure,
+          isPriceOverriden: false,
+        },
         disbursementFees: {
           airportFee: 0,
           cateringFee: 0,
@@ -203,11 +206,19 @@ const Form: React.FC = () => {
   };
 
   // HELPERS
-  const submit = (data: any) => {
+  const submit = (data: Flight) => {
     dispatch(
       updateFlight({
         ...existingFlight,
-        providedServices: data.providedServices,
+        providedServices: {
+          ...data.providedServices,
+          basicHandling: {
+            total: data?.providedServices?.basicHandling?.total,
+            isPriceOverriden:
+              data?.providedServices?.basicHandling?.total !==
+              existingFlight?.providedServices?.basicHandling?.total,
+          },
+        },
       })
     );
     router.navigate("/signature");
@@ -227,7 +238,7 @@ const Form: React.FC = () => {
           <Controller
             control={control}
             defaultValue={0}
-            name="providedServices.basicHandling"
+            name="providedServices.basicHandling.total"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             }}
@@ -236,17 +247,18 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Basic handling fee:"
                   style={formStyles.input}
-                  value={String(value)}
+                  value={value ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
-                  error={errors.providedServices?.basicHandling && true}
+                  onChangeText={(text) => (text ? onChange(text) : onChange(0))}
+                  error={errors.providedServices?.basicHandling?.total && true}
                 />
                 {/* <Text>{renderBasicHandlingVATString()}</Text> */}
                 <HelperText type="error">
-                  {errors?.providedServices?.basicHandling?.message}
+                  {errors?.providedServices?.basicHandling?.total?.message}
                 </HelperText>
-                {!getFieldState("providedServices.basicHandling").isDirty ? (
+                {!getFieldState("providedServices.basicHandling.total")
+                  .isDirty ? (
                   <Text>{renderBasicHandlingVATString()}</Text>
                 ) : (
                   <Text>*Price has been manually overriden</Text>

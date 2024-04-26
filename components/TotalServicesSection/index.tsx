@@ -75,7 +75,7 @@ const TotalServicesSection: React.FC<{
           Number(catering.total) +
           Number(HOTAC.total) +
           Number(airportFee.total) +
-          Number(basicHandling) +
+          Number(basicHandling.total) +
           calculateOtherServicesTotal()
       )
     );
@@ -87,13 +87,13 @@ const TotalServicesSection: React.FC<{
         Number(catering.total) +
         Number(HOTAC.total) +
         Number(airportFee.total) +
-        Number(basicHandling) +
+        Number(basicHandling.total) +
         calculateOtherServicesTotal() +
         calculateDisbursementsTotal()
     );
   }, [JSON.stringify(providedServices)]);
 
-  const renderBasicHandlingVAT = basicHandling;
+  const renderBasicHandlingVAT = basicHandling?.total;
   return (
     <View>
       <SectionTitle>Services list:</SectionTitle>

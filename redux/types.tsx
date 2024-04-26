@@ -128,7 +128,10 @@ type Pricing = {
 };
 
 export type ProvidedServices = {
-  basicHandling: number | string;
+  basicHandling: {
+    total: number | string;
+    isPriceOverriden?: boolean;
+  };
   disbursementFees: {
     airportFee: number;
     fuelFee: number;
