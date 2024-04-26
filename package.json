@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll"
   },
@@ -17,11 +17,13 @@
     "@react-native-community/datetimepicker": "7.6.1",
     "@react-navigation/drawer": "^6.6.11",
     "@react-navigation/native": "^6.0.2",
+    "@realm/react": "^0.6.2",
     "@reduxjs/toolkit": "^2.2.1",
     "dayjs": "^1.11.10",
     "deepmerge": "^4.3.1",
     "expo": "~50.0.8",
     "expo-asset": "~9.0.2",
+    "expo-dev-client": "^3.3.11",
     "expo-draw": "github:MarangoniEduardo/expo-draw",
     "expo-file-system": "~16.0.8",
     "expo-font": "~11.10.3",
@@ -53,6 +55,7 @@
     "react-native-web": "~0.19.6",
     "react-redux": "^9.1.0",
     "react-uuid": "^2.0.0",
+    "realm": "^12.7.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
