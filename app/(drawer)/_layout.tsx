@@ -40,7 +40,7 @@ export default function Layout() {
           }}
         />
         <Drawer.Screen
-          name="config" // This is the name of the page and must match the url from root
+          name="(confTabs)" // This is the name of the page and must match the url from root
           options={{
             drawerLabel: "Configuration",
             title: "Configurations",

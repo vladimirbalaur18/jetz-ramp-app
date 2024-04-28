@@ -27,6 +27,9 @@ export {
 import { enGB, registerTranslation } from "react-native-paper-dates";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { realmConfig, realmWithoutSync } from "@/realm";
+import DefaultBasicHandlingFees from "@/configs/basicHandlingFees.json";
+import DefaultServices from "@/configs/serviceDefinitions.json";
+import { ServicesSchema } from "@/models/Services";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -89,6 +92,9 @@ function RootLayoutNav() {
     useSelector((state: RootState) => state)
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
+  const basicHandlingFees = realmWithoutSync.objects("BasicHandling");
+  const services = realmWithoutSync.objects<ServicesSchema>("Services");
+
   const FlightNumberIndicator = currentFlightNumber
     ? `(${currentFlightNumber})`
     : "";
@@ -96,6 +102,29 @@ function RootLayoutNav() {
   useEffect(() => {
     if (!configs) {
       router.navigate("/(drawer)/config");
+    }
+
+    if (!basicHandlingFees?.length) {
+      realmWithoutSync.write(() => {
+        DefaultBasicHandlingFees.forEach((fee) => {
+          realmWithoutSync.create("BasicHandling", { ...fee });
+        });
+      });
+    }
+
+    if (!services?.length) {
+      DefaultServices.forEach((serviceCategory) => {
+        realmWithoutSync.write(() => {
+          const servicesArray = serviceCategory.services.map((service) => {
+            return realmWithoutSync.create("Service", { ...service });
+          });
+
+          realmWithoutSync.create("Services", {
+            serviceCategoryName: serviceCategory.serviceCategoryName,
+            services: servicesArray,
+          });
+        });
+      });
     }
   }, []);
 

@@ -41,7 +41,7 @@ import { GeneralConfigState } from "@/models/Config";
 type FormData = Flight;
 
 const Form: React.FC = () => {
-  const SERVICES_DEFINITIONS = getAllServices();
+  const allServices = getAllServices();
   const state = useSelector((state: RootState) => state);
   const [general] = useQuery<GeneralConfigState>("General");
   const existingFlight = selectCurrentFlight(state);
@@ -163,11 +163,10 @@ const Form: React.FC = () => {
     //render additional services inputs
 
     //prevent from appending too many fields
-    const areThereFieldsLeftToRender =
-      fields?.length < SERVICES_DEFINITIONS.length;
+    const areThereFieldsLeftToRender = fields?.length < allServices.length;
 
     areThereFieldsLeftToRender &&
-      SERVICES_DEFINITIONS?.forEach(({ serviceCategoryName, services }) => {
+      allServices?.forEach(({ serviceCategoryName, services }) => {
         append({
           serviceCategoryName: serviceCategoryName,
           services: services.map(({ serviceName, pricing, hasVAT }) => {
@@ -188,7 +187,7 @@ const Form: React.FC = () => {
           }),
         });
       });
-  }, [append, SERVICES_DEFINITIONS]);
+  }, [append, allServices]);
 
   const renderBasicHandlingVATString = () => {
     if (

@@ -37,7 +37,6 @@ type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {
   const realm = useRealm();
   const router = useRouter();
-  const dispatch = useDispatch();
 
   let [configs] = useQuery<GeneralConfigState>("General");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
@@ -93,7 +92,7 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">Departure {configs?.VAT}</Text>
+          <Text variant="headlineSmall">General settings {configs?.VAT}</Text>
         </View>
         <Controller
           control={control}
