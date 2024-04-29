@@ -30,6 +30,7 @@ import { realmConfig, realmWithoutSync } from "@/realm";
 import DefaultBasicHandlingFees from "@/configs/basicHandlingFees.json";
 import DefaultServices from "@/configs/serviceDefinitions.json";
 import { ServicesSchema } from "@/models/Services";
+import { SnackbarProvider } from "@/context/snackbarContext";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -131,52 +132,54 @@ function RootLayoutNav() {
   return (
     <PaperProvider theme={themeBase}>
       <ThemeProvider value={themeBase}>
-        <Stack>
-          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+        <SnackbarProvider>
+          <Stack>
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
 
-          <Stack.Screen
-            name="(createFlight)/general"
-            options={{
-              headerShown: true,
-              title: "General flight information",
-            }}
-          />
-          <Stack.Screen
-            name="(createFlight)/arrival"
-            options={{
-              headerShown: true,
-              title: `Arrival information ${FlightNumberIndicator}`,
-            }}
-          />
-          <Stack.Screen
-            name="(createFlight)/departure"
-            options={{
-              headerShown: true,
-              title: `Departure information ${FlightNumberIndicator}`,
-            }}
-          />
-          <Stack.Screen
-            name="(createFlight)/providedServices"
-            options={{
-              headerShown: true,
-              title: `Provided services ${FlightNumberIndicator}`,
-            }}
-          />
-          <Stack.Screen
-            name="(createFlight)/signature"
-            options={{
-              headerShown: true,
-              title: `Signature ${FlightNumberIndicator}`,
-            }}
-          />
-          <Stack.Screen
-            name="(createFlight)/(tabs)"
-            options={{
-              headerShown: true,
-              title: `Generate PDF files ${FlightNumberIndicator}`,
-            }}
-          />
-        </Stack>
+            <Stack.Screen
+              name="(createFlight)/general"
+              options={{
+                headerShown: true,
+                title: "General flight information",
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/arrival"
+              options={{
+                headerShown: true,
+                title: `Arrival information ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/departure"
+              options={{
+                headerShown: true,
+                title: `Departure information ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/providedServices"
+              options={{
+                headerShown: true,
+                title: `Provided services ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/signature"
+              options={{
+                headerShown: true,
+                title: `Signature ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="(createFlight)/(tabs)"
+              options={{
+                headerShown: true,
+                title: `Generate PDF files ${FlightNumberIndicator}`,
+              }}
+            />
+          </Stack>
+        </SnackbarProvider>
       </ThemeProvider>
     </PaperProvider>
   );

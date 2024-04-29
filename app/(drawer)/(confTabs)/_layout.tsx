@@ -17,11 +17,13 @@ export default function TabLayout() {
         options={{
           title: "General settings",
           headerShown: false,
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <FontAwesome6
               name="user-gear"
               size={24}
-              color={iconColor.colors.primary}
+              color={
+                focused ? iconColor.colors.primary : iconColor.colors.secondary
+              }
             />
           ),
         }}
@@ -31,11 +33,13 @@ export default function TabLayout() {
         options={{
           title: "Basic handling settings",
           headerShown: false,
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <FontAwesome6
               name="cart-flatbed-suitcase"
               size={24}
-              color={iconColor.colors.primary}
+              color={
+                focused ? iconColor.colors.primary : iconColor.colors.secondary
+              }
             />
           ),
         }}
@@ -45,11 +49,13 @@ export default function TabLayout() {
         options={{
           title: "Services settings",
           headerShown: false,
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <FontAwesome6
               name="list"
               size={24}
-              color={iconColor.colors.primary}
+              color={
+                focused ? iconColor.colors.primary : iconColor.colors.secondary
+              }
             />
           ),
         }}

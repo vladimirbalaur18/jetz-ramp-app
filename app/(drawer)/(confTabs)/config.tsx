@@ -32,6 +32,7 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { useQuery, useRealm } from "@realm/react";
 import General, { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
+import { useSnackbar } from "@/context/snackbarContext";
 
 type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {
@@ -40,7 +41,7 @@ const Form: React.FC = () => {
 
   let [configs] = useQuery<GeneralConfigState>("General");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
-
+  const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
     defaultValues: {
@@ -80,6 +81,7 @@ const Form: React.FC = () => {
           });
         }
       });
+      showSnackbar("General settings saved successfully");
     } catch (err) {
       console.warn(err);
     }
@@ -92,7 +94,7 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">General settings {configs?.VAT}</Text>
+          <Text variant="headlineSmall">General settings</Text>
         </View>
         <Controller
           control={control}
