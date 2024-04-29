@@ -30,6 +30,8 @@ export const getBasicHandlingPrice = (flight: Flight) => {
   if (flight?.mtow > basicHandlingFees[basicHandlingFees.length - 1].maxMTOW)
     basePricePerLeg +=
       basicHandlingFees[basicHandlingFees.length - 1].pricePerLeg;
+  else if (flight?.mtow < basicHandlingFees[0].minMTOW)
+    basePricePerLeg += basicHandlingFees[0].pricePerLeg;
   else
     for (let { minMTOW, maxMTOW, pricePerLeg } of basicHandlingFees) {
       if (flight.mtow >= minMTOW && flight.mtow <= maxMTOW) {
