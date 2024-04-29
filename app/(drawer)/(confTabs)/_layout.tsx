@@ -45,7 +45,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="servicesSettings"
+        name="(services)"
         options={{
           title: "Services settings",
           headerShown: false,

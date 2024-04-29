@@ -14,13 +14,15 @@ import {
   List,
   Text,
   RadioButton,
+  Icon,
+  useTheme,
 } from "react-native-paper";
 import { Flight, ProvidedServices } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
-import { useRouter } from "expo-router";
+import { Link, useNavigation, useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,14 +34,14 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { useQuery, useRealm } from "@realm/react";
 import General, { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
-import { ServicesSchema } from "@/models/Services";
+import { ProvidedServicesSchema, ServiceSchema } from "@/models/Services";
 
 type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {
   const realm = useRealm();
   const router = useRouter();
 
-  let services = useQuery<ServicesSchema>("Services");
+  let services = useQuery<ProvidedServicesSchema>("Services");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
@@ -87,25 +89,57 @@ const Form: React.FC = () => {
         contentContainerStyle={styles.container}
         alwaysBounceVertical={false}
       >
-        <View style={styles.row}>
-          <Text variant="headlineSmall">Services settings:</Text>
-        </View>
-        {services.map((s) => (
-          <Text> {s.serviceCategoryName}</Text>
-        ))}
+        {services.map((s) => {
+          return (
+            <View>
+              <SectionTitle>{s.serviceCategoryName}</SectionTitle>
+              <View>
+                {s.services.map((service) => (
+                  <ServiceItem key={service.serviceId} service={service} />
+                ))}
+              </View>
+            </View>
+          );
+        })}
 
         <Button
           mode="contained"
-          onPress={handleSubmit(submit)}
+          onPress={() =>
+            router.navigate("/(drawer)/(confTabs)/(services)/newService")
+          }
           disabled={!formState.isValid}
         >
-          Submit
+          Add new service
         </Button>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+function ServiceItem({ service }: { service: ServiceSchema }) {
+  const theme = useTheme();
+  return (
+    <View
+      style={{
+        marginVertical: 10,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <Text>{service?.serviceName}</Text>
+
+      <Link
+        href={{
+          pathname: "/(drawer)/(confTabs)/(services)/[serviceId]",
+          params: { serviceId: service.serviceId || "" },
+        }}
+      >
+        <Icon source={"eye"} size={18} color={theme.colors.secondary} />
+      </Link>
+    </View>
+  );
+}
 export default Form;
 
 const styles = StyleSheet.create({

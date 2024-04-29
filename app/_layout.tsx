@@ -29,8 +29,9 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { realmConfig, realmWithoutSync } from "@/realm";
 import DefaultBasicHandlingFees from "@/configs/basicHandlingFees.json";
 import DefaultServices from "@/configs/serviceDefinitions.json";
-import { ServicesSchema } from "@/models/Services";
+import { ProvidedServicesSchema } from "@/models/Services";
 import { SnackbarProvider } from "@/context/snackbarContext";
+import uuid from "react-uuid";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -94,7 +95,7 @@ function RootLayoutNav() {
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
   const basicHandlingFees = realmWithoutSync.objects("BasicHandling");
-  const services = realmWithoutSync.objects<ServicesSchema>("Services");
+  const services = realmWithoutSync.objects<ProvidedServicesSchema>("Services");
 
   const FlightNumberIndicator = currentFlightNumber
     ? `(${currentFlightNumber})`
@@ -117,7 +118,10 @@ function RootLayoutNav() {
       DefaultServices.forEach((serviceCategory) => {
         realmWithoutSync.write(() => {
           const servicesArray = serviceCategory.services.map((service) => {
-            return realmWithoutSync.create("Service", { ...service });
+            return realmWithoutSync.create("Service", {
+              ...service,
+              serviceId: uuid(),
+            });
           });
 
           realmWithoutSync.create("Services", {

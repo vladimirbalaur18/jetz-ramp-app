@@ -3,7 +3,7 @@ import { DepartureArrival, LoungeFee, Price } from "./models/LoungeFees";
 import General from "./models/Config";
 import { FuelFees } from "./models/Fuelfees";
 import BasicHandling from "./models/BasicHandling";
-import Services, { Service } from "./models/Services";
+import ProvidedServices, { Service } from "./models/Services";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -14,7 +14,7 @@ export const realmConfig: Realm.Configuration = {
     FuelFees,
     BasicHandling,
     Service,
-    Services,
+    ProvidedServices,
   ],
 };
 

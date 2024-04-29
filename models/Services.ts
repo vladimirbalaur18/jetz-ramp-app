@@ -1,8 +1,9 @@
 import { Flight } from "@/redux/types";
-import Realm, { ObjectSchema } from "realm";
+import Realm, { BSON, ObjectSchema } from "realm";
 import { Price } from "./LoungeFees";
 
 export type ServiceSchema = {
+  serviceId?: string;
   serviceName: string;
   hasVAT: boolean;
   isDisbursed: boolean;
@@ -11,7 +12,7 @@ export type ServiceSchema = {
     currency: string;
   };
 };
-export type ServicesSchema = {
+export type ProvidedServicesSchema = {
   serviceCategoryName: string;
   services: ServiceSchema[];
 };
@@ -21,10 +22,13 @@ export class Service extends Realm.Object<ServiceSchema> {
   hasVAT!: boolean;
   isDisbursed!: boolean;
   pricing!: Price;
+  serviceId!: string;
 
   static schema: ObjectSchema = {
     name: "Service",
+    primaryKey: "serviceId",
     properties: {
+      serviceId: { type: "string", optional: false },
       serviceName: { type: "string" },
       hasVAT: { type: "bool" },
       isDisbursed: { type: "bool" },
@@ -33,7 +37,7 @@ export class Service extends Realm.Object<ServiceSchema> {
   };
 }
 
-export class Services extends Realm.Object<ServicesSchema> {
+export class ProvidedServices extends Realm.Object<ProvidedServicesSchema> {
   serviceCategoryName!: string;
   services!: Service[];
 
@@ -45,4 +49,4 @@ export class Services extends Realm.Object<ServicesSchema> {
     },
   };
 }
-export default Services;
+export default ProvidedServices;

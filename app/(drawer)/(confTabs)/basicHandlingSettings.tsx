@@ -4,24 +4,17 @@ import {
   Button,
   Divider,
   HelperText,
-  Snackbar,
   Text,
   TextInput,
   useTheme,
 } from "react-native-paper";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { useRouter } from "expo-router";
 import { useQuery, useRealm } from "@realm/react";
-import { GeneralConfigState } from "@/models/Config";
-import { FuelFeesState } from "@/models/Fuelfees";
 import { BasicHandlingSchema } from "@/models/BasicHandling";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
 import { useSnackbar } from "@/context/snackbarContext";
-function useForceRender() {
-  const [, setTick] = useState(0);
-  return () => setTick((tick) => tick + 1);
-}
+
 type FormData = {
   BasicHandlingFees: (BasicHandlingSchema & { alreadyExists: boolean })[];
 };
@@ -226,7 +219,7 @@ function BasicHandlingInput({
         buttonColor={theme.colors.errorContainer}
         onPress={handleRemoveRule}
       >
-        Remove rule
+        {alreadyExistingRule ? "Remove rule" : "Dismiss rule"}
       </Button>
     );
   };
