@@ -389,6 +389,7 @@ const Form: React.FC = () => {
                 style={formStyles.input}
                 value={value}
                 onBlur={onBlur}
+                keyboardType="numeric"
                 onChangeText={(value) => onChange(value)}
                 error={errors?.chargeNote?.currency?.euroToMDL && true}
               />
@@ -411,6 +412,7 @@ const Form: React.FC = () => {
                 label="USD to MDL rate"
                 style={formStyles.input}
                 value={value}
+                keyboardType="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 error={errors?.chargeNote?.currency?.usdToMDL && true}

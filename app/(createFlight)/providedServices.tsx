@@ -38,10 +38,12 @@ import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
+import { ProvidedServicesSchema } from "@/models/Services";
 type FormData = Flight;
 
 const Form: React.FC = () => {
-  const allServices = getAllServices();
+  // const allServices = getAllServices();
+  const allServices = useQuery<ProvidedServicesSchema>("Services");
   const state = useSelector((state: RootState) => state);
   const [general] = useQuery<GeneralConfigState>("General");
   const existingFlight = selectCurrentFlight(state);
