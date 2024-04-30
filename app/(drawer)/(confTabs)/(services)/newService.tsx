@@ -15,6 +15,8 @@ import {
   Text,
   RadioButton,
   useTheme,
+  Portal,
+  Modal,
 } from "react-native-paper";
 import { Flight, ProvidedServices } from "@/redux/types";
 import {
@@ -54,96 +56,60 @@ import formStyles from "@/styles/formStyles";
 import { useObject, useQuery, useRealm } from "@realm/react";
 import { ProvidedServicesSchema, ServiceSchema } from "@/models/Services";
 import { useSnackbar } from "@/context/snackbarContext";
+import uuid from "react-uuid";
 type FormData = Omit<ServiceSchema, "pricing"> & {
   amount: number;
   currency: string;
+  serviceCategoryName: string;
 };
 const NewService: React.FC = () => {
-  const { serviceId } = useLocalSearchParams();
-  const [currentService] = useQuery<ServiceSchema>(
-    "Service",
-    (collection) => collection.filtered("serviceId == $0", serviceId),
-    [serviceId]
-  );
+  const serviceCategories = useQuery<ProvidedServicesSchema>("Services");
   const realm = useRealm();
 
   const theme = useTheme();
   const router = useRouter();
-  const [scope, setScope] = useState<"view" | "edit">("view");
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues, reset, watch } =
     useForm<FormData>({
       mode: "onChange",
       defaultValues: {
-        serviceName: currentService?.serviceName,
-        amount: currentService?.pricing.amount,
-        hasVAT: currentService?.hasVAT,
-        isDisbursed: currentService?.isDisbursed,
-        currency: currentService?.pricing.currency,
+        serviceName: "",
+        amount: 0,
       },
     });
   const formValues = watch();
-  const handleServiceEdit = () => {};
-  const handleServiceRemove = () => {
-    realm.write(() => {
-      showSnackbar(`${currentService.serviceName} has been removed`);
-      realm.delete(currentService);
-      router.back();
-    });
-  };
+
   const handleServiceSubmit = () => {
-    realm.write(() => {
-      currentService.serviceName = formValues.serviceName;
-      currentService.pricing.amount = Number(formValues.amount);
-      currentService.hasVAT = formValues.hasVAT;
-      currentService.isDisbursed = formValues.isDisbursed;
-      showSnackbar(`Services has been updated successfully`);
-      setScope("view");
-    });
+    for (let serviceCategory of serviceCategories) {
+      if (
+        formValues.serviceCategoryName === serviceCategory.serviceCategoryName
+      ) {
+        realm.write(() => {
+          serviceCategory.services.push(
+            realm.create<ServiceSchema>("Service", {
+              serviceId: uuid(),
+              hasVAT: formValues.hasVAT,
+              isDisbursed: formValues.isDisbursed,
+              pricing: {
+                currency: "EUR",
+                amount: Number(formValues.amount),
+              },
+              serviceName: formValues.serviceName,
+            })
+          );
+        });
+      }
+    }
+    reset();
+    showSnackbar(`Services has been added successfully`);
   };
-  const disableField = scope === "view";
 
-  const EditButton = ({ onPress }: any) => {
-    return (
-      <Button
-        mode="contained"
-        onPress={onPress}
-        icon={"clipboard-edit-outline"}
-      >
-        Edit service
-      </Button>
-    );
-  };
-
-  const RemoveButton = () => {
-    return (
-      <Button
-        mode="contained-tonal"
-        icon={"clipboard-remove-outline"}
-        buttonColor={theme.colors.errorContainer}
-        onPress={handleServiceRemove}
-      >
-        Remove service
-      </Button>
-    );
-  };
-  const DismissButton = () => {
-    return (
-      <Button
-        onPress={() => {
-          reset();
-          setScope("view");
-        }}
-      >
-        Cancel
-      </Button>
-    );
-  };
   const SubmitButton = () => {
     return (
       <Button
         mode="contained"
         onPress={handleServiceSubmit}
+        disabled={!formState.isValid}
         // icon={signButtonIconName}
       >
         Save changes
@@ -152,6 +118,14 @@ const NewService: React.FC = () => {
   };
 
   const { errors } = formState;
+  const [showCategoriesDropdown, setShowCategoriesDropdown] = useState(false);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const categoriesOptions = serviceCategories.map((c) => {
+    return {
+      label: c.serviceCategoryName,
+      value: c.serviceCategoryName,
+    };
+  });
   return (
     <SafeAreaView>
       <ScrollView
@@ -170,7 +144,6 @@ const NewService: React.FC = () => {
               <TextInput
                 label="Service name"
                 style={styles.input}
-                disabled={disableField}
                 value={String(value)}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -181,6 +154,63 @@ const NewService: React.FC = () => {
               </HelperText>
             </>
           )}
+        />
+        <Controller
+          control={control}
+          defaultValue={""}
+          name="serviceCategoryName"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <View style={styles.input}>
+              <DropDown
+                label={"Choose service category"}
+                mode={"outlined"}
+                visible={showCategoriesDropdown}
+                showDropDown={() => setShowCategoriesDropdown(true)}
+                onDismiss={() => setShowCategoriesDropdown(false)}
+                value={value}
+                setValue={(value) => {
+                  if (value === "newCategory") {
+                    setShowAddCategoryModal(true);
+                  } else onChange(value);
+                }}
+                list={[
+                  ...categoriesOptions,
+                  { label: "Create new category", value: "newCategory" },
+                ]}
+              />
+              <HelperText type="error">
+                {errors?.serviceCategoryName?.message}
+              </HelperText>
+            </View>
+          )}
+        />
+        <AddCategoryModal
+          visible={showAddCategoryModal}
+          onDismiss={() => setShowAddCategoryModal(false)}
+          onSubmit={(values) => {
+            for (const serviceCategory of serviceCategories) {
+              if (
+                values.serviceCategoryName ===
+                serviceCategory.serviceCategoryName
+              ) {
+                alert("This category already exists");
+                setShowAddCategoryModal(false);
+
+                return;
+              }
+            }
+
+            realm.write(() => {
+              realm.create<ProvidedServicesSchema>("Services", {
+                serviceCategoryName: values.serviceCategoryName,
+                services: [],
+              });
+            });
+            setShowAddCategoryModal(false);
+          }}
         />
         <Controller
           control={control}
@@ -195,7 +225,7 @@ const NewService: React.FC = () => {
                 style={styles.input}
                 value={String(value)}
                 onBlur={onBlur}
-                disabled={disableField}
+                keyboardType="numeric"
                 onChangeText={(value) => onChange(value)}
                 error={errors?.amount && true}
               />
@@ -215,7 +245,6 @@ const NewService: React.FC = () => {
               <>
                 <Switch
                   value={value}
-                  disabled={disableField}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -232,7 +261,6 @@ const NewService: React.FC = () => {
               <>
                 <Switch
                   value={value}
-                  disabled={disableField}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -247,16 +275,7 @@ const NewService: React.FC = () => {
             alignItems: "center",
           }}
         >
-          {scope === "edit" ? <DismissButton /> : <RemoveButton />}
-          {scope === "view" ? (
-            <EditButton
-              onPress={() => {
-                setScope("edit");
-              }}
-            />
-          ) : (
-            <SubmitButton />
-          )}
+          <SubmitButton />
         </View>
         {/* <Controller
           control={control}
@@ -286,6 +305,99 @@ const NewService: React.FC = () => {
 };
 
 export default NewService;
+
+const AddCategoryModal = ({
+  visible = false,
+  onDismiss = () => {},
+  onSubmit = (values: { serviceCategoryName: string }) => {},
+}) => {
+  const theme = useTheme();
+  const { control, formState, handleSubmit, getValues, reset, watch } =
+    useForm<{
+      serviceCategoryName: string;
+    }>({
+      mode: "onChange",
+      defaultValues: {
+        serviceCategoryName: "",
+      },
+    });
+
+  const { errors } = formState;
+  return (
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={onDismiss}
+        contentContainerStyle={{
+          padding: 20,
+          backgroundColor: "transparent",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: theme.colors.surface,
+            height: 250,
+            padding: 30,
+            justifyContent: "center",
+            borderRadius: 15,
+          }}
+        >
+          <Text variant="bodyLarge">Create new category</Text>
+
+          <Controller
+            control={control}
+            name="serviceCategoryName"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            }}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <>
+                <TextInput
+                  label="Category:"
+                  style={styles.input}
+                  value={String(value)}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  error={errors?.serviceCategoryName && true}
+                />
+                <HelperText type="error">
+                  {errors?.serviceCategoryName?.message}
+                </HelperText>
+              </>
+            )}
+          />
+
+          <View
+            style={{
+              justifyContent: "space-between",
+              flexDirection: "row",
+              marginVertical: 10,
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onPress={() => {
+                onDismiss();
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              style={{ marginVertical: 20 }}
+              mode="contained"
+              disabled={!formState.isValid}
+              onPress={() => {
+                onSubmit(watch());
+              }}
+            >
+              Submit
+            </Button>
+          </View>
+        </View>
+      </Modal>
+    </Portal>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

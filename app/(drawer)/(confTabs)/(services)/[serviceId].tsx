@@ -65,6 +65,7 @@ const Form: React.FC = () => {
     (collection) => collection.filtered("serviceId == $0", serviceId),
     [serviceId]
   );
+  const allServiceCategories = useQuery<ProvidedServicesSchema>("Services");
   const realm = useRealm();
 
   const theme = useTheme();
@@ -88,6 +89,12 @@ const Form: React.FC = () => {
     realm.write(() => {
       showSnackbar(`${currentService.serviceName} has been removed`);
       realm.delete(currentService);
+
+      for (const category of allServiceCategories) {
+        if (!category.services.length) {
+          realm.delete(category);
+        }
+      }
       router.back();
     });
   };
