@@ -2,7 +2,7 @@ import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import { ReactNode, useState } from "react";
 import { useTheme, Text, Menu } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   removeFlight,
@@ -20,7 +20,7 @@ type Field = [
   value: ReactNode,
   displayField?: boolean | undefined | null
 ];
-const FlightItem = ({ flight }: { flight: Flight }) => {
+const FlightItem = ({ flight }: { flight: IFlight }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();

@@ -1,4 +1,4 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import dayjs from "dayjs";
 import getParsedDateTime from "./getParsedDateTime";
 import {
@@ -21,7 +21,7 @@ type ChargeListService = {
   isPriceOverriden?: boolean;
   quantity?: number;
 };
-export default function chargeNoteTemplateHTML(flight: Flight) {
+export default function chargeNoteTemplateHTML(flight: IFlight) {
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
@@ -61,7 +61,10 @@ export default function chargeNoteTemplateHTML(flight: Flight) {
   })();
   const totalDisbursementFeesAmount = Object.values(
     flight?.providedServices.disbursementFees
-  ).reduce((accumulator, current) => accumulator + (current || 0), 0);
+  ).reduce(
+    (accumulator, current) => Number(accumulator) + Number(current || 0),
+    0
+  );
 
   if (
     basicHandlingWithVAT &&

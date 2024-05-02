@@ -2,7 +2,7 @@ import { View, StyleSheet } from "react-native";
 import React, { ReactNode, useMemo } from "react";
 import SectionTitle from "../FormUtils/SectionTitle";
 import { Text } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
+import { IFlight, IProvidedServices } from "@/redux/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLoungeFeePrice } from "@/services/servicesCalculator";
@@ -14,8 +14,8 @@ import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 
 const TotalServicesSection: React.FC<{
-  providedServices: ProvidedServices;
-  existingFlight: Flight;
+  providedServices: IProvidedServices;
+  existingFlight: IFlight;
 }> = ({ providedServices, existingFlight }) => {
   const {
     otherServices,

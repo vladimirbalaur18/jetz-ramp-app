@@ -1,55 +1,11 @@
+import { IArrival, IDeparture, IPayloadData } from "@/models/DepartureArrival";
+import { IProvidedServices } from "@/models/ProvidedServices";
+import { IRampAgent } from "@/models/RampAgentName";
 import { Dayjs } from "dayjs";
 
 export type Ramp = {
   name: string;
   surname: string;
-};
-
-type PayloadData = {
-  crewNumber: number;
-  specialInfo?: string;
-  cargoInfo?: string;
-  mailInfo?: string;
-  remarksInfo?: string;
-};
-
-export type Arrival = {
-  from: string;
-  isLocalFlight: boolean;
-  arrivalDate: Date;
-  arrivalTime: {
-    hours: number;
-    minutes: number;
-  };
-  adultCount: number;
-  minorCount: number;
-
-  rampInspectionBeforeArrival: {
-    status: boolean;
-    FOD: boolean;
-    agent: RampAgent;
-  };
-} & PayloadData;
-
-export type Departure = {
-  to: string;
-  isLocalFlight: boolean;
-  departureDate: Date;
-  departureTime: {
-    hours: number;
-    minutes: number;
-  };
-  adultCount: number;
-  minorCount: number;
-  rampInspectionBeforeDeparture: {
-    status: boolean;
-    FOD: boolean;
-    agent: RampAgent;
-  };
-} & PayloadData;
-
-export type RampAgent = {
-  fullname: string;
 };
 
 export enum FlightSchedule {
@@ -58,7 +14,7 @@ export enum FlightSchedule {
 }
 export type HandlingTypes = "Arrival" | "Departure" | "FULL";
 
-export type Flight = {
+export type IFlight = {
   flightId?: string;
   operatorName: string;
   flightNumber: string;
@@ -67,11 +23,12 @@ export type Flight = {
   aircraftType?: string;
   aircraftRegistration?: string;
   handlingType: HandlingTypes;
-  arrival: Arrival;
-  departure: Departure;
+  arrival: IArrival;
+  departure: IDeparture;
   mtow: number;
   parkingPosition?: string | number;
-  providedServices: ProvidedServices;
+  providedServices: IProvidedServices;
+  //
   crew: { signature: string; name: string };
   ramp: { signature: string; name: string };
   isCommercialFlight?: boolean;
@@ -94,67 +51,4 @@ export type Flight = {
   };
 
   // chargeNote: Charges;
-};
-
-type ServiceManualPriceOverride = {
-  isPriceOverriden: boolean;
-} & (
-  | {
-      isPriceOverriden: true;
-      totalPriceOverride?: number;
-    }
-  | {
-      isPriceOverriden: false;
-    }
-);
-
-type Service = {
-  serviceCategoryName: string;
-  services: Array<
-    {
-      serviceName: string;
-      quantity: number;
-      notes: string;
-      isUsed: boolean;
-      pricing: Pricing;
-      hasVAT: boolean;
-    } & ServiceManualPriceOverride
-  >;
-};
-
-type Pricing = {
-  currency: string;
-  amount: number;
-};
-
-export type ProvidedServices = {
-  basicHandling: {
-    total: number | string;
-    isPriceOverriden?: boolean;
-  };
-  disbursementFees: {
-    airportFee: number;
-    fuelFee: number;
-    cateringFee: number;
-    HOTACFee: number;
-    VIPLoungeFee: number;
-  };
-  supportServices: {
-    airportFee: {
-      total: number;
-    };
-    fuel: {
-      fuelLitersQuantity: number;
-      fuelDensity: number;
-    };
-    catering: {
-      total: number;
-    };
-    HOTAC: {
-      total: number;
-    };
-  };
-  VIPLoungeServices: { adultPax: number; minorPax: number; typeOf: string };
-  remarks: string;
-  otherServices?: Service[];
 };

@@ -1,47 +1,20 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
-import {
-  TextInput,
-  Button,
-  Switch,
-  HelperText,
-  List,
-  Text,
-  RadioButton,
-  Icon,
-  useTheme,
-} from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
-import { useForm, Controller } from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
-import dayjs from "dayjs";
-import { Link, useNavigation, useRouter } from "expo-router";
-import REGEX from "@/utils/regexp";
-import { updateFlight } from "@/redux/slices/flightsSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import ERROR_MESSAGES from "@/utils/formErrorMessages";
-import _ from "lodash";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import { Button, Text, Icon, useTheme } from "react-native-paper";
+import { useForm } from "react-hook-form";
+import { Link, useRouter } from "expo-router";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { useQuery, useRealm } from "@realm/react";
-import General, { GeneralConfigState } from "@/models/Config";
+import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
-import { ProvidedServicesSchema, ServiceSchema } from "@/models/Services";
+import { ServiceCategorySchema, IService } from "@/models/Services";
 
 type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {
   const realm = useRealm();
   const router = useRouter();
 
-  let services = useQuery<ProvidedServicesSchema>("Services");
+  let services = useQuery<ServiceCategorySchema>("Services");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
@@ -118,7 +91,7 @@ const Form: React.FC = () => {
   );
 };
 
-function ServiceItem({ service }: { service: ServiceSchema }) {
+function ServiceItem({ service }: { service: IService }) {
   const theme = useTheme();
   return (
     <View

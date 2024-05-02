@@ -1,4 +1,4 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import AirportFees from "@/configs/airportFees.json";
 import {
   getDifferenceBetweenArrivalDeparture,
@@ -21,7 +21,7 @@ export const getFuelFeeAmount = ({
 }: {
   fuelDensity: number;
   fuelLitersQuantity: number;
-  flight: Flight;
+  flight: IFlight;
 }) => {
   const [general] = realmWithoutSync.objects<GeneralConfigState>("General");
   const [FuelFees] = realmWithoutSync.objects<FuelFeesState>("FuelFees");
@@ -37,7 +37,7 @@ export const getFuelFeeAmount = ({
   const fuelEURAmount = priceEURPerTon * fuelTons;
   return VATRateMultiplier * fuelEURAmount;
 };
-export const getLandingFees = (flight: Flight): number => {
+export const getLandingFees = (flight: IFlight): number => {
   if (flight?.handlingType === "Departure") return 0;
 
   const { arrivalDate, arrivalTime } = flight?.arrival;
@@ -54,7 +54,7 @@ export const getLandingFees = (flight: Flight): number => {
           (isNightTime(fullArrivalDateTime) ? 1.2 : 1);
   }
 };
-export const getTakeOffFees = (flight: Flight): number => {
+export const getTakeOffFees = (flight: IFlight): number => {
   if (flight.handlingType === "Arrival") return 0;
 
   const mtowTons = getFlightMTOWinTons(flight);
@@ -71,7 +71,7 @@ export const getTakeOffFees = (flight: Flight): number => {
           (isNightTime(fullDepartureDateTime) ? 1.2 : 1);
 };
 
-export const getPassengersFee = (flight: Flight): number => {
+export const getPassengersFee = (flight: IFlight): number => {
   const feePerPax = flight.isCommercialFlight
     ? AirportFees.commercial.passengerFee.perPax
     : AirportFees.nonCommercial.passengerFee.perPax;
@@ -81,7 +81,7 @@ export const getPassengersFee = (flight: Flight): number => {
 
   return feePerPax * paxCount;
 };
-export const getSecurityFee = (flight: Flight): number => {
+export const getSecurityFee = (flight: IFlight): number => {
   const departingPax = getPassengerCount(flight?.departure);
   const mtowTons = getFlightMTOWinTons(flight);
 
@@ -96,7 +96,7 @@ export const getSecurityFee = (flight: Flight): number => {
     ? securityFeePerPax * departingPax
     : securityFeePerTon * mtowTons;
 };
-export const getParkingFee = (flight: Flight): number => {
+export const getParkingFee = (flight: IFlight): number => {
   if (flight.handlingType === "Arrival") return 0;
   const { hours, days } = getDifferenceBetweenArrivalDeparture(flight);
   const mtowTons = getFlightMTOWinTons(flight);

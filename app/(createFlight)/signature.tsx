@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { TextInput, HelperText, Button } from "react-native-paper";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import DrawSignatureScreen from "@/components/DrawSignatureScreen";
 import { Stack, useRouter } from "expo-router";
@@ -21,12 +21,12 @@ const SignaturePage = () => {
   const state = useSelector((state: RootState) => state);
   const existingFlight = selectCurrentFlight(state);
   const { control, formState, handleSubmit, getValues, watch } =
-    useForm<Flight>({
+    useForm<IFlight>({
       mode: "onChange",
     });
   const { errors, isValid } = formState;
 
-  const submit = (data: Partial<Flight>) => {
+  const submit = (data: Partial<IFlight>) => {
     dispatch(updateFlight({ ...existingFlight, ...data }));
     router.navigate("(tabs)/chargeNote");
   };

@@ -16,7 +16,7 @@ import {
   RadioButton,
   useTheme,
 } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import {
   useForm,
   Controller,
@@ -52,20 +52,20 @@ import DropDown from "react-native-paper-dropdown";
 import _ from "lodash";
 import formStyles from "@/styles/formStyles";
 import { useObject, useQuery, useRealm } from "@realm/react";
-import { ProvidedServicesSchema, ServiceSchema } from "@/models/Services";
+import { ServiceCategorySchema, IService } from "@/models/Services";
 import { useSnackbar } from "@/context/snackbarContext";
-type FormData = Omit<ServiceSchema, "pricing"> & {
+type FormData = Omit<IService, "pricing"> & {
   amount: number;
   currency: string;
 };
 const Form: React.FC = () => {
   const { serviceId } = useLocalSearchParams();
-  const [currentService] = useQuery<ServiceSchema>(
+  const [currentService] = useQuery<IService>(
     "Service",
     (collection) => collection.filtered("serviceId == $0", serviceId),
     [serviceId]
   );
-  const allServiceCategories = useQuery<ProvidedServicesSchema>("Services");
+  const allServiceCategories = useQuery<ServiceCategorySchema>("Services");
   const realm = useRealm();
 
   const theme = useTheme();

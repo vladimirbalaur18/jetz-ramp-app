@@ -7,7 +7,7 @@ import {
   HelperText,
   Text,
 } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
+import { IFlight, IProvidedServices } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
@@ -18,7 +18,7 @@ import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import _ from "lodash";
-type FormData = Flight;
+type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
@@ -35,7 +35,7 @@ const Form: React.FC = () => {
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onChange",
-      defaultValues: (existingFlight as unknown as Flight) || {
+      defaultValues: (existingFlight as unknown as IFlight) || {
         arrival: {
           arrivalTime: { hours: 10, minutes: 12 },
           arrivalDate: new Date(),
@@ -56,14 +56,14 @@ const Form: React.FC = () => {
 
   const { errors } = formState;
 
-  const submit = (data: Flight) => {
+  const submit = (data: IFlight) => {
     //nullyfy services if we update new data
     if (existingFlight) {
       if (!_.isEqual(existingFlight, data)) {
         dispatch(
           updateFlight({
             ...data,
-            providedServices: null as unknown as ProvidedServices,
+            providedServices: null as unknown as IProvidedServices,
           })
         );
       } else dispatch(updateFlight(data));

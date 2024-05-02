@@ -14,7 +14,7 @@ import {
   Portal,
   useTheme,
 } from "react-native-paper";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import REGEX from "@/utils/regexp";
 import { useSelector } from "react-redux";
@@ -38,12 +38,12 @@ import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
-import { ProvidedServicesSchema } from "@/models/Services";
-type FormData = Flight;
+import { ServiceCategorySchema } from "@/models/Services";
+type FormData = IFlight;
 
 const Form: React.FC = () => {
   // const allServices = getAllServices();
-  const allServices = useQuery<ProvidedServicesSchema>("Services");
+  const allServices = useQuery<ServiceCategorySchema>("Services");
   const state = useSelector((state: RootState) => state);
   const [general] = useQuery<GeneralConfigState>("General");
   const existingFlight = selectCurrentFlight(state);
@@ -205,7 +205,7 @@ const Form: React.FC = () => {
   };
 
   // HELPERS
-  const submit = (data: Flight) => {
+  const submit = (data: IFlight) => {
     dispatch(
       updateFlight({
         ...existingFlight,
@@ -745,7 +745,7 @@ const Form: React.FC = () => {
                                     Amount:{" "}
                                     {isPriceOverriden
                                       ? service?.totalPriceOverride
-                                      : quantity * amount}
+                                      : (quantity || 0) * amount}
                                     {currency}
                                   </Text>
                                   <Button

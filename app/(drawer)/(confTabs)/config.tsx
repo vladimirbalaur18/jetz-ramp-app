@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
+import { IFlight, IProvidedServices } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
 import { FlightSchedule } from "@/redux/types";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";

@@ -1,10 +1,10 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { View, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 import FlightItem from "./FlightItem";
 const FlightSection: React.FC<{
   dateString: string;
-  flights: Flight[];
+  flights: IFlight[];
 }> = ({ dateString, flights }) => {
   return (
     <View style={styles.verticalContainer}>

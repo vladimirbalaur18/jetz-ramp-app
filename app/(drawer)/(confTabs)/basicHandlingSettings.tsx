@@ -10,18 +10,18 @@ import {
 } from "react-native-paper";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useQuery, useRealm } from "@realm/react";
-import { BasicHandlingSchema } from "@/models/BasicHandling";
+import { IBasicHandlingRule } from "@/models/BasicHandlingRule";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
 import { useSnackbar } from "@/context/snackbarContext";
 
 type FormData = {
-  BasicHandlingFees: (BasicHandlingSchema & { alreadyExists: boolean })[];
+  BasicHandlingFees: (IBasicHandlingRule & { alreadyExists: boolean })[];
 };
 const Form: React.FC = () => {
   const [forceRenderIndex, setForceRender] = useState(0);
   let basicHandlingFees =
-    useQuery<BasicHandlingSchema>("BasicHandling").sorted("minMTOW");
+    useQuery<IBasicHandlingRule>("BasicHandlingRule").sorted("minMTOW");
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
   });
@@ -108,7 +108,7 @@ function BasicHandlingInput({
 }: any) {
   const theme = useTheme();
   const { control, formState, handleSubmit, getValues, watch, getFieldState } =
-    useForm<BasicHandlingSchema>({
+    useForm<IBasicHandlingRule>({
       mode: "onChange",
       defaultValues: {
         minMTOW,
@@ -119,7 +119,7 @@ function BasicHandlingInput({
   const formValues = watch();
   const realm = useRealm();
   const { errors } = formState;
-  const fees = useQuery<BasicHandlingSchema>("BasicHandling");
+  const fees = useQuery<IBasicHandlingRule>("BasicHandlingRule");
   const [scope, setScope] = useState<"view" | "create" | "edit">(
     alreadyExistingRule ? "view" : "create"
   );
@@ -165,7 +165,7 @@ function BasicHandlingInput({
         }
 
         onFieldCreatePress && onFieldCreatePress();
-        realm.create("BasicHandling", {
+        realm.create("BasicHandlingRule", {
           minMTOW: Number(formValues.minMTOW),
           maxMTOW: Number(formValues.maxMTOW),
           pricePerLeg: Number(formValues.pricePerLeg),
@@ -332,8 +332,8 @@ function BasicHandlingInput({
 }
 
 const isFeeMTOWRangeOverlapping = (
-  { minMTOW, maxMTOW }: BasicHandlingSchema,
-  fees: BasicHandlingSchema[]
+  { minMTOW, maxMTOW }: IBasicHandlingRule,
+  fees: IBasicHandlingRule[]
 ): boolean => {
   for (const fee of fees) {
     if (
@@ -345,8 +345,8 @@ const isFeeMTOWRangeOverlapping = (
   return false;
 };
 const compareBasicHandlingFees = (
-  { minMTOW, maxMTOW }: BasicHandlingSchema,
-  compareFee: BasicHandlingSchema
+  { minMTOW, maxMTOW }: IBasicHandlingRule,
+  compareFee: IBasicHandlingRule
 ): boolean => {
   return (
     Number(minMTOW) === Number(compareFee.minMTOW) &&

@@ -18,12 +18,12 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { Controller, useForm } from "react-hook-form";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { HelperText, TextInput, Button } from "react-native-paper";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import printToFile from "@/utils/printToFile";
-type FormData = Flight;
+type FormData = IFlight;
 
 export default function App() {
   const state = useSelector((state: RootState) => state);

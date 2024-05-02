@@ -1,7 +1,7 @@
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView } from "react-native";
@@ -28,12 +28,12 @@ export default function Page() {
 
   const state = useSelector((state: RootState) => state);
   const existingFlight = selectCurrentFlight(state);
-  const { control, formState, handleSubmit, getValues } = useForm<Flight>({
+  const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
     mode: "onChange",
     defaultValues: { ...existingFlight },
   });
 
-  const submitArrDeparture = (data: Partial<Flight>) => {
+  const submitArrDeparture = (data: Partial<IFlight>) => {
     submit(data);
     console.log("SIGA", data.crew?.signature);
     printToFile({

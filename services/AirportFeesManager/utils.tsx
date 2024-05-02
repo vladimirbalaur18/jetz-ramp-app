@@ -1,16 +1,16 @@
 import { GeneralConfigState } from "@/models/Config";
 import { realmWithoutSync } from "@/realm";
-import { Arrival, Departure, Flight } from "@/redux/types";
+import { IArrival, Departure, IFlight } from "@/redux/types";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import dayjs from "dayjs";
 
-export const getPassengerCount = (data: Arrival | Departure): number =>
+export const getPassengerCount = (data: IArrival | Departure): number =>
   Number(data?.adultCount || 0) + Number(data?.minorCount || 0);
-export const isLightAircraft = (flight: Flight) => flight.mtow < 2000;
-export const getFlightMTOWinTons = (flight: Flight) =>
+export const isLightAircraft = (flight: IFlight) => flight.mtow < 2000;
+export const getFlightMTOWinTons = (flight: IFlight) =>
   flight.mtow ? Number(flight.mtow) / 1000 : 0;
 export const getDifferenceBetweenArrivalDeparture = (
-  flight: Flight
+  flight: IFlight
 ): { hours: number; days: number } => {
   const isArrivalOnly = flight.handlingType === "Arrival";
 

@@ -1,6 +1,6 @@
 import FlightSection from "@/components/FlightSection";
 import { RootState } from "@/redux/store";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
@@ -15,10 +15,10 @@ export default function () {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  let parseFlightsByDate: Record<string, Flight[]> = useMemo(() => {
-    let dateFlightsMap: Record<string, Flight[]> = {};
+  let parseFlightsByDate: Record<string, IFlight[]> = useMemo(() => {
+    let dateFlightsMap: Record<string, IFlight[]> = {};
 
-    completedFlightsArray.forEach((flight: Flight) => {
+    completedFlightsArray.forEach((flight: IFlight) => {
       const dateOfFlight = dayjs(flight.arrival?.arrivalDate).format(
         "YYYY-MM-DD"
       );

@@ -1,70 +1,36 @@
-import React, { useLayoutEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
   Button,
   Switch,
   HelperText,
-  List,
   Text,
-  RadioButton,
   useTheme,
   Portal,
   Modal,
   Icon,
 } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-  UseFieldArrayRemove,
-  Control,
-  FieldErrors,
-  useWatch,
-} from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import REGEX from "@/utils/regexp";
+import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "expo-router";
+import DropDown from "react-native-paper-dropdown";
+import { useQuery, useRealm } from "@realm/react";
+import { ServiceCategorySchema, IService } from "@/models/Services";
+import { useSnackbar } from "@/context/snackbarContext";
+import uuid from "react-uuid";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
-import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import DropDown from "react-native-paper-dropdown";
-import _ from "lodash";
-import formStyles from "@/styles/formStyles";
-import { useObject, useQuery, useRealm } from "@realm/react";
-import { ProvidedServicesSchema, ServiceSchema } from "@/models/Services";
-import { useSnackbar } from "@/context/snackbarContext";
-import uuid from "react-uuid";
-type FormData = Omit<ServiceSchema, "pricing"> & {
+type FormData = Omit<IService, "pricing"> & {
   amount: number;
   currency: string;
   serviceCategoryName: string;
 };
 const NewService: React.FC = () => {
-  const serviceCategories = useQuery<ProvidedServicesSchema>("Services");
+  const serviceCategories = useQuery<ServiceCategorySchema>("Services");
   const realm = useRealm();
 
   const theme = useTheme();
@@ -87,7 +53,7 @@ const NewService: React.FC = () => {
       ) {
         realm.write(() => {
           serviceCategory.services.push(
-            realm.create<ServiceSchema>("Service", {
+            realm.create<IService>("Service", {
               serviceId: uuid(),
               hasVAT: formValues.hasVAT,
               isDisbursed: formValues.isDisbursed,
@@ -219,7 +185,7 @@ const NewService: React.FC = () => {
             }
 
             realm.write(() => {
-              realm.create<ProvidedServicesSchema>("Services", {
+              realm.create<ServiceCategorySchema>("Services", {
                 serviceCategoryName: values.serviceCategoryName,
                 services: [],
               });

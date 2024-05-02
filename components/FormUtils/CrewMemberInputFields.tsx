@@ -1,6 +1,6 @@
 import React from "react";
 import { TextInput, Button, HelperText, Text } from "react-native-paper";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import {
   Controller,
   UseFieldArrayRemove,
@@ -15,8 +15,8 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 const CrewMemberInputFields: React.FC<{
   remove: UseFieldArrayRemove;
   index: number;
-  control: Control<Flight, any>;
-  errors: FieldErrors<Flight>;
+  control: Control<IFlight, any>;
+  errors: FieldErrors<IFlight>;
   styles: StyleProps;
 }> = ({ control, index, remove, errors, styles }) => {
   return (

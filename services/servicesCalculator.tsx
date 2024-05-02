@@ -1,4 +1,4 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import serviceDefinitions from "@/configs/serviceDefinitions.json";
 import loungeFees from "@/configs/loungeFees.json";
 import dayjs from "dayjs";
@@ -16,14 +16,14 @@ import {
 import { applyVAT, getVATMultiplier } from "./AirportFeesManager/utils";
 import { realmWithoutSync } from "@/realm";
 import { GeneralConfigState } from "@/models/Config";
-import { BasicHandlingSchema } from "@/models/BasicHandling";
+import { IBasicHandlingRule } from "@/models/BasicHandlingRule";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
 
-export const getBasicHandlingPrice = (flight: Flight) => {
+export const getBasicHandlingPrice = (flight: IFlight) => {
   const basicHandlingFees =
-    realmWithoutSync.objects<BasicHandlingSchema>("BasicHandling");
+    realmWithoutSync.objects<IBasicHandlingRule>("BasicHandlingRule");
 
   let basePricePerLeg = 0;
 
@@ -95,7 +95,7 @@ export const getBasicHandlingPrice = (flight: Flight) => {
   }
 };
 
-export const getTotalAirportFeesPrice = (flight: Flight) => {
+export const getTotalAirportFeesPrice = (flight: IFlight) => {
   const result = {
     landing: getLandingFees(flight),
     takeOff: getTakeOffFees(flight),

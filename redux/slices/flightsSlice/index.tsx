@@ -1,12 +1,12 @@
 // Import the createSlice API from Redux Toolkit
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 
 type Nullable<T> = T | undefined | null;
 
 type FlightState = {
-  flightsArray: Array<Flight>;
+  flightsArray: Array<IFlight>;
   currentFlightId: Nullable<string>;
 };
 const initialState: FlightState = {
@@ -25,7 +25,7 @@ export const flightsSlice = createSlice({
     removeCurrentFlightById: (state) => {
       state.currentFlightId = null;
     },
-    createFlight: (state, { payload }: PayloadAction<Flight>) => {
+    createFlight: (state, { payload }: PayloadAction<IFlight>) => {
       const id = payload?.flightNumber + uuid.v4();
       state.currentFlightId = id;
       state?.flightsArray.push({
@@ -41,7 +41,7 @@ export const flightsSlice = createSlice({
       );
     },
 
-    updateFlight: (state, { payload }: PayloadAction<Flight>) => {
+    updateFlight: (state, { payload }: PayloadAction<IFlight>) => {
       state.currentFlightId = payload?.flightId;
       state.flightsArray = [
         ...state.flightsArray.map((f) => {

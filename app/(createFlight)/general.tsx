@@ -15,7 +15,7 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { Flight, ProvidedServices } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import {
   useForm,
   Controller,
@@ -33,7 +33,7 @@ import {
 } from "react-native-paper-dates";
 import dayjs, { Dayjs } from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
-type FormData = Flight;
+type FormData = IFlight;
 import REGEX from "@/utils/regexp";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -50,6 +50,7 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import DropDown from "react-native-paper-dropdown";
 import _ from "lodash";
 import formStyles from "@/styles/formStyles";
+import { IProvidedServices } from "@/models/ProvidedServices";
 
 const Form: React.FC = () => {
   const router = useRouter();
@@ -62,7 +63,7 @@ const Form: React.FC = () => {
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: (existingFlight as unknown as Flight) || {
+    defaultValues: (existingFlight as unknown as IFlight) || {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SFR22",
       isCommercialFlight: true,
@@ -80,7 +81,7 @@ const Form: React.FC = () => {
     },
   });
   const { errors } = formState;
-  const submit = (data: Flight) => {
+  const submit = (data: IFlight) => {
     //nullyfy services if we update new data
 
     if (existingFlight) {
@@ -88,7 +89,7 @@ const Form: React.FC = () => {
         dispatch(
           updateFlight({
             ...data,
-            providedServices: null as unknown as ProvidedServices,
+            providedServices: null as unknown as IProvidedServices,
           })
         );
       }

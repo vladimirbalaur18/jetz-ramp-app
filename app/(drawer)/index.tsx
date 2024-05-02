@@ -9,7 +9,7 @@ import FlightItem from "@/components/FlightItem";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useAppTheme } from "react-native-paper/src/core/theming";
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import { RootState } from "@/redux/store";
 import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 import FlightSection from "@/components/FlightSection";
@@ -23,10 +23,10 @@ export default function Page() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  let parseFlightsByDate: Record<string, Flight[]> = useMemo(() => {
-    let dateFlightsMap: Record<string, Flight[]> = {};
+  let parseFlightsByDate: Record<string, IFlight[]> = useMemo(() => {
+    let dateFlightsMap: Record<string, IFlight[]> = {};
 
-    flightsArr.forEach((flight: Flight) => {
+    flightsArr.forEach((flight: IFlight) => {
       const dateOfFlight = dayjs(flight.arrival?.arrivalDate).format(
         "YYYY-MM-DD"
       );

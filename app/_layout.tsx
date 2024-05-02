@@ -29,7 +29,7 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { realmConfig, realmWithoutSync } from "@/realm";
 import DefaultBasicHandlingFees from "@/configs/basicHandlingFees.json";
 import DefaultServices from "@/configs/serviceDefinitions.json";
-import { ProvidedServicesSchema } from "@/models/Services";
+import { ServiceCategorySchema } from "@/models/Services";
 import { SnackbarProvider } from "@/context/snackbarContext";
 import uuid from "react-uuid";
 registerTranslation("en-GB", enGB);
@@ -94,8 +94,8 @@ function RootLayoutNav() {
     useSelector((state: RootState) => state)
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
-  const basicHandlingFees = realmWithoutSync.objects("BasicHandling");
-  const services = realmWithoutSync.objects<ProvidedServicesSchema>("Services");
+  const basicHandlingFees = realmWithoutSync.objects("BasicHandlingRule");
+  const services = realmWithoutSync.objects<ServiceCategorySchema>("Services");
 
   const FlightNumberIndicator = currentFlightNumber
     ? `(${currentFlightNumber})`
@@ -109,7 +109,7 @@ function RootLayoutNav() {
     if (!basicHandlingFees?.length) {
       realmWithoutSync.write(() => {
         DefaultBasicHandlingFees.forEach((fee) => {
-          realmWithoutSync.create("BasicHandling", { ...fee });
+          realmWithoutSync.create("BasicHandlingRule", { ...fee });
         });
       });
     }

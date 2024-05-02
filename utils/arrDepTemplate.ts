@@ -1,7 +1,7 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import dayjs from "dayjs";
 
-export default function ArrDepTemplateRenderHTML(flight: Flight) {
+export default function ArrDepTemplateRenderHTML(flight: IFlight) {
   const arrivalDate =
     flight?.arrival.arrivalDate &&
     dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");

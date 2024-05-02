@@ -1,24 +1,19 @@
-import { Flight } from "@/redux/types";
 import Realm, { ObjectSchema } from "realm";
-export type BasicHandlingSchema = {
-  minMTOW: number;
-  maxMTOW: number;
-  pricePerLeg: number;
+
+export type IBasicHandling = {
+  total: number | string;
+  isPriceOverriden?: boolean;
 };
 
-class BasicHandling extends Realm.Object<BasicHandlingSchema> {
-  minMTOW!: number;
-  maxMTOW!: number;
-  pricePerLeg!: number;
+export class BasicHandling extends Realm.Object<IBasicHandling> {
+  total!: number;
+  isPriceOverriden?: boolean;
 
   static schema: ObjectSchema = {
     name: "BasicHandling",
     properties: {
-      minMTOW: { type: "int", default: 0 },
-      maxMTOW: { type: "int", default: 0 },
-      pricePerLeg: { type: "float", default: 0 },
+      total: "float",
+      isPriceOverriden: "bool?",
     },
   };
 }
-
-export default BasicHandling;

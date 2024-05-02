@@ -1,28 +1,34 @@
-import { Flight } from "@/redux/types";
+import { IFlight } from "@/redux/types";
 import Realm, { BSON, ObjectSchema } from "realm";
 import { Price } from "./LoungeFees";
 
-export type ServiceSchema = {
+export type IService = {
   serviceId?: string;
   serviceName: string;
   hasVAT: boolean;
-  isDisbursed: boolean;
+  isDisbursed?: boolean;
   pricing: {
     amount: number;
     currency: string;
   };
+  isPriceOverriden: boolean;
+  totalPriceOverride?: number;
+  quantity?: number;
+  notes?: string;
+  isUsed?: boolean;
 };
-export type ProvidedServicesSchema = {
+export type ServiceCategorySchema = {
   serviceCategoryName: string;
-  services: ServiceSchema[];
+  services: IService[];
 };
 
-export class Service extends Realm.Object<ServiceSchema> {
+export class Service extends Realm.Object<IService> {
   serviceName!: string;
   hasVAT!: boolean;
-  isDisbursed!: boolean;
+  isDisbursed?: boolean;
   pricing!: Price;
   serviceId!: string;
+  isPriceOverriden!: boolean;
 
   static schema: ObjectSchema = {
     name: "Service",
@@ -31,13 +37,18 @@ export class Service extends Realm.Object<ServiceSchema> {
       serviceId: { type: "string", optional: false },
       serviceName: { type: "string" },
       hasVAT: { type: "bool" },
-      isDisbursed: { type: "bool" },
+      isDisbursed: "bool?",
       pricing: { type: "object", objectType: "Price" },
+      isPriceOverriden: { type: "bool", default: false },
+      totalPriceOverride: { type: "float", optional: true },
+      quantity: "int?",
+      notes: "string?",
+      isUsed: "bool?",
     },
   };
 }
 
-export class ProvidedServices extends Realm.Object<ProvidedServicesSchema> {
+export class Services extends Realm.Object<ServiceCategorySchema> {
   serviceCategoryName!: string;
   services!: Service[];
 
@@ -49,4 +60,4 @@ export class ProvidedServices extends Realm.Object<ProvidedServicesSchema> {
     },
   };
 }
-export default ProvidedServices;
+export default Services;

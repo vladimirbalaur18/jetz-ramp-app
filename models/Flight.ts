@@ -1,19 +1,34 @@
-// import { Flight } from "@/redux/types";
-// import Realm, { ObjectSchema } from "realm";
+import { IFlight } from "@/redux/types";
+import Realm, { ObjectSchema } from "realm";
+class Flight extends Realm.Object<IFlight> {
+  static schema: ObjectSchema = {
+    name: "Flight",
+    primaryKey: "flightId",
+    properties: {
+      flightId: { type: "string" },
+      operatorName: "string",
+      flightNumber: "string",
+      scheduleType: "string",
+      orderingCompanyName: "string",
+      aircraftType: "string",
+      aircraftRegistration: "string",
+      handlingType: "string",
+      arrival: {
+        type: "object",
+        objectType: "Arrival",
+      },
+      departure: {
+        type: "object",
+        objectType: "Departure",
+      },
+      mtow: "float",
+      parkingPosition: "string",
+      providedServices: {
+        type: "object",
+        objectType: "ProvidedServices",
+      },
+    },
+  };
+}
 
-// class FlightModel extends Realm.Object<Flight> {
-//   static schema: ObjectSchema = {
-//     name: "Flight",
-//     properties: {
-//       flightId: { type: "string" },
-//       operatorName: { type: "string" },
-//       flightNumber: { type: "string" },
-//       scheduleType: { type: "string" },
-//       orderingCompanyName: { type: "string" },
-//       aircraftType: { type: "string" },
-//       aircraftRegistration: { type: "string" },
-//       handlingType: { type: "string" },
-//       arrival
-//     },
-//   };
-// }
+export default Flight;
