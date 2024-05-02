@@ -104,9 +104,11 @@ const Form: React.FC = () => {
 
         <Button
           mode="contained"
+          style={{ marginVertical: 20 }}
           onPress={() =>
             router.navigate("/(drawer)/(confTabs)/(services)/newService")
           }
+          icon={"archive-plus-outline"}
           disabled={!formState.isValid}
         >
           Add new service

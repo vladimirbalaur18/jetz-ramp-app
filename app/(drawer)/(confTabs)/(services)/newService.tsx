@@ -17,6 +17,7 @@ import {
   useTheme,
   Portal,
   Modal,
+  Icon,
 } from "react-native-paper";
 import { Flight, ProvidedServices } from "@/redux/types";
 import {
@@ -178,7 +179,21 @@ const NewService: React.FC = () => {
                 }}
                 list={[
                   ...categoriesOptions,
-                  { label: "Create new category", value: "newCategory" },
+                  {
+                    label: "Create new category",
+                    value: "newCategory",
+                    custom: (
+                      <Text style={{ color: theme.colors.primary }}>
+                        <Icon
+                          source={"archive-plus-outline"}
+                          size={18}
+                          color={theme.colors.primary}
+                        />
+                        {"   "}
+                        Create a new category
+                      </Text>
+                    ),
+                  },
                 ]}
               />
               <HelperText type="error">
@@ -251,22 +266,7 @@ const NewService: React.FC = () => {
             )}
           />
         </View>
-        <View style={styles.row}>
-          <Text variant="bodyLarge">Is disbursed </Text>
-          <Controller
-            control={control}
-            defaultValue={false}
-            name="isDisbursed"
-            render={({ field: { value, onChange } }) => (
-              <>
-                <Switch
-                  value={value}
-                  onValueChange={(value) => onChange(value)}
-                />
-              </>
-            )}
-          />
-        </View>
+
         <View
           style={{
             justifyContent: "space-between",
@@ -342,7 +342,9 @@ const AddCategoryModal = ({
             borderRadius: 15,
           }}
         >
-          <Text variant="bodyLarge">Create new category</Text>
+          <Text style={{ marginBottom: 20 }} variant="bodyLarge">
+            Create a new category
+          </Text>
 
           <Controller
             control={control}
@@ -353,7 +355,7 @@ const AddCategoryModal = ({
             render={({ field: { onBlur, onChange, value } }) => (
               <>
                 <TextInput
-                  label="Category:"
+                  label="Category name:"
                   style={styles.input}
                   value={String(value)}
                   onBlur={onBlur}
@@ -371,7 +373,6 @@ const AddCategoryModal = ({
             style={{
               justifyContent: "space-between",
               flexDirection: "row",
-              marginVertical: 10,
               alignItems: "center",
             }}
           >
@@ -380,10 +381,9 @@ const AddCategoryModal = ({
                 onDismiss();
               }}
             >
-              Reset
+              Close
             </Button>
             <Button
-              style={{ marginVertical: 20 }}
               mode="contained"
               disabled={!formState.isValid}
               onPress={() => {
