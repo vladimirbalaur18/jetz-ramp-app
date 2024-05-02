@@ -1,4 +1,4 @@
-import { IFlight } from "@/redux/types";
+import { IFlight } from "@/models/Flight";
 import dayjs from "dayjs";
 
 export default function ArrDepTemplateRenderHTML(flight: IFlight) {

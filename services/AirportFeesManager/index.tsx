@@ -1,4 +1,3 @@
-import { IFlight } from "@/redux/types";
 import AirportFees from "@/configs/airportFees.json";
 import {
   getDifferenceBetweenArrivalDeparture,
@@ -13,6 +12,7 @@ import convertCurrency from "@/utils/convertCurrency";
 import { realmWithoutSync } from "@/realm";
 import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
+import { IFlight } from "@/models/Flight";
 
 export const getFuelFeeAmount = ({
   fuelDensity,

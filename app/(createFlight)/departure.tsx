@@ -1,23 +1,13 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
   Button,
   Switch,
   HelperText,
-  List,
   Text,
-  RadioButton,
 } from "react-native-paper";
-import { IFlight, IProvidedServices } from "@/redux/types";
 import { useForm, Controller } from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -28,7 +18,8 @@ import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _ from "lodash";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { IFlight } from "@/models/Flight";
+import { IProvidedServices } from "@/models/ProvidedServices";
 type FormData = IFlight;
 
 const Form: React.FC = () => {

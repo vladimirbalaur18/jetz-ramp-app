@@ -1,28 +1,17 @@
-import * as React from "react";
-import {
-  View,
-  StyleSheet,
-  Platform,
-  Text,
-  Linking,
-  ScrollView,
-} from "react-native";
-import * as FileSystem from "expo-file-system";
-import * as IntentLauncher from "expo-intent-launcher";
-import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
-import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
-import { useSelector } from "react-redux";
+import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { IFlight } from "@/models/Flight";
+import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import { Controller, useForm } from "react-hook-form";
-import { IFlight } from "@/redux/types";
-import { HelperText, TextInput, Button } from "react-native-paper";
+import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
-import { updateFlight } from "@/redux/slices/flightsSlice";
 import printToFile from "@/utils/printToFile";
+import * as React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ScrollView, StyleSheet } from "react-native";
+import { Button, HelperText, TextInput } from "react-native-paper";
+import { useSelector } from "react-redux";
 type FormData = IFlight;
 
 export default function App() {

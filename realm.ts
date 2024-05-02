@@ -14,6 +14,11 @@ import { FeeTotal } from "./models/FeeTotal";
 import { SupportServices } from "./models/SupportServices";
 import { VIPLoungeService } from "./models/VIPLoungeService";
 import { ProvidedServices } from "./models/ProvidedServices";
+import { PersonNameSignature } from "./models/PersonNameSignature";
+import { CurrencyRates } from "./models/CurrencyRates";
+import { ChargeNoteDetails } from "./models/ChargeNoteDetails";
+import Flight from "./models/Flight";
+import { BasicHandling } from "./models/BasicHandling";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -36,6 +41,11 @@ export const realmConfig: Realm.Configuration = {
     SupportServices,
     VIPLoungeService,
     ProvidedServices,
+    PersonNameSignature,
+    CurrencyRates,
+    ChargeNoteDetails,
+    Flight,
+    BasicHandling,
   ],
 };
 

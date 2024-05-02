@@ -1,38 +1,15 @@
-import React from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
-import {
-  TextInput,
-  Button,
-  Switch,
-  HelperText,
-  List,
-  Text,
-  RadioButton,
-} from "react-native-paper";
-import { IFlight, IProvidedServices } from "@/redux/types";
-import { useForm, Controller } from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
+import { useSnackbar } from "@/context/snackbarContext";
+import { GeneralConfigState } from "@/models/Config";
+import { FuelFeesState } from "@/models/Fuelfees";
+import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import REGEX from "@/utils/regexp";
+import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
-import REGEX from "@/utils/regexp";
-import { updateFlight } from "@/redux/slices/flightsSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import ERROR_MESSAGES from "@/utils/formErrorMessages";
-import _ from "lodash";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import { useQuery, useRealm } from "@realm/react";
-import General, { GeneralConfigState } from "@/models/Config";
-import { FuelFeesState } from "@/models/Fuelfees";
-import { useSnackbar } from "@/context/snackbarContext";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Button, HelperText, Text, TextInput } from "react-native-paper";
 
 type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {

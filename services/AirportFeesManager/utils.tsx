@@ -1,10 +1,10 @@
 import { GeneralConfigState } from "@/models/Config";
+import { IArrival, IDeparture } from "@/models/DepartureArrival";
+import { IFlight } from "@/models/Flight";
 import { realmWithoutSync } from "@/realm";
-import { IArrival, Departure, IFlight } from "@/redux/types";
 import getParsedDateTime from "@/utils/getParsedDateTime";
-import dayjs from "dayjs";
 
-export const getPassengerCount = (data: IArrival | Departure): number =>
+export const getPassengerCount = (data: IArrival | IDeparture): number =>
   Number(data?.adultCount || 0) + Number(data?.minorCount || 0);
 export const isLightAircraft = (flight: IFlight) => flight.mtow < 2000;
 export const getFlightMTOWinTons = (flight: IFlight) =>

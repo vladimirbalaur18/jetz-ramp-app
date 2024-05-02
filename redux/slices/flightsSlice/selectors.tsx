@@ -1,5 +1,5 @@
+import { IFlight } from "@/models/Flight";
 import { RootState } from "@/redux/store";
-import { IFlight } from "@/redux/types";
 import { createSelector } from "@reduxjs/toolkit";
 
 const selectCurrentFlightId = (state: RootState) =>

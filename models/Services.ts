@@ -1,4 +1,3 @@
-import { IFlight } from "@/redux/types";
 import Realm, { BSON, ObjectSchema } from "realm";
 import { Price } from "./LoungeFees";
 

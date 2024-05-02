@@ -1,44 +1,41 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { View, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import formStyles from "@/styles/formStyles";
+import React, { useEffect, useState } from "react";
+import { SafeAreaView, ScrollView, View } from "react-native";
 
-import {
-  TextInput,
-  Button,
-  Switch,
-  HelperText,
-  Text,
-  Divider,
-  Modal,
-  PaperProvider,
-  Portal,
-  useTheme,
-} from "react-native-paper";
-import { IFlight } from "@/redux/types";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
-import REGEX from "@/utils/regexp";
-import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "@/redux/store";
-import {
-  getTotalAirportFeesPrice,
-  getAllServices,
-  getBasicHandlingPrice,
-  getLoungeFeePrice,
-} from "@/services/servicesCalculator";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import ERROR_MESSAGES from "@/utils/formErrorMessages";
-import DropDown from "react-native-paper-dropdown";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
-import { updateFlight } from "@/redux/slices/flightsSlice";
-import { useRouter } from "expo-router";
 import TotalServicesSection from "@/components/TotalServicesSection";
-import { getFuelFeeAmount } from "@/services/AirportFeesManager";
-import convertCurrency from "@/utils/convertCurrency";
-import formatMDLPriceToEuro from "@/utils/priceFormatter";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 import { ServiceCategorySchema } from "@/models/Services";
+import { updateFlight } from "@/redux/slices/flightsSlice";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import {
+  getBasicHandlingPrice,
+  getLoungeFeePrice,
+  getTotalAirportFeesPrice,
+} from "@/services/servicesCalculator";
+import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import formatMDLPriceToEuro from "@/utils/priceFormatter";
+import REGEX from "@/utils/regexp";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useQuery } from "@realm/react";
+import { useRouter } from "expo-router";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import {
+  Button,
+  Divider,
+  HelperText,
+  Modal,
+  Portal,
+  Switch,
+  Text,
+  TextInput,
+  useTheme,
+} from "react-native-paper";
+import DropDown from "react-native-paper-dropdown";
+import { useSelector } from "react-redux";
+import { IFlight } from "@/models/Flight";
 type FormData = IFlight;
 
 const Form: React.FC = () => {

@@ -1,23 +1,24 @@
-import React from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
-import {
-  TextInput,
-  Button,
-  Switch,
-  HelperText,
-  Text,
-} from "react-native-paper";
-import { IFlight, IProvidedServices } from "@/redux/types";
-import { useForm, Controller } from "react-hook-form";
-import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
+import { IFlight } from "@/models/Flight";
+import { IProvidedServices } from "@/models/ProvidedServices";
+import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { RootState } from "@/redux/store";
+import REGEX from "@/utils/regexp";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
-import REGEX from "@/utils/regexp";
-import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import _ from "lodash";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Button,
+  HelperText,
+  Switch,
+  Text,
+  TextInput,
+} from "react-native-paper";
+import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
+import { useDispatch, useSelector } from "react-redux";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",

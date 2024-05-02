@@ -1,59 +1,24 @@
-import React, { useLayoutEffect, useState } from "react";
+import { useSnackbar } from "@/context/snackbarContext";
+import { IService, ServiceCategorySchema } from "@/models/Services";
+import { useQuery, useRealm } from "@realm/react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
-import {
-  TextInput,
   Button,
-  Switch,
   HelperText,
-  List,
+  Switch,
   Text,
-  RadioButton,
+  TextInput,
   useTheme,
 } from "react-native-paper";
-import { IFlight } from "@/redux/types";
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-  UseFieldArrayRemove,
-  Control,
-  FieldErrors,
-  useWatch,
-} from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import REGEX from "@/utils/regexp";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
-import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import DropDown from "react-native-paper-dropdown";
-import _ from "lodash";
-import formStyles from "@/styles/formStyles";
-import { useObject, useQuery, useRealm } from "@realm/react";
-import { ServiceCategorySchema, IService } from "@/models/Services";
-import { useSnackbar } from "@/context/snackbarContext";
 type FormData = Omit<IService, "pricing"> & {
   amount: number;
   currency: string;

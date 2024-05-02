@@ -1,9 +1,7 @@
 import Realm, { ObjectSchema } from "realm";
-import { IService, ServiceCategorySchema } from "./Services";
+import { ServiceCategorySchema } from "./Services";
 import { IBasicHandling } from "./BasicHandling";
 import { IDisbursementFees } from "./DisbursementFees";
-import { IFeeTotal } from "./FeeTotal";
-import { IFuel } from "./Fuel";
 import { IVIPLoungeService } from "./VIPLoungeService";
 import { ISupportServices } from "./SupportServices";
 

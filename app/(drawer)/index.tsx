@@ -9,10 +9,10 @@ import FlightItem from "@/components/FlightItem";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useAppTheme } from "react-native-paper/src/core/theming";
-import { IFlight } from "@/redux/types";
 import { RootState } from "@/redux/store";
 import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 import FlightSection from "@/components/FlightSection";
+import { IFlight } from "@/models/Flight";
 dayjs.extend(isToday);
 
 export default function Page() {

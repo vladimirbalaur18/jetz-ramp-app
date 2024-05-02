@@ -1,10 +1,12 @@
-import { IFlight } from "@/redux/types";
-import serviceDefinitions from "@/configs/serviceDefinitions.json";
 import loungeFees from "@/configs/loungeFees.json";
+import serviceDefinitions from "@/configs/serviceDefinitions.json";
+import { IBasicHandlingRule } from "@/models/BasicHandlingRule";
+import { GeneralConfigState } from "@/models/Config";
+import { IFlight } from "@/models/Flight";
+import { realmWithoutSync } from "@/realm";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
-import { store } from "@/redux/store";
 import {
   getFuelFeeAmount,
   getLandingFees,
@@ -14,9 +16,6 @@ import {
   getTakeOffFees,
 } from "./AirportFeesManager";
 import { applyVAT, getVATMultiplier } from "./AirportFeesManager/utils";
-import { realmWithoutSync } from "@/realm";
-import { GeneralConfigState } from "@/models/Config";
-import { IBasicHandlingRule } from "@/models/BasicHandlingRule";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);

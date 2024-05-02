@@ -1,19 +1,17 @@
-import formStyles from "@/styles/formStyles";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { TextInput, HelperText, Button } from "react-native-paper";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { IFlight } from "@/redux/types";
-import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import DrawSignatureScreen from "@/components/DrawSignatureScreen";
-import { Stack, useRouter } from "expo-router";
-import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
-import { RootState, useAppDispatch } from "@/redux/store";
+import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { IFlight } from "@/models/Flight";
 import { updateFlight } from "@/redux/slices/flightsSlice";
-import { useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import { RootState, useAppDispatch } from "@/redux/store";
+import formStyles from "@/styles/formStyles";
+import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import { Stack, useRouter } from "expo-router";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Button, HelperText, TextInput } from "react-native-paper";
+import { useSelector } from "react-redux";
 
 const SignaturePage = () => {
   const router = useRouter();

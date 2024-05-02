@@ -2,7 +2,6 @@ import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import { ReactNode, useState } from "react";
 import { useTheme, Text, Menu } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { IFlight } from "@/redux/types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   removeFlight,
@@ -14,6 +13,7 @@ import { RootState } from "@/redux/store";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
+import { IFlight } from "@/models/Flight";
 
 type Field = [
   label: ReactNode,

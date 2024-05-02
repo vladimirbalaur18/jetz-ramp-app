@@ -1,11 +1,5 @@
-import React, { useLayoutEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TextComponent,
-  SafeAreaView,
-} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import {
   TextInput,
   Button,
@@ -15,47 +9,38 @@ import {
   Text,
   RadioButton,
 } from "react-native-paper";
-import { IFlight } from "@/redux/types";
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-  UseFieldArrayRemove,
-  Control,
-  FieldErrors,
-} from "react-hook-form";
-import { FlightSchedule } from "@/redux/types";
-import {
-  DatePickerInput,
-  DatePickerModal,
-  TimePicker,
-  TimePickerModal,
-} from "react-native-paper-dates";
-import dayjs, { Dayjs } from "dayjs";
-import { useLocalSearchParams, useRouter } from "expo-router";
-type FormData = IFlight;
+import { useForm, Controller } from "react-hook-form";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
+import { useDispatch, useSelector } from "react-redux";
+import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
+import { RootState } from "@/redux/store";
+import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
+import SectionTitle from "@/components/FormUtils/SectionTitle";
+import DropDown from "react-native-paper-dropdown";
+import _ from "lodash";
+import formStyles from "@/styles/formStyles";
+import { IProvidedServices } from "@/models/ProvidedServices";
+import { FlightSchedule, IFlight } from "@/models/Flight";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useQuery, useRealm } from "@realm/react";
+import uuid from "react-uuid";
+type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
-import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
-import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import CrewMemberInputFields from "@/components/FormUtils/CrewMemberInputFields";
-import SectionTitle from "@/components/FormUtils/SectionTitle";
-import DropDown from "react-native-paper-dropdown";
-import _ from "lodash";
-import formStyles from "@/styles/formStyles";
-import { IProvidedServices } from "@/models/ProvidedServices";
 
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
   const existingFlight = selectCurrentFlight(state);
+  const _existingFlight = _selectCurrentFlight(
+    state.flights.currentFlightId || ""
+  );
 
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
@@ -67,7 +52,7 @@ const Form: React.FC = () => {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SFR22",
       isCommercialFlight: true,
-      parkingPosition: 22,
+      parkingPosition: "22",
       flightNumber: "TY123",
       operatorName: "OperatorName",
       orderingCompanyName: "OrderingOperator",
@@ -75,12 +60,15 @@ const Form: React.FC = () => {
       mtow: 2417,
       chargeNote: {
         currency: {
-          date: dayjs(),
+          date: new Date(),
         },
       },
     },
   });
   const { errors } = formState;
+  const realm = useRealm();
+  const allFlight = useQuery<IFlight>("Flight");
+  console.log("allFlight", allFlight);
   const submit = (data: IFlight) => {
     //nullyfy services if we update new data
 
@@ -96,6 +84,19 @@ const Form: React.FC = () => {
     } else {
       alert("creating a flight");
       dispatch(createFlight(data));
+    }
+
+    if (!_existingFlight) {
+      realm.write(() => {
+        const newFlight = realm.create<IFlight>("Flight", {
+          ...data,
+          flightId: uuid(),
+        });
+
+        console.log("newflight", newFlight);
+      });
+    } else {
+      console.log("from db, existing flight");
     }
 
     alert(JSON.stringify(data));
@@ -341,7 +342,7 @@ const Form: React.FC = () => {
                 style={styles.input}
                 value={String(value)}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(String(value))}
                 error={errors.parkingPosition && true}
               />
               <HelperText type="error">

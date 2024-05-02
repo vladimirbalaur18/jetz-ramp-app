@@ -1,18 +1,16 @@
-import { IFlight } from "@/redux/types";
-import dayjs from "dayjs";
-import getParsedDateTime from "./getParsedDateTime";
+import { GeneralConfigState } from "@/models/Config";
+import { realmWithoutSync } from "@/realm";
+import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 import {
   getBasicHandlingPrice,
   getLoungeFeePrice,
   getTotalAirportFeesPrice,
 } from "@/services/servicesCalculator";
+import dayjs from "dayjs";
 import convertCurrency from "./convertCurrency";
-import { store } from "@/redux/store";
-import { getFuelFeeAmount } from "@/services/AirportFeesManager";
-import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
-import { useQuery } from "@realm/react";
-import { GeneralConfigState } from "@/models/Config";
-import { realmWithoutSync } from "@/realm";
+import getParsedDateTime from "./getParsedDateTime";
+import { IFlight } from "@/models/Flight";
 
 type ChargeListService = {
   serviceName: string;

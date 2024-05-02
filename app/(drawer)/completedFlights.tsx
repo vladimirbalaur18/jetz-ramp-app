@@ -1,6 +1,6 @@
 import FlightSection from "@/components/FlightSection";
+import { IFlight } from "@/models/Flight";
 import { RootState } from "@/redux/store";
-import { IFlight } from "@/redux/types";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
