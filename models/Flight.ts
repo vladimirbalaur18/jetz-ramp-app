@@ -23,9 +23,9 @@ export type IFlight = {
   departure: IDeparture;
   mtow: number;
   parkingPosition?: string;
-  providedServices: IProvidedServices;
-  crew: IPersonNameSignature;
-  ramp: IPersonNameSignature;
+  providedServices?: IProvidedServices;
+  crew?: IPersonNameSignature;
+  ramp?: IPersonNameSignature;
   isCommercialFlight?: boolean;
   status?: string;
   chargeNote: IChargeNoteDetails;
@@ -44,7 +44,7 @@ class Flight extends Realm.Object<IFlight> {
   departure!: IDeparture;
   mtow!: number;
   parkingPosition!: string;
-  providedServices?: IProvidedServices;
+  providedServices!: IProvidedServices;
   crew?: IPersonNameSignature;
   ramp?: IPersonNameSignature;
   isCommercialFlight?: boolean;

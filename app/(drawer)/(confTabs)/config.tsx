@@ -86,6 +86,7 @@ const Form: React.FC = () => {
                 label="VAT percentage:"
                 style={styles.input}
                 value={String(value)}
+                inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 error={errors?.VAT && true}
@@ -107,6 +108,7 @@ const Form: React.FC = () => {
                 label="Disbursement percentage:"
                 style={styles.input}
                 value={String(value)}
+                inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 error={errors?.disbursementPercentage && true}
@@ -159,6 +161,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Fuel price USD per KG"
                 style={styles.input}
+                inputMode="numeric"
                 value={String(value)}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}

@@ -1,6 +1,7 @@
 import Realm, { ObjectSchema } from "realm";
 
-class Time extends Realm.Object<{ hours: number; minutes: number }> {
+export type ITime = { hours: number; minutes: number };
+class Time extends Realm.Object<ITime> {
   static schema: ObjectSchema = {
     name: "Time",
     properties: {

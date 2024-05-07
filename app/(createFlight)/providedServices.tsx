@@ -5,11 +5,12 @@ import { SafeAreaView, ScrollView, View } from "react-native";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import TotalServicesSection from "@/components/TotalServicesSection";
 import { GeneralConfigState } from "@/models/Config";
-import { ServiceCategorySchema } from "@/models/Services";
+import { aServiceCategorySchema } from "@/models/Services";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
+import { Services, Service } from "@/models/Services";
 import {
   getBasicHandlingPrice,
   getLoungeFeePrice,
@@ -19,7 +20,7 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import REGEX from "@/utils/regexp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useQuery } from "@realm/react";
+import { useQuery, useRealm } from "@realm/react";
 import { useRouter } from "expo-router";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
@@ -36,6 +37,12 @@ import {
 import DropDown from "react-native-paper-dropdown";
 import { useSelector } from "react-redux";
 import { IFlight } from "@/models/Flight";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { IProvidedServices, ProvidedServices } from "@/models/ProvidedServices";
+import { IBasicHandling } from "@/models/BasicHandling";
+import { IVIPLoungeService } from "@/models/VIPLoungeService";
+import { ISupportServices } from "@/models/SupportServices";
+import uuid from "react-uuid";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -43,10 +50,17 @@ const Form: React.FC = () => {
   const allServices = useQuery<ServiceCategorySchema>("Services");
   const state = useSelector((state: RootState) => state);
   const [general] = useQuery<GeneralConfigState>("General");
-  const existingFlight = selectCurrentFlight(state);
+  const realmExistingFlight = _selectCurrentFlight(
+    state.flights.currentFlightId || ""
+  );
+  const existingFlight = realmExistingFlight?.toJSON() as IFlight;
+
+  console.log("HEY", existingFlight);
+  const realm = useRealm();
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const basicHandlingPricePerLegs = getBasicHandlingPrice(existingFlight);
+  const basicHandlingPricePerLegs =
+    existingFlight && getBasicHandlingPrice({ ...existingFlight });
 
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
   const {
@@ -64,8 +78,8 @@ const Form: React.FC = () => {
       providedServices: existingFlight?.providedServices || {
         basicHandling: {
           total:
-            basicHandlingPricePerLegs.arrival +
-            basicHandlingPricePerLegs.departure,
+            (basicHandlingPricePerLegs?.arrival || 0) +
+            (basicHandlingPricePerLegs?.departure || 0),
           isPriceOverriden: false,
         },
         disbursementFees: {
@@ -78,7 +92,9 @@ const Form: React.FC = () => {
         supportServices: {
           airportFee: {
             total: Number(
-              getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
+              existingFlight
+                ? getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
+                : 0
             ),
           },
           fuel: {
@@ -129,33 +145,36 @@ const Form: React.FC = () => {
     const disbursementFeeMultplier = general?.disbursementPercentage / 100;
     const disbursementFees = {
       airportFee:
-        providedServicesObj.supportServices.airportFee.total *
+        (providedServicesObj?.supportServices.airportFee.total || 0) *
         disbursementFeeMultplier,
       fuelFee:
         getFuelFeeAmount({
-          ...providedServicesObj.supportServices.fuel,
+          ...(providedServicesObj?.supportServices.fuel || {
+            fuelDensity: 0,
+            fuelLitersQuantity: 0,
+          }),
           flight: existingFlight,
         }) * disbursementFeeMultplier,
       cateringFee:
-        providedServicesObj.supportServices.catering.total *
+        (providedServicesObj?.supportServices.catering.total || 0) *
         disbursementFeeMultplier,
       HOTACFee:
-        providedServicesObj.supportServices.HOTAC.total *
+        (providedServicesObj?.supportServices.HOTAC.total || 0) *
         disbursementFeeMultplier,
       VIPLoungeFee:
         formatMDLPriceToEuro({
-          ...getLoungeFeePrice({ ...providedServicesObj.VIPLoungeServices }),
+          ...getLoungeFeePrice({ ...providedServicesObj?.VIPLoungeServices }),
           euroToMDL: Number(existingFlight?.chargeNote.currency.euroToMDL),
         }).amountEuro * disbursementFeeMultplier,
     };
 
     setValue("providedServices.disbursementFees", disbursementFees);
   }, [
-    providedServicesObj.supportServices.HOTAC.total,
-    providedServicesObj.supportServices.catering.total,
-    JSON.stringify(providedServicesObj.supportServices.fuel),
-    providedServicesObj.supportServices.airportFee.total,
-    JSON.stringify(providedServicesObj.VIPLoungeServices),
+    providedServicesObj?.supportServices.HOTAC.total,
+    providedServicesObj?.supportServices.catering.total,
+    JSON.stringify(providedServicesObj?.supportServices.fuel),
+    providedServicesObj?.supportServices.airportFee.total,
+    JSON.stringify(providedServicesObj?.VIPLoungeServices),
   ]);
   const theme = useTheme();
   useEffect(() => {
@@ -203,20 +222,83 @@ const Form: React.FC = () => {
 
   // HELPERS
   const submit = (data: IFlight) => {
-    dispatch(
-      updateFlight({
-        ...existingFlight,
-        providedServices: {
-          ...data.providedServices,
-          basicHandling: {
+    // dispatch(
+    //   updateFlight({
+    //     ...existingFlight,
+    //     providedServices: {
+    //       ...data.providedServices,
+    //       basicHandling: {
+    //         total: data?.providedServices?.basicHandling?.total,
+    //         isPriceOverriden:
+    // data?.providedServices?.basicHandling?.total !==
+    //   existingFlight?.providedServices?.basicHandling?.total,
+    //       },
+    //     },
+    //   })
+    // );
+
+    console.log("providedServicesSubmit", data);
+    console.log("services", data.providedServices?.otherServices);
+
+    realm.write(() => {
+      const providedServices = realm.create<IProvidedServices>(
+        "ProvidedServices",
+        {
+          VIPLoungeServices: realm.create<IVIPLoungeService>(
+            "VIPLoungeService",
+            { ...data.providedServices?.VIPLoungeServices }
+          ),
+          basicHandling: realm.create<IBasicHandling>("BasicHandling", {
             total: data?.providedServices?.basicHandling?.total,
             isPriceOverriden:
               data?.providedServices?.basicHandling?.total !==
               existingFlight?.providedServices?.basicHandling?.total,
-          },
-        },
-      })
-    );
+          }),
+          disbursementFees: data.providedServices?.disbursementFees,
+          supportServices: realm.create<ISupportServices>("SupportServices", {
+            HOTAC: {
+              total: data?.providedServices?.supportServices.HOTAC.total,
+            },
+            airportFee: {
+              total: data?.providedServices?.supportServices.airportFee.total,
+            },
+            catering: {
+              total: data?.providedServices?.supportServices.catering.total,
+            },
+            fuel: { ...data.providedServices?.supportServices.fuel },
+          }),
+          otherServices: data?.providedServices?.otherServices?.map((s) => {
+            return new Services(realm, {
+              serviceCategoryName: s.serviceCategoryName,
+              services: s.services.map(
+                (serv) => new Service(realm, { ...serv, serviceId: uuid() })
+              ),
+            });
+          }),
+          // ?.map((s) => {
+          //   return realm.create<ServiceCategorySchema>("Services", {
+          //     serviceCategoryName: s.serviceCategoryName,
+          //     services: s.services.map((_service) => {
+          //       return realm.create<IService>("Service", {
+          //         serviceName: _service.serviceName,
+          //         hasVAT: _service.hasVAT,
+          //         isDisbursed: _service.isDisbursed,
+          //         isPriceOverriden: _service.isPriceOverriden,
+          //         isUsed: _service.isUsed,
+          //         notes: _service.notes,
+          //         pricing: _service.pricing,
+          //         quantity: _service.quantity,
+          //         totalPriceOverride: _service.totalPriceOverride,
+          //       });
+          //     }),
+          //   });
+          // })
+        }
+      );
+      existingFlight.providedServices = providedServices;
+
+      console.log("providedServicesRealm: ", providedServices.toJSON());
+    });
     router.navigate("/signature");
   };
 
@@ -508,7 +590,7 @@ const Form: React.FC = () => {
             </>
           )}
         />
-        {providedServicesObj.VIPLoungeServices?.typeOf !== "None" && (
+        {providedServicesObj?.VIPLoungeServices?.typeOf !== "None" && (
           <View>
             <Controller
               control={control}

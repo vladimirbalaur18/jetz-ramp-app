@@ -13,12 +13,15 @@ import { RootState } from "@/redux/store";
 import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 import FlightSection from "@/components/FlightSection";
 import { IFlight } from "@/models/Flight";
+import { useQuery } from "@realm/react";
 dayjs.extend(isToday);
 
 export default function Page() {
-  const flightsArr = useSelector((state: RootState) =>
-    state.flights.flightsArray.filter((f) => f?.status !== "Completed")
-  );
+  // const flightsArr = useSelector((state: RootState) =>
+  //   state.flights.flightsArray.filter((f) => f?.status !== "Completed")
+  // );
+
+  const flightsArr = useQuery<IFlight>("Flight");
   const theme = useTheme();
   const dispatch = useDispatch();
   const router = useRouter();

@@ -7,16 +7,16 @@ export type IVIPLoungeService = {
 };
 
 export class VIPLoungeService extends Realm.Object<IVIPLoungeService> {
-  adultPax!: number;
-  minorPax!: number;
-  typeOf!: string;
+  adultPax?: number;
+  minorPax?: number;
+  typeOf?: string;
 
   static schema: ObjectSchema = {
     name: "VIPLoungeService",
     properties: {
-      adultPax: "int",
-      minorPax: "int",
-      typeOf: "string",
+      adultPax: "int?",
+      minorPax: "int?",
+      typeOf: "string?",
     },
   };
 }

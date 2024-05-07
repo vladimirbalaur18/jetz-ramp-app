@@ -1,7 +1,7 @@
-import { IFlight } from "@/redux/types";
 import { View, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 import FlightItem from "./FlightItem";
+import { IFlight } from "@/models/Flight";
 const FlightSection: React.FC<{
   dateString: string;
   flights: IFlight[];

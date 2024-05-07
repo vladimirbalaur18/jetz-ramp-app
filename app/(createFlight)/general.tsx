@@ -14,7 +14,11 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import { useDispatch, useSelector } from "react-redux";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
+import {
+  createFlight,
+  setCurrentFlightById,
+  updateFlight,
+} from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
@@ -26,6 +30,8 @@ import { FlightSchedule, IFlight } from "@/models/Flight";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useQuery, useRealm } from "@realm/react";
 import uuid from "react-uuid";
+import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
+import { ICurrencyRates } from "@/models/CurrencyRates";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -37,18 +43,16 @@ const ERROR_MESSAGES = {
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
   const _existingFlight = _selectCurrentFlight(
     state.flights.currentFlightId || ""
   );
-
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
   const dispatch = useDispatch();
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: (existingFlight as unknown as IFlight) || {
+    defaultValues: ({ ..._existingFlight?.toJSON() } as unknown as IFlight) || {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SFR22",
       isCommercialFlight: true,
@@ -72,31 +76,66 @@ const Form: React.FC = () => {
   const submit = (data: IFlight) => {
     //nullyfy services if we update new data
 
-    if (existingFlight) {
-      if (!_.isEqual(existingFlight, data)) {
-        dispatch(
-          updateFlight({
-            ...data,
-            providedServices: null as unknown as IProvidedServices,
-          })
-        );
-      }
-    } else {
-      alert("creating a flight");
-      dispatch(createFlight(data));
-    }
+    //OLD REDUX LOGIC
+    // if (existingFlight) {
+    //   if (!_.isEqual(existingFlight, data)) {
+    //     dispatch(
+    //       updateFlight({
+    //         ...data,
+    //         providedServices: null as unknown as IProvidedServices,
+    //       })
+    //     );
+    //   }
+    // } else {
+    //   alert("creating a flight");
+    //   dispatch(createFlight(data));
+    // }
 
     if (!_existingFlight) {
       realm.write(() => {
-        const newFlight = realm.create<IFlight>("Flight", {
+        const newFlightId = uuid();
+        realm.create<IFlight>("Flight", {
           ...data,
-          flightId: uuid(),
+          chargeNote: realm.create<IChargeNoteDetails>("ChargeNoteDetails", {
+            currency: realm.create<ICurrencyRates>("CurrencyRates", {
+              date: data.chargeNote.currency.date,
+              usdToMDL: data.chargeNote.currency.usdToMDL,
+              euroToMDL: data.chargeNote.currency.euroToMDL,
+            }),
+          }),
+          flightId: newFlightId,
         });
-
-        console.log("newflight", newFlight);
+        dispatch(setCurrentFlightById(newFlightId));
       });
     } else {
       console.log("from db, existing flight");
+      if (!_.isEqual(_existingFlight.toJSON(), data)) {
+        alert("updaging");
+        dispatch(setCurrentFlightById(data.flightId as any));
+
+        realm.write(() => {
+          _existingFlight.aircraftRegistration = data.aircraftRegistration;
+          _existingFlight.aircraftType = data.aircraftType;
+          _existingFlight.chargeNote.date = data.chargeNote.date;
+          _existingFlight.chargeNote.currency.euroToMDL =
+            data.chargeNote.currency.euroToMDL;
+          _existingFlight.chargeNote.currency.usdToMDL =
+            data.chargeNote.currency.usdToMDL;
+          _existingFlight.crew = data?.crew;
+          _existingFlight.departure = data?.departure;
+          _existingFlight.flightNumber = data?.flightNumber;
+          _existingFlight.handlingType = data?.handlingType;
+          _existingFlight.isCommercialFlight = data?.isCommercialFlight;
+          _existingFlight.mtow = Number(data?.mtow);
+          _existingFlight.operatorName = data?.operatorName;
+          _existingFlight.orderingCompanyName = data?.orderingCompanyName;
+          _existingFlight.parkingPosition = data?.parkingPosition;
+          _existingFlight.providedServices = undefined;
+          _existingFlight.ramp = undefined;
+          _existingFlight.scheduleType = data?.scheduleType;
+          _existingFlight.status = data?.status;
+        });
+      }
     }
 
     alert(JSON.stringify(data));
@@ -130,7 +169,7 @@ const Form: React.FC = () => {
                 mode={"outlined"}
                 visible={handleTypeDropdownVisible}
                 showDropDown={() =>
-                  !existingFlight?.handlingType &&
+                  !_existingFlight?.toJSON()?.handlingType &&
                   setHandleTypeDropdownVisible(true)
                 }
                 onDismiss={() => setHandleTypeDropdownVisible(false)}
@@ -370,7 +409,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 keyboardType="number-pad"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(Number(value))}
                 error={errors.mtow && true}
               />
               <HelperText type="error">{errors.mtow?.message}</HelperText>
@@ -430,7 +469,7 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {existingFlight ? "Save information" : "Create new flight"}
+          {_existingFlight?.toJSON() ? "Save information" : "Create new flight"}
         </Button>
       </ScrollView>
     </SafeAreaView>

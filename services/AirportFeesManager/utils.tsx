@@ -16,10 +16,13 @@ export const getDifferenceBetweenArrivalDeparture = (
 
   if (isArrivalOnly) return { hours: 0, days: 0 };
 
-  if (!isArrivalOnly && (!flight?.arrival || !flight?.departure))
+  if (!isArrivalOnly && (!flight?.arrival || !flight?.departure)) {
+    console.log(flight);
+
     throw new Error(
       `Invalid arrival or departure date/time for ${flight?.handlingType} handling`
     );
+  }
 
   const arrivalTime = getParsedDateTime(
     flight.arrival.arrivalDate,

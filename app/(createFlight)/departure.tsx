@@ -12,7 +12,10 @@ import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
-import { updateFlight } from "@/redux/slices/flightsSlice";
+import {
+  setCurrentFlightById,
+  updateFlight,
+} from "@/redux/slices/flightsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
@@ -20,6 +23,13 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _ from "lodash";
 import { IFlight } from "@/models/Flight";
 import { IProvidedServices } from "@/models/ProvidedServices";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useRealm } from "@realm/react";
+import { IArrival, IDeparture } from "@/models/DepartureArrival";
+import { ITime } from "@/models/Time";
+import { IRampInspection } from "@/models/RampInspection";
+import { IRampAgent, RampAgent } from "@/models/RampAgentName";
+import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -27,15 +37,17 @@ const Form: React.FC = () => {
   const dispatch = useDispatch();
 
   const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
-  // alert(JSON.stringLUKify(currentFlight));
+  const realm = useRealm();
+  const _existingFlight = _selectCurrentFlight(
+    state.flights.currentFlightId || ""
+  ); // alert(JSON.stringLUKify(currentFlight));
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: existingFlight?.departure
-      ? existingFlight
+    defaultValues: _existingFlight?.toJSON().departure
+      ? _existingFlight?.toJSON()
       : {
-          ...existingFlight,
+          ..._existingFlight?.toJSON(),
           departure: {
             departureTime: { hours: 10, minutes: 12 },
             departureDate: new Date(),
@@ -54,19 +66,60 @@ const Form: React.FC = () => {
   });
   const { errors } = formState;
 
-  const submit = (data: any) => {
+  const submit = (data: IFlight) => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
 
-    if (!_.isEqual(existingFlight, data)) {
-      alert("Nullyfind services");
-      dispatch(
-        updateFlight({
-          ...data,
-          providedServices: null as unknown as IProvidedServices,
-        })
-      );
-    } else dispatch(updateFlight(data));
+    // if (!_.isEqual(existingFlight, data)) {
+    //   alert("Nullyfind services");
+    //   dispatch(
+    //     updateFlight({
+    //       ...data,
+    //       providedServices: null as unknown as IProvidedServices,
+    //     })
+    //   );
+    // } else dispatch(updateFlight(data));
+
+    console.log("from db, existing flight");
+    realm.write(() => {
+      const departureTime = realm.create<ITime>("Time", {
+        hours: Number(data.departure.departureTime.hours),
+        minutes: Number(data.departure.departureTime.minutes),
+      });
+      const rampAgent = realm.create<IRampAgent>("RampAgent", {
+        fullname: data.departure.rampInspectionBeforeDeparture.agent.fullname,
+      });
+      const rampInspection = realm.create<IRampInspection>("RampInspection", {
+        FOD: data.departure.rampInspectionBeforeDeparture.FOD,
+        agent: rampAgent,
+        status: data.departure.rampInspectionBeforeDeparture.status,
+      });
+      const departure = realm.create<IDeparture>("Departure", {
+        adultCount: Number(data.departure.adultCount),
+        departureDate: dayjs(data.departure.departureDate).toDate(),
+        departureTime: departureTime,
+        isLocalFlight: data.departure.isLocalFlight,
+        minorCount: Number(data.departure.minorCount),
+        rampInspectionBeforeDeparture: rampInspection,
+        to: data.departure.to,
+      });
+      const arrival = realm.create<IArrival>("Arrival", {
+        arrivalDate: data.arrival.arrivalDate,
+        arrivalTime: data.arrival.arrivalTime,
+      });
+
+      if (_existingFlight)
+        if (!_.isEqual(_existingFlight.toJSON(), data)) {
+          alert("updaging");
+          console.log("departure data", data);
+
+          _existingFlight.departure = departure;
+          _existingFlight.arrival = arrival;
+        }
+    });
+    dispatch(
+      setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
+    );
 
     router.navigate("/(createFlight)/providedServices");
   };
@@ -81,7 +134,9 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">Departure</Text>
+          <Text variant="headlineSmall">
+            Departure {_existingFlight?.flightId}
+          </Text>
         </View>
         <Controller
           control={control}
@@ -126,7 +181,7 @@ const Form: React.FC = () => {
             )}
           />
         </View>
-        {existingFlight?.handlingType === "Departure" && (
+        {_existingFlight?.handlingType === "Departure" && (
           <>
             <Controller
               control={control}
@@ -180,11 +235,16 @@ const Form: React.FC = () => {
                       label="Arrival time:"
                       editable={false}
                       style={{ ...styles.input, flex: 3 }}
-                      value={`${
-                        value.hours < 10 ? "0" + value.hours : value.hours
-                      }:${
-                        value.minutes < 10 ? "0" + value.minutes : value.minutes
-                      }`}
+                      value={
+                        value &&
+                        `${
+                          value.hours < 10 ? "0" + value.hours : value.hours
+                        }:${
+                          value.minutes < 10
+                            ? "0" + value.minutes
+                            : value.minutes
+                        }`
+                      }
                     />
                     <Button
                       onPress={() => setArrivalTimerVisible(true)}
@@ -233,7 +293,7 @@ const Form: React.FC = () => {
                 style={{ width: 200 }}
                 mode="outlined"
                 validRange={{
-                  startDate: existingFlight?.arrival?.arrivalDate,
+                  startDate: _existingFlight?.arrival?.arrivalDate,
                 }}
               />
               <HelperText type="error">
@@ -438,7 +498,7 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {existingFlight
+          {_existingFlight
             ? "Save departure information"
             : "Submit departure information"}
         </Button>

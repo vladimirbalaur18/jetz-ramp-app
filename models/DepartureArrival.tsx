@@ -1,9 +1,10 @@
 import Realm, { ObjectSchema } from "realm";
 import { IRampAgent, RampAgent } from "./RampAgentName";
 import { IRampInspection } from "./RampInspection";
+import { ITime } from "./Time";
 
 export type IPayloadData = {
-  crewNumber: number;
+  crewNumber?: number;
   specialInfo?: string;
   cargoInfo?: string;
   mailInfo?: string;
@@ -14,10 +15,7 @@ export type IDeparture = {
   to: string;
   isLocalFlight: boolean;
   departureDate: Date;
-  departureTime: {
-    hours: number;
-    minutes: number;
-  };
+  departureTime: ITime;
   adultCount: number;
   minorCount: number;
   rampInspectionBeforeDeparture: {
@@ -31,14 +29,11 @@ class Departure extends Realm.Object<IDeparture> {
   to!: string;
   isLocalFlight!: boolean;
   departureDate!: Date;
-  departureTime!: {
-    hours: number;
-    minutes: number;
-  };
+  departureTime!: ITime;
   adultCount!: number;
   minorCount!: number;
   rampInspectionBeforeDeparture!: IRampInspection;
-  crewNumber!: number;
+  crewNumber?: number;
   specialInfo?: string;
   cargoInfo?: string;
   mailInfo?: string;
@@ -60,11 +55,11 @@ class Departure extends Realm.Object<IDeparture> {
         objectType: "RampInspection",
         type: "object",
       }, //TBD
-      crewNumber: "int",
-      specialInfo: "string",
-      cargoInfo: "string",
-      mailInfo: "string",
-      remarksInfo: "string",
+      crewNumber: "int?",
+      specialInfo: "string?",
+      cargoInfo: "string?",
+      mailInfo: "string?",
+      remarksInfo: "string?",
     },
   };
 }
@@ -84,17 +79,17 @@ export type IArrival = {
 } & IPayloadData;
 
 class Arrival extends Realm.Object<IArrival> {
-  from!: string;
-  isLocalFlight!: boolean;
+  from?: string;
+  isLocalFlight?: boolean;
   arrivalDate!: Date;
   arrivalTime!: {
     hours: number;
     minutes: number;
   };
-  adultCount!: number;
-  minorCount!: number;
-  rampInspectionBeforeDeparture!: IRampInspection;
-  crewNumber!: number;
+  adultCount?: number;
+  minorCount?: number;
+  rampInspectionBeforeDeparture?: IRampInspection;
+  crewNumber?: number;
   specialInfo?: string;
   cargoInfo?: string;
   mailInfo?: string;
@@ -103,24 +98,25 @@ class Arrival extends Realm.Object<IArrival> {
   static schema: ObjectSchema = {
     name: "Arrival",
     properties: {
-      from: "string",
-      isLocalFlight: "bool",
+      from: "string?",
+      isLocalFlight: "bool?",
       arrivalDate: "date",
       arrivalTime: {
         type: "object",
         objectType: "Time",
       },
-      adultCount: "int",
-      minorCount: "int",
+      adultCount: "int?",
+      minorCount: "int?",
       rampInspectionBeforeArrival: {
         objectType: "RampInspection",
         type: "object",
+        optional: true,
       },
-      crewNumber: "int",
-      specialInfo: "string",
-      cargoInfo: "string",
-      mailInfo: "string",
-      remarksInfo: "string",
+      crewNumber: "int?",
+      specialInfo: "string?",
+      cargoInfo: "string?",
+      mailInfo: "string?",
+      remarksInfo: "string?",
     },
   };
 }

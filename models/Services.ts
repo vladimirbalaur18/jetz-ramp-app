@@ -1,8 +1,7 @@
-import Realm, { BSON, ObjectSchema } from "realm";
+import Realm, { ObjectSchema } from "realm";
 import { Price } from "./LoungeFees";
 
 export type IService = {
-  serviceId?: string;
   serviceName: string;
   hasVAT: boolean;
   isDisbursed?: boolean;
@@ -13,8 +12,10 @@ export type IService = {
   isPriceOverriden: boolean;
   totalPriceOverride?: number;
   quantity?: number;
-  notes?: string;
   isUsed?: boolean;
+
+  notes?: string;
+  serviceId?: string;
 };
 export type ServiceCategorySchema = {
   serviceCategoryName: string;
@@ -26,8 +27,9 @@ export class Service extends Realm.Object<IService> {
   hasVAT!: boolean;
   isDisbursed?: boolean;
   pricing!: Price;
-  serviceId!: string;
   isPriceOverriden!: boolean;
+  serviceId!: string;
+  isUsed?: boolean;
 
   static schema: ObjectSchema = {
     name: "Service",

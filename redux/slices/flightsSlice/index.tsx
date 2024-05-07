@@ -1,5 +1,5 @@
 // Import the createSlice API from Redux Toolkit
-import { IFlight } from "@/redux/types";
+import { IFlight } from "@/models/Flight";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import uuid from "react-native-uuid";
 
