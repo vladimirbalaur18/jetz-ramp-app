@@ -29,9 +29,11 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { realmConfig, realmWithoutSync } from "@/realm";
 import DefaultBasicHandlingFees from "@/configs/basicHandlingFees.json";
 import DefaultServices from "@/configs/serviceDefinitions.json";
-import { ServiceCategorySchema } from "@/models/Services";
 import { SnackbarProvider } from "@/context/snackbarContext";
 import uuid from "react-uuid";
+import { IServiceCategory } from "@/models/ServiceCategory";
+import { ObjectId } from "bson";
+import { IService, Service } from "@/models/Services";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -95,7 +97,8 @@ function RootLayoutNav() {
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
   const basicHandlingFees = realmWithoutSync.objects("BasicHandlingRule");
-  const services = realmWithoutSync.objects<ServiceCategorySchema>("Services");
+  const serviceCategories =
+    realmWithoutSync.objects<IServiceCategory>("ServiceCategory");
 
   const FlightNumberIndicator = currentFlightNumber
     ? `(${currentFlightNumber})`
@@ -114,21 +117,31 @@ function RootLayoutNav() {
       });
     }
 
-    if (!services?.length) {
-      DefaultServices.forEach((serviceCategory) => {
-        realmWithoutSync.write(() => {
-          const servicesArray = serviceCategory.services.map((service) => {
-            return realmWithoutSync.create("Service", {
-              ...service,
-              serviceId: uuid(),
-            });
-          });
+    if (!serviceCategories?.length) {
+      DefaultServices.forEach(({ serviceCategoryName, services }) => {
+        const category = realmWithoutSync.write(() => {
+          const _cat = realmWithoutSync.create<IServiceCategory>(
+            "ServiceCategory",
+            {
+              _id: new ObjectId(),
+              categoryName: serviceCategoryName,
+            }
+          );
 
-          realmWithoutSync.create("Services", {
-            serviceCategoryName: serviceCategory.serviceCategoryName,
-            services: servicesArray,
-          });
+          return _cat;
         });
+
+        realmWithoutSync.write(() =>
+          services.map((s) =>
+            category.services.push(
+              new Service(realm, {
+                _id: new ObjectId(),
+                serviceCategory: category,
+                ...s,
+              })
+            )
+          )
+        );
       });
     }
   }, []);

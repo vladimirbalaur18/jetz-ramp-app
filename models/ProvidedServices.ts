@@ -1,9 +1,9 @@
 import Realm, { ObjectSchema } from "realm";
-import { ServiceCategorySchema } from "./Services";
 import { IBasicHandling } from "./BasicHandling";
 import { IDisbursementFees } from "./DisbursementFees";
 import { IVIPLoungeService } from "./VIPLoungeService";
 import { ISupportServices } from "./SupportServices";
+import { IProvidedService, ProvidedService } from "./ProvidedService";
 
 export type IProvidedServices = {
   basicHandling: IBasicHandling;
@@ -11,7 +11,7 @@ export type IProvidedServices = {
   supportServices: ISupportServices;
   VIPLoungeServices: IVIPLoungeService;
   remarks?: string;
-  otherServices?: ServiceCategorySchema[];
+  otherServices?: IProvidedService[];
 };
 export class ProvidedServices extends Realm.Object<IProvidedServices> {
   basicHandling!: IBasicHandling;
@@ -19,7 +19,7 @@ export class ProvidedServices extends Realm.Object<IProvidedServices> {
   supportServices!: ISupportServices;
   VIPLoungeServices!: IVIPLoungeService;
   remarks!: string;
-  otherServices?: ServiceCategorySchema[];
+  otherServices?: Realm.List<ProvidedService>;
 
   static schema: ObjectSchema = {
     name: "ProvidedServices",
@@ -29,7 +29,7 @@ export class ProvidedServices extends Realm.Object<IProvidedServices> {
       supportServices: { type: "object", objectType: "SupportServices" },
       VIPLoungeServices: { type: "object", objectType: "VIPLoungeService" },
       remarks: "string?",
-      otherServices: { type: "list", objectType: "Services" },
+      otherServices: { type: "list", objectType: "ProvidedService" },
     },
   };
 }

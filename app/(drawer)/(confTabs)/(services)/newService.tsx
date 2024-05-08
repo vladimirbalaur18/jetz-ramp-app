@@ -11,13 +11,16 @@ import {
   Modal,
   Icon,
 } from "react-native-paper";
+import { ObjectId } from "bson";
+
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "expo-router";
 import DropDown from "react-native-paper-dropdown";
 import { useQuery, useRealm } from "@realm/react";
-import { ServiceCategorySchema, IService } from "@/models/Services";
+import { IService } from "@/models/Services";
 import { useSnackbar } from "@/context/snackbarContext";
 import uuid from "react-uuid";
+import { IServiceCategory } from "@/models/ServiceCategory";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
@@ -30,7 +33,7 @@ type FormData = Omit<IService, "pricing"> & {
   serviceCategoryName: string;
 };
 const NewService: React.FC = () => {
-  const serviceCategories = useQuery<ServiceCategorySchema>("Services");
+  const serviceCategories = useQuery<IServiceCategory>("ServiceCategory");
   const realm = useRealm();
 
   const theme = useTheme();
@@ -48,19 +51,14 @@ const NewService: React.FC = () => {
 
   const handleServiceSubmit = () => {
     for (let serviceCategory of serviceCategories) {
-      if (
-        formValues.serviceCategoryName === serviceCategory.serviceCategoryName
-      ) {
+      if (formValues.serviceCategoryName === serviceCategory.categoryName) {
         realm.write(() => {
           serviceCategory.services.push(
             realm.create<IService>("Service", {
-              serviceId: uuid(),
+              _id: new ObjectId(),
               hasVAT: formValues.hasVAT,
               isDisbursed: formValues.isDisbursed,
-              pricing: {
-                currency: "EUR",
-                amount: Number(formValues.amount),
-              },
+              price: Number(formValues.amount),
               serviceName: formValues.serviceName,
             })
           );
@@ -89,8 +87,8 @@ const NewService: React.FC = () => {
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const categoriesOptions = serviceCategories.map((c) => {
     return {
-      label: c.serviceCategoryName,
-      value: c.serviceCategoryName,
+      label: c.categoryName,
+      value: c.categoryName,
     };
   });
   return (
@@ -173,10 +171,7 @@ const NewService: React.FC = () => {
           onDismiss={() => setShowAddCategoryModal(false)}
           onSubmit={(values) => {
             for (const serviceCategory of serviceCategories) {
-              if (
-                values.serviceCategoryName ===
-                serviceCategory.serviceCategoryName
-              ) {
+              if (values.serviceCategoryName === serviceCategory.categoryName) {
                 alert("This category already exists");
                 setShowAddCategoryModal(false);
 
@@ -185,9 +180,9 @@ const NewService: React.FC = () => {
             }
 
             realm.write(() => {
-              realm.create<ServiceCategorySchema>("Services", {
-                serviceCategoryName: values.serviceCategoryName,
-                services: [],
+              realm.create<IServiceCategory>("ServiceCategory", {
+                _id: new ObjectId(),
+                categoryName: values.serviceCategoryName,
               });
             });
             setShowAddCategoryModal(false);

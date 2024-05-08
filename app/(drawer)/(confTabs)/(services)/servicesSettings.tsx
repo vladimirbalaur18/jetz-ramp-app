@@ -7,14 +7,17 @@ import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { useQuery, useRealm } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
-import { ServiceCategorySchema, IService } from "@/models/Services";
+import { IServiceCategory } from "@/models/ServiceCategory";
+import { IService, Service } from "@/models/Services";
+import _ from "lodash";
 
 type FormData = GeneralConfigState & FuelFeesState;
 const Form: React.FC = () => {
   const realm = useRealm();
   const router = useRouter();
 
-  let services = useQuery<ServiceCategorySchema>("Services");
+  let serviceCategories = useQuery<IServiceCategory>("ServiceCategory");
+  let services = useQuery<IService>("Service");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
@@ -62,15 +65,19 @@ const Form: React.FC = () => {
         contentContainerStyle={styles.container}
         alwaysBounceVertical={false}
       >
-        {services.map((s) => {
+        {serviceCategories.map((s) => {
           return (
             <View>
-              <SectionTitle>{s.serviceCategoryName}</SectionTitle>
-              <View>
-                {s.services.map((service) => (
-                  <ServiceItem key={service.serviceId} service={service} />
-                ))}
-              </View>
+              <SectionTitle>{s.categoryName}</SectionTitle>
+              {s.services.map((service) => {
+                return (
+                  <ServiceItem
+                    key={service._id as unknown as string}
+                    service={service}
+                  />
+                );
+              })}
+              <View></View>
             </View>
           );
         })}
@@ -91,7 +98,7 @@ const Form: React.FC = () => {
   );
 };
 
-function ServiceItem({ service }: { service: IService }) {
+function ServiceItem({ service }: { service: Service }) {
   const theme = useTheme();
   return (
     <View
@@ -107,7 +114,9 @@ function ServiceItem({ service }: { service: IService }) {
       <Link
         href={{
           pathname: "/(drawer)/(confTabs)/(services)/[serviceId]",
-          params: { serviceId: service.serviceId || "" },
+          params: {
+            serviceId: (service._id as unknown as string | number) || "",
+          },
         }}
       >
         <Icon source={"eye"} size={18} color={theme.colors.secondary} />

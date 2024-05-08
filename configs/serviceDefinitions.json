@@ -6,10 +6,7 @@
                 "serviceName": "Meet & Assist",
                 "hasVAT": true,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 20,
-                    "currency": "EUR"
-                }
+                "price": 20
             }
         ]
     },
@@ -20,55 +17,37 @@
                 "serviceName": "Documents printing and delivery",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 10,
-                    "currency": "EUR"
-                }
+                "price": 10
             },
             {
                 "serviceName": "Crew transportation on the apron",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 25,
-                    "currency": "EUR"
-                }
+                "price": 25
             },
             {
                 "serviceName": "Passenger transportation on the apron",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 25,
-                    "currency": "EUR"
-                }
+                "price": 25
             },
             {
                 "serviceName": "GPU (up to 30min)",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 75,
-                    "currency": "EUR"
-                }
+                "price": 75
             },
             {
                 "serviceName": "Toilet service",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 50,
-                    "currency": "EUR"
-                }
+                "price": 50
             },
             {
                 "serviceName": "Water service",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 50,
-                    "currency": "EUR"
-                }
+                "price": 50
             }
         ]
     },
@@ -79,37 +58,25 @@
                 "serviceName": "Landing permit",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 30,
-                    "currency": "EUR"
-                }
+                "price": 30
             },
             {
                 "serviceName": "Dishwashing",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 50,
-                    "currency": "EUR"
-                }
+                "price": 50
             },
             {
                 "serviceName": "Laundry",
                 "hasVAT": false,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 50,
-                    "currency": "EUR"
-                }
+                "price": 50
             },
             {
                 "serviceName": "Hotel transportation",
                 "hasVAT": true,
                 "isDisbursed": false,
-                "pricing": {
-                    "amount": 50,
-                    "currency": "EUR"
-                }
+                "price": 50
             }
         ]
     }

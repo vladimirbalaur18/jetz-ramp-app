@@ -19,8 +19,8 @@ export const getFuelFeeAmount = ({
   fuelLitersQuantity,
   flight,
 }: {
-  fuelDensity: number;
-  fuelLitersQuantity: number;
+  fuelDensity?: number;
+  fuelLitersQuantity?: number;
   flight: IFlight;
 }) => {
   const [general] = realmWithoutSync.objects<GeneralConfigState>("General");
@@ -33,7 +33,7 @@ export const getFuelFeeAmount = ({
     FuelFees.priceUSDperKG * Number(flight?.chargeNote?.currency?.usdToMDL),
     Number(flight?.chargeNote?.currency?.euroToMDL)
   );
-  const fuelTons = (fuelDensity * fuelLitersQuantity) / 1000;
+  const fuelTons = ((fuelDensity || 0) * (fuelLitersQuantity || 0)) / 1000;
   const fuelEURAmount = priceEURPerTon * fuelTons;
   return VATRateMultiplier * fuelEURAmount;
 };

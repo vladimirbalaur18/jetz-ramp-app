@@ -1,10 +1,12 @@
 import { useSnackbar } from "@/context/snackbarContext";
-import { IService, ServiceCategorySchema } from "@/models/Services";
-import { useQuery, useRealm } from "@realm/react";
+import { IServiceCategory } from "@/models/ServiceCategory";
+import { IService } from "@/models/Services";
+import { useObject, useQuery, useRealm } from "@realm/react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { ObjectId } from "bson";
 import {
   Button,
   HelperText,
@@ -25,12 +27,11 @@ type FormData = Omit<IService, "pricing"> & {
 };
 const Form: React.FC = () => {
   const { serviceId } = useLocalSearchParams();
-  const [currentService] = useQuery<IService>(
+  const currentService = useObject<IService>(
     "Service",
-    (collection) => collection.filtered("serviceId == $0", serviceId),
-    [serviceId]
+    new ObjectId(String(serviceId))
   );
-  const allServiceCategories = useQuery<ServiceCategorySchema>("Services");
+  const allServiceCategories = useQuery<IServiceCategory>("ServiceCategory");
   const realm = useRealm();
 
   const theme = useTheme();
@@ -42,17 +43,16 @@ const Form: React.FC = () => {
       mode: "onChange",
       defaultValues: {
         serviceName: currentService?.serviceName,
-        amount: currentService?.pricing.amount,
+        amount: currentService?.price,
         hasVAT: currentService?.hasVAT,
         isDisbursed: currentService?.isDisbursed,
-        currency: currentService?.pricing.currency,
       },
     });
   const formValues = watch();
   const handleServiceEdit = () => {};
   const handleServiceRemove = () => {
     realm.write(() => {
-      showSnackbar(`${currentService.serviceName} has been removed`);
+      showSnackbar(`${currentService?.serviceName} has been removed`);
       realm.delete(currentService);
 
       for (const category of allServiceCategories) {
@@ -65,12 +65,14 @@ const Form: React.FC = () => {
   };
   const handleServiceSubmit = () => {
     realm.write(() => {
-      currentService.serviceName = formValues.serviceName;
-      currentService.pricing.amount = Number(formValues.amount);
-      currentService.hasVAT = formValues.hasVAT;
-      currentService.isDisbursed = formValues.isDisbursed;
-      showSnackbar(`Services has been updated successfully`);
-      setScope("view");
+      if (currentService) {
+        currentService.serviceName = formValues.serviceName;
+        currentService.price = Number(formValues.amount);
+        currentService.hasVAT = formValues.hasVAT;
+        currentService.isDisbursed = formValues.isDisbursed;
+        showSnackbar(`Services has been updated successfully`);
+        setScope("view");
+      }
     });
   };
   const disableField = scope === "view";

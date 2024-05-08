@@ -5,12 +5,11 @@ import { SafeAreaView, ScrollView, View } from "react-native";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import TotalServicesSection from "@/components/TotalServicesSection";
 import { GeneralConfigState } from "@/models/Config";
-import { aServiceCategorySchema } from "@/models/Services";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
-import { Services, Service } from "@/models/Services";
+import { IService, Service } from "@/models/Services";
 import {
   getBasicHandlingPrice,
   getLoungeFeePrice,
@@ -43,11 +42,14 @@ import { IBasicHandling } from "@/models/BasicHandling";
 import { IVIPLoungeService } from "@/models/VIPLoungeService";
 import { ISupportServices } from "@/models/SupportServices";
 import uuid from "react-uuid";
+import { IServiceCategory } from "@/models/ServiceCategory";
+import { IProvidedService, ProvidedService } from "@/models/ProvidedService";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
   // const allServices = getAllServices();
-  const allServices = useQuery<ServiceCategorySchema>("Services");
+  const allServices = useQuery<IServiceCategory>("ServiceCategory");
+  const services = useQuery<IService>("Service");
   const state = useSelector((state: RootState) => state);
   const [general] = useQuery<GeneralConfigState>("General");
   const realmExistingFlight = _selectCurrentFlight(
@@ -75,7 +77,7 @@ const Form: React.FC = () => {
   } = useForm<FormData>({
     mode: "all",
     defaultValues: {
-      providedServices: existingFlight?.providedServices || {
+      providedServices: {
         basicHandling: {
           total:
             (basicHandlingPricePerLegs?.arrival || 0) +
@@ -140,6 +142,24 @@ const Form: React.FC = () => {
 
   let providedServicesObj = watch("providedServices");
 
+  useEffect(() => {
+    if (!existingFlight.providedServices) {
+      services.map((s) => {
+        append({
+          service: s,
+          isUsed: false,
+          isPriceOverriden: false,
+          quantity: 1,
+        });
+      });
+    } else {
+      alert("appending services");
+
+      // append(
+      //   existingFlight.providedServices.otherServices as IProvidedService[]
+      // ); CAUSES NATIVE CALLSTACK EXCEED ERROR
+    }
+  }, [control]);
   //disbursement calculation
   useEffect(() => {
     const disbursementFeeMultplier = general?.disbursementPercentage / 100;
@@ -177,35 +197,6 @@ const Form: React.FC = () => {
     JSON.stringify(providedServicesObj?.VIPLoungeServices),
   ]);
   const theme = useTheme();
-  useEffect(() => {
-    //render additional services inputs
-
-    //prevent from appending too many fields
-    const areThereFieldsLeftToRender = fields?.length < allServices.length;
-
-    areThereFieldsLeftToRender &&
-      allServices?.forEach(({ serviceCategoryName, services }) => {
-        append({
-          serviceCategoryName: serviceCategoryName,
-          services: services.map(({ serviceName, pricing, hasVAT }) => {
-            return {
-              serviceName: serviceName,
-              pricing,
-              isUsed: false,
-              quantity: 1,
-              isPriceOverriden: false,
-              notes: "",
-
-              hasVAT:
-                existingFlight?.departure?.isLocalFlight ||
-                existingFlight?.arrival?.isLocalFlight
-                  ? hasVAT
-                  : false,
-            };
-          }),
-        });
-      });
-  }, [append, allServices]);
 
   const renderBasicHandlingVATString = () => {
     if (
@@ -268,11 +259,13 @@ const Form: React.FC = () => {
             fuel: { ...data.providedServices?.supportServices.fuel },
           }),
           otherServices: data?.providedServices?.otherServices?.map((s) => {
-            return new Services(realm, {
-              serviceCategoryName: s.serviceCategoryName,
-              services: s.services.map(
-                (serv) => new Service(realm, { ...serv, serviceId: uuid() })
-              ),
+            return new ProvidedService(realm, {
+              isPriceOverriden: s.isPriceOverriden,
+              isUsed: s.isUsed,
+              notes: s.notes,
+              quantity: s.quantity,
+              service: s.service,
+              totalPriceOverride: s.totalPriceOverride,
             });
           }),
           // ?.map((s) => {
@@ -295,10 +288,13 @@ const Form: React.FC = () => {
           // })
         }
       );
-      existingFlight.providedServices = providedServices;
-
-      console.log("providedServicesRealm: ", providedServices.toJSON());
+      console.log("pushind provided services", providedServices);
+      if (realmExistingFlight)
+        realmExistingFlight.providedServices = providedServices;
     });
+
+    //   console.log("providedServicesRealm: ", providedServices.toJSON());
+    // });
     router.navigate("/signature");
   };
 
@@ -681,7 +677,12 @@ const Form: React.FC = () => {
           </View>
         )}
         <View>
-          {fields?.map((category, categoryIndex) => {
+          {allServices.map(({ categoryName }) => {
+            return <SectionTitle>{categoryName}</SectionTitle>;
+          })}
+        </View>
+        <View>
+          {/* {fields?.map(() => {
             return (
               <>
                 <SectionTitle>{category?.serviceCategoryName}</SectionTitle>
@@ -936,27 +937,6 @@ const Form: React.FC = () => {
                                 </View>
                               </>
                             }
-
-                            {/* {isPriceOverriden && (
-                              <Controller
-                                control={control}
-                                defaultValue={0}
-                                name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.totalPriceOverride`}
-                                render={({
-                                  field: { onBlur, onChange, value },
-                                }) => (
-                                  <>
-                                    <TextInput
-                                      label="Manual price override:"
-                                      style={formStyles.input}
-                                      value={String(value)}
-                                      onBlur={onBlur}
-                                      onChangeText={(text) => onChange(text)}
-                                    />
-                                  </>
-                                )}
-                              />
-                            )} */}
                           </>
                         )}
                       </View>
@@ -964,6 +944,234 @@ const Form: React.FC = () => {
                     </>
                   );
                 })}
+              </>
+            );
+          })} */}
+          {fields.map((field, serviceIndex) => {
+            const {
+              service,
+              isPriceOverriden,
+              isUsed,
+              notes,
+              quantity,
+              totalPriceOverride,
+            } = field;
+
+            const { serviceName, hasVAT, price } = service;
+            return (
+              <>
+                <View style={{ ...formStyles.row, marginVertical: 30 }}>
+                  <Text variant="bodyLarge">
+                    {isPriceOverriden && (
+                      <MaterialCommunityIcons
+                        name="pencil"
+                        size={14}
+                        color={theme.colors.onSurface}
+                      />
+                    )}{" "}
+                    {serviceName} {hasVAT && `(with VAT)`}
+                    {"  "}
+                  </Text>
+                  <Controller
+                    control={control}
+                    defaultValue={isUsed}
+                    name={`providedServices.otherServices.${serviceIndex}.isUsed`}
+                    render={({ field: { value, onChange } }) => (
+                      <>
+                        <Switch
+                          value={value}
+                          onValueChange={(value) => {
+                            //if there is at least oen erroneous field, dont' allow selecting dynamic fields
+                            //this causees race conditions
+                            if (
+                              Object.entries(errors).some(([key, value]) => {
+                                if (value) {
+                                  alert(
+                                    "Please complete the erroneous fields first"
+                                  );
+                                  return value;
+                                }
+                              })
+                            )
+                              return;
+
+                            update(serviceIndex, {
+                              service,
+                              isPriceOverriden,
+                              notes,
+                              quantity,
+                              totalPriceOverride,
+                              isUsed: value,
+                            });
+                            onChange(value);
+                          }}
+                        />
+                      </>
+                    )}
+                  />
+                </View>
+                <View>
+                  {isUsed === true && (
+                    <>
+                      {
+                        <>
+                          <Controller
+                            control={control}
+                            defaultValue={1}
+                            name={`providedServices.otherServices.${serviceIndex}.quantity`}
+                            rules={{
+                              required: {
+                                value: true,
+                                message: ERROR_MESSAGES.REQUIRED,
+                              },
+                              pattern: {
+                                message: "Please insert correct format",
+                                value: REGEX.number,
+                              },
+                            }}
+                            render={({
+                              field: { onBlur, onChange, value },
+                            }) => (
+                              <>
+                                <TextInput
+                                  label="Quantity:"
+                                  style={formStyles.input}
+                                  value={String(value)}
+                                  onBlur={onBlur}
+                                  keyboardType="numeric"
+                                  onChangeText={(text) => onChange(text)}
+                                  error={
+                                    //@ts-ignore
+                                    errors?.providedServices?.otherServices[
+                                      serviceIndex
+                                    ]?.quantity && true
+                                  }
+                                />
+                              </>
+                            )}
+                          />
+                          <Controller
+                            control={control}
+                            defaultValue={""}
+                            name={`providedServices.otherServices.${serviceIndex}.notes`}
+                            render={({
+                              field: { onBlur, onChange, value },
+                            }) => (
+                              <>
+                                <TextInput
+                                  label="notes:"
+                                  style={formStyles.input}
+                                  value={String(value)}
+                                  onBlur={onBlur}
+                                  onChangeText={(text) => onChange(text)}
+                                />
+                              </>
+                            )}
+                          />
+                          <View
+                            style={{
+                              ...formStyles.row,
+                              marginVertical: 0,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                marginVertical: 5,
+                                alignItems: "center",
+                              }}
+                            >
+                              Amount:{" "}
+                              {isPriceOverriden
+                                ? totalPriceOverride
+                                : (quantity || 0) * price}
+                              &euro;
+                            </Text>
+                            <Button
+                              onPress={() => setPriceOverrideModalVisible(true)}
+                            >
+                              <MaterialCommunityIcons name="pencil" size={14} />
+                            </Button>
+                          </View>
+                          <View
+                            style={{
+                              ...formStyles.row,
+                              marginVertical: 0,
+                            }}
+                          >
+                            <PriceOverrideModal
+                              visible={priceOverrideModalVisible}
+                              onDismiss={() =>
+                                setPriceOverrideModalVisible(false)
+                              }
+                            >
+                              <Text variant="bodyMedium">{serviceName}</Text>
+                              <Controller
+                                control={control}
+                                defaultValue={undefined}
+                                name={`providedServices.otherServices.${serviceIndex}.totalPriceOverride`}
+                                render={({
+                                  field: { onBlur, onChange, value },
+                                }) => (
+                                  <>
+                                    <TextInput
+                                      label="Manual price override:"
+                                      style={formStyles.input}
+                                      onBlur={onBlur}
+                                      onChangeText={(text) => onChange(text)}
+                                    />
+
+                                    <View
+                                      style={{
+                                        justifyContent: "space-between",
+                                        flexDirection: "row",
+                                        marginVertical: 10,
+                                        alignItems: "center",
+                                      }}
+                                    >
+                                      <Button
+                                        onPress={() => {
+                                          update(serviceIndex, {
+                                            service,
+                                            isPriceOverriden: false,
+                                            notes,
+                                            quantity,
+                                            totalPriceOverride,
+                                            isUsed,
+                                          });
+                                          setPriceOverrideModalVisible(false);
+                                        }}
+                                      >
+                                        Reset
+                                      </Button>
+                                      <Button
+                                        style={{ marginVertical: 20 }}
+                                        mode="contained"
+                                        onPress={() => {
+                                          update(serviceIndex, {
+                                            service,
+                                            isPriceOverriden: true,
+                                            notes,
+                                            quantity,
+                                            totalPriceOverride: value,
+                                            isUsed,
+                                          });
+                                          setPriceOverrideModalVisible(false);
+                                        }}
+                                      >
+                                        Submit
+                                      </Button>
+                                    </View>
+                                  </>
+                                )}
+                              />
+                            </PriceOverrideModal>
+                          </View>
+                        </>
+                      }
+                    </>
+                  )}
+                </View>
+                <Divider />
               </>
             );
           })}

@@ -3,7 +3,7 @@ import { DepartureArrival, LoungeFee, Price } from "./models/LoungeFees";
 import General from "./models/Config";
 import { FuelFees } from "./models/Fuelfees";
 import BasicHandlingRule from "./models/BasicHandlingRule";
-import Services, { Service } from "./models/Services";
+import { Service } from "./models/Services";
 import { Arrival, Departure } from "./models/DepartureArrival";
 import { Time } from "./models/Time";
 import { RampAgent } from "./models/RampAgentName";
@@ -19,6 +19,8 @@ import { CurrencyRates } from "./models/CurrencyRates";
 import { ChargeNoteDetails } from "./models/ChargeNoteDetails";
 import Flight from "./models/Flight";
 import { BasicHandling } from "./models/BasicHandling";
+import { ProvidedService } from "./models/ProvidedService";
+import { ServiceCategory } from "./models/ServiceCategory";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -29,7 +31,6 @@ export const realmConfig: Realm.Configuration = {
     FuelFees,
     BasicHandlingRule,
     Service,
-    Services,
     Departure,
     Arrival,
     Time,
@@ -41,11 +42,13 @@ export const realmConfig: Realm.Configuration = {
     SupportServices,
     VIPLoungeService,
     ProvidedServices,
+    ProvidedService,
     PersonNameSignature,
     CurrencyRates,
     ChargeNoteDetails,
     Flight,
     BasicHandling,
+    ServiceCategory,
   ],
 };
 

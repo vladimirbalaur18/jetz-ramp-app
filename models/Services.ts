@@ -1,64 +1,33 @@
 import Realm, { ObjectSchema } from "realm";
-import { Price } from "./LoungeFees";
+import { ServiceCategory } from "./ServiceCategory";
 
 export type IService = {
   serviceName: string;
   hasVAT: boolean;
+  serviceCategory: ServiceCategory;
   isDisbursed?: boolean;
-  pricing: {
-    amount: number;
-    currency: string;
-  };
-  isPriceOverriden: boolean;
-  totalPriceOverride?: number;
-  quantity?: number;
-  isUsed?: boolean;
-
-  notes?: string;
-  serviceId?: string;
-};
-export type ServiceCategorySchema = {
-  serviceCategoryName: string;
-  services: IService[];
+  price: number;
+  _id: Realm.BSON.ObjectId;
 };
 
 export class Service extends Realm.Object<IService> {
   serviceName!: string;
   hasVAT!: boolean;
+  serviceCategory!: ServiceCategory;
   isDisbursed?: boolean;
-  pricing!: Price;
-  isPriceOverriden!: boolean;
-  serviceId!: string;
-  isUsed?: boolean;
+  price!: number;
+  _id!: Realm.BSON.ObjectId;
 
   static schema: ObjectSchema = {
     name: "Service",
-    primaryKey: "serviceId",
+    primaryKey: "_id",
     properties: {
-      serviceId: { type: "string", optional: false },
-      serviceName: { type: "string" },
-      hasVAT: { type: "bool" },
-      isDisbursed: "bool?",
-      pricing: { type: "object", objectType: "Price" },
-      isPriceOverriden: { type: "bool", default: false },
-      totalPriceOverride: { type: "float", optional: true },
-      quantity: "int?",
-      notes: "string?",
-      isUsed: "bool?",
+      serviceName: "string",
+      hasVAT: { type: "bool", default: false },
+      serviceCategory: "ServiceCategory",
+      isDisbursed: { type: "bool", default: false },
+      price: { type: "float", default: 0 },
+      _id: "objectId",
     },
   };
 }
-
-export class Services extends Realm.Object<ServiceCategorySchema> {
-  serviceCategoryName!: string;
-  services!: Service[];
-
-  static schema: ObjectSchema = {
-    name: "Services",
-    properties: {
-      serviceCategoryName: { type: "string" },
-      services: { type: "list", objectType: "Service" },
-    },
-  };
-}
-export default Services;

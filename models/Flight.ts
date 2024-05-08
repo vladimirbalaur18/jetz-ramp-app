@@ -1,6 +1,6 @@
 import Realm, { ObjectSchema } from "realm";
 import { IArrival, IDeparture } from "./DepartureArrival";
-import { IProvidedServices } from "./ProvidedServices";
+import { IProvidedServices, ProvidedServices } from "./ProvidedServices";
 import { IPersonNameSignature } from "./PersonNameSignature";
 import { IChargeNoteDetails } from "./ChargeNoteDetails";
 
@@ -44,7 +44,7 @@ class Flight extends Realm.Object<IFlight> {
   departure!: IDeparture;
   mtow!: number;
   parkingPosition!: string;
-  providedServices!: IProvidedServices;
+  providedServices!: ProvidedServices;
   crew?: IPersonNameSignature;
   ramp?: IPersonNameSignature;
   isCommercialFlight?: boolean;

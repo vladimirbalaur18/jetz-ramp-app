@@ -2,7 +2,6 @@ import { View, StyleSheet } from "react-native";
 import React, { ReactNode, useMemo } from "react";
 import SectionTitle from "../FormUtils/SectionTitle";
 import { Text } from "react-native-paper";
-import { IFlight, IProvidedServices } from "@/redux/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLoungeFeePrice } from "@/services/servicesCalculator";
@@ -12,11 +11,37 @@ import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
+import { IFlight } from "@/models/Flight";
+import { IProvidedServices } from "@/models/ProvidedServices";
+import { IService } from "@/models/Services";
+import { IProvidedService } from "@/models/ProvidedService";
 
+function getCircularReplacer() {
+  const ancestors: any[] = []; //@ts-expect-error
+
+  return function (key, value) {
+    if (typeof value !== "object" || value === null) {
+      return value;
+    }
+    // `this` is the object that value is contained in,
+    // i.e., its direct parent.
+    //@ts-expect-error
+    while (ancestors.length > 0 && ancestors.at(-1) !== (this as any)) {
+      ancestors.pop();
+    }
+    if (ancestors.includes(value)) {
+      return "[Circular]";
+    }
+    ancestors.push(value);
+    return value;
+  };
+}
 const TotalServicesSection: React.FC<{
-  providedServices: IProvidedServices;
+  providedServices?: IProvidedServices;
   existingFlight: IFlight;
 }> = ({ providedServices, existingFlight }) => {
+  if (!providedServices) return;
+
   const {
     otherServices,
     basicHandling,
@@ -32,33 +57,41 @@ const TotalServicesSection: React.FC<{
     getLoungeFeePrice({ ...VIPLoungeServices });
 
   const totalFuelPrice = getFuelFeeAmount({
-    fuelDensity: fuel?.fuelDensity,
-    fuelLitersQuantity: fuel?.fuelLitersQuantity,
+    fuelDensity: fuel.fuelDensity || 0,
+    fuelLitersQuantity: fuel.fuelLitersQuantity || 0,
     flight: existingFlight,
   }).toFixed(2);
 
   const totalAmountOfServices = useMemo(() => {
     //GENERAL CONFIG FOR SOME REASON DOESNT INITIALIZE
-    const rateMDLtoEUR = Number(existingFlight.chargeNote.currency.euroToMDL);
+    const rateMDLtoEUR = Number(
+      existingFlight?.chargeNote?.currency?.euroToMDL
+    );
     const calculateOtherServicesTotal = () => {
       let total = 0;
 
-      otherServices?.forEach(({ serviceCategoryName, services }) => {
-        services?.forEach((s) => {
-          if (s.isUsed) {
-            if (s.isPriceOverriden && s?.totalPriceOverride) {
-              total += s?.hasVAT
-                ? Number(s?.totalPriceOverride) * getVATMultiplier()
-                : Number(s?.totalPriceOverride);
+      otherServices?.forEach(
+        ({
+          isUsed,
+          isPriceOverriden,
+          totalPriceOverride,
+          quantity,
+          service: { price, hasVAT },
+        }) => {
+          if (isUsed) {
+            if (isPriceOverriden && totalPriceOverride) {
+              total += hasVAT
+                ? Number(totalPriceOverride) * getVATMultiplier()
+                : Number(totalPriceOverride);
             } else {
-              const servicePriceTotal = s?.quantity * s.pricing?.amount;
-              total += s?.hasVAT
+              const servicePriceTotal = (quantity || 0) * price;
+              total += hasVAT
                 ? servicePriceTotal * getVATMultiplier()
                 : servicePriceTotal;
             }
           }
-        });
-      });
+        }
+      );
 
       return Number(total);
     };
@@ -93,7 +126,7 @@ const TotalServicesSection: React.FC<{
         calculateOtherServicesTotal() +
         calculateDisbursementsTotal()
     );
-  }, [JSON.stringify(providedServices)]);
+  }, [JSON.stringify(providedServices, getCircularReplacer())]);
 
   const renderBasicHandlingVAT = basicHandling?.total;
   return (
@@ -110,53 +143,46 @@ const TotalServicesSection: React.FC<{
           formatMDLPriceToEuro({
             amount: loungeFeeAmount,
             currency: loungeFeeCurrency,
-            euroToMDL: Number(existingFlight.chargeNote.currency.euroToMDL),
+            euroToMDL: Number(existingFlight?.chargeNote?.currency?.euroToMDL),
           }).displayedString
         }
       </Text>
-      {otherServices?.map(({ serviceCategoryName, services }) => {
-        return (
-          <>
-            <Text style={styles.serviceListItem} variant="titleMedium">
-              {serviceCategoryName}:
+
+      {!providedServices?.otherServices?.some((service) => service.isUsed) ? (
+        <Text>None</Text>
+      ) : (
+        providedServices?.otherServices?.map((s) => {
+          return s.isUsed ? (
+            <Text>
+              {" "}
+              {s?.isPriceOverriden &&
+                s?.totalPriceOverride &&
+                " **manual price "}
+              {s?.service.serviceName} (x{s?.quantity}) :{" "}
+              {((): ReactNode => {
+                let total: any;
+                let totalWithVAT: number;
+
+                if (s?.isPriceOverriden && s?.totalPriceOverride) {
+                  total = s.totalPriceOverride;
+                } else total = (s?.quantity || 0) * s.service.price;
+
+                if (s?.service.hasVAT) {
+                  totalWithVAT = total * (generalConfig?.VAT / 100 + 1);
+
+                  return (
+                    <>
+                      {Number(total).toFixed(2)} x {generalConfig?.VAT}% VAT ={" "}
+                      {totalWithVAT.toFixed(2)}
+                    </>
+                  );
+                } else return <>{Number(total).toFixed(2)}</>;
+              })()}
             </Text>
-            {!services.some((service) => service.isUsed) ? (
-              <Text>None</Text>
-            ) : (
-              services?.map((s) => {
-                return s.isUsed ? (
-                  <Text>
-                    {" "}
-                    {s?.isPriceOverriden &&
-                      s?.totalPriceOverride &&
-                      " **manual price "}
-                    {s?.serviceName} (x{s?.quantity}) :{" "}
-                    {((): ReactNode => {
-                      let total: any;
-                      let totalWithVAT: number;
+          ) : null;
+        })
+      )}
 
-                      if (s?.isPriceOverriden && s?.totalPriceOverride) {
-                        total = s.totalPriceOverride;
-                      } else total = s?.quantity * s.pricing?.amount;
-
-                      if (s?.hasVAT) {
-                        totalWithVAT = total * (generalConfig?.VAT / 100 + 1);
-
-                        return (
-                          <>
-                            {Number(total).toFixed(2)} x {generalConfig?.VAT}%
-                            VAT = {totalWithVAT.toFixed(2)}
-                          </>
-                        );
-                      } else return <>{Number(total).toFixed(2)}</>;
-                    })()}
-                  </Text>
-                ) : null;
-              })
-            )}
-          </>
-        );
-      })}
       <Text style={styles.serviceListItem} variant="titleMedium">
         Airport fees: {airportFee?.total || 0}&euro;
       </Text>
