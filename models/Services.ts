@@ -4,7 +4,7 @@ import { ServiceCategory } from "./ServiceCategory";
 export type IService = {
   serviceName: string;
   hasVAT: boolean;
-  serviceCategory: ServiceCategory;
+  categoryName: string;
   isDisbursed?: boolean;
   price: number;
   _id: Realm.BSON.ObjectId;
@@ -13,7 +13,7 @@ export type IService = {
 export class Service extends Realm.Object<IService> {
   serviceName!: string;
   hasVAT!: boolean;
-  serviceCategory!: ServiceCategory;
+  categoryName!: string;
   isDisbursed?: boolean;
   price!: number;
   _id!: Realm.BSON.ObjectId;
@@ -24,7 +24,7 @@ export class Service extends Realm.Object<IService> {
     properties: {
       serviceName: "string",
       hasVAT: { type: "bool", default: false },
-      serviceCategory: "ServiceCategory",
+      categoryName: "string",
       isDisbursed: { type: "bool", default: false },
       price: { type: "float", default: 0 },
       _id: "objectId",

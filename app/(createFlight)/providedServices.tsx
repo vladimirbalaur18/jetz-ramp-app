@@ -41,7 +41,7 @@ import { IProvidedServices, ProvidedServices } from "@/models/ProvidedServices";
 import { IBasicHandling } from "@/models/BasicHandling";
 import { IVIPLoungeService } from "@/models/VIPLoungeService";
 import { ISupportServices } from "@/models/SupportServices";
-import uuid from "react-uuid";
+import { ObjectId } from "bson";
 import { IServiceCategory } from "@/models/ServiceCategory";
 import { IProvidedService, ProvidedService } from "@/models/ProvidedService";
 type FormData = IFlight;
@@ -155,11 +155,18 @@ const Form: React.FC = () => {
     } else {
       alert("appending services");
 
-      // append(
-      //   existingFlight.providedServices.otherServices as IProvidedService[]
-      // ); CAUSES NATIVE CALLSTACK EXCEED ERROR
+      existingFlight.providedServices.otherServices?.forEach((s) => {
+        append({
+          service: s.service,
+          isUsed: s.isUsed,
+          isPriceOverriden: s.isPriceOverriden,
+          quantity: s.quantity,
+          notes: s.notes || "",
+          totalPriceOverride: s.totalPriceOverride,
+        });
+      });
     }
-  }, [control]);
+  }, []);
   //disbursement calculation
   useEffect(() => {
     const disbursementFeeMultplier = general?.disbursementPercentage / 100;
@@ -263,9 +270,12 @@ const Form: React.FC = () => {
               isPriceOverriden: s.isPriceOverriden,
               isUsed: s.isUsed,
               notes: s.notes,
-              quantity: s.quantity,
-              service: s.service,
-              totalPriceOverride: s.totalPriceOverride,
+              quantity: Number(s.quantity),
+              service: new Service(realm, {
+                ...s.service,
+                _id: new ObjectId(),
+              }),
+              totalPriceOverride: Number(s.totalPriceOverride),
             });
           }),
           // ?.map((s) => {
@@ -998,7 +1008,7 @@ const Form: React.FC = () => {
                             update(serviceIndex, {
                               service,
                               isPriceOverriden,
-                              notes,
+                              notes: notes || "",
                               quantity,
                               totalPriceOverride,
                               isUsed: value,

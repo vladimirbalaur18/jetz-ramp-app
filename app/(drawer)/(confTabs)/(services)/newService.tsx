@@ -60,6 +60,7 @@ const NewService: React.FC = () => {
               isDisbursed: formValues.isDisbursed,
               price: Number(formValues.amount),
               serviceName: formValues.serviceName,
+              categoryName: serviceCategory.categoryName,
             })
           );
         });

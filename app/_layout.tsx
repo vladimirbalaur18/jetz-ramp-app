@@ -136,7 +136,7 @@ function RootLayoutNav() {
             category.services.push(
               new Service(realm, {
                 _id: new ObjectId(),
-                serviceCategory: category,
+                categoryName: serviceCategoryName,
                 ...s,
               })
             )

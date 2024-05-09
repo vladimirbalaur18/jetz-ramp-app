@@ -43,16 +43,18 @@ const ERROR_MESSAGES = {
 const Form: React.FC = () => {
   const router = useRouter();
   const state = useSelector((state: RootState) => state);
-  const _existingFlight = _selectCurrentFlight(
+  const realmExistingFlight = _selectCurrentFlight(
     state.flights.currentFlightId || ""
   );
+  const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
+  console.log("existingFlightJSON", existingFlightJSON);
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
   const dispatch = useDispatch();
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: ({ ..._existingFlight?.toJSON() } as unknown as IFlight) || {
+    defaultValues: existingFlightJSON || {
       aircraftRegistration: "LY-TBA",
       aircraftType: "SFR22",
       isCommercialFlight: true,
@@ -91,7 +93,7 @@ const Form: React.FC = () => {
     //   dispatch(createFlight(data));
     // }
 
-    if (!_existingFlight) {
+    if (!realmExistingFlight) {
       realm.write(() => {
         const newFlightId = uuid();
         realm.create<IFlight>("Flight", {
@@ -109,31 +111,31 @@ const Form: React.FC = () => {
       });
     } else {
       console.log("from db, existing flight");
-      if (!_.isEqual(_existingFlight.toJSON(), data)) {
+      if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
         alert("updaging");
         dispatch(setCurrentFlightById(data.flightId as any));
 
         realm.write(() => {
-          _existingFlight.aircraftRegistration = data.aircraftRegistration;
-          _existingFlight.aircraftType = data.aircraftType;
-          _existingFlight.chargeNote.date = data.chargeNote.date;
-          _existingFlight.chargeNote.currency.euroToMDL =
+          realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
+          realmExistingFlight.aircraftType = data.aircraftType;
+          realmExistingFlight.chargeNote.date = data.chargeNote.date;
+          realmExistingFlight.chargeNote.currency.euroToMDL =
             data.chargeNote.currency.euroToMDL;
-          _existingFlight.chargeNote.currency.usdToMDL =
+          realmExistingFlight.chargeNote.currency.usdToMDL =
             data.chargeNote.currency.usdToMDL;
-          _existingFlight.crew = data?.crew;
-          _existingFlight.departure = data?.departure;
-          _existingFlight.flightNumber = data?.flightNumber;
-          _existingFlight.handlingType = data?.handlingType;
-          _existingFlight.isCommercialFlight = data?.isCommercialFlight;
-          _existingFlight.mtow = Number(data?.mtow);
-          _existingFlight.operatorName = data?.operatorName;
-          _existingFlight.orderingCompanyName = data?.orderingCompanyName;
-          _existingFlight.parkingPosition = data?.parkingPosition;
-          _existingFlight.providedServices = undefined;
-          _existingFlight.ramp = undefined;
-          _existingFlight.scheduleType = data?.scheduleType;
-          _existingFlight.status = data?.status;
+          realmExistingFlight.crew = data?.crew;
+          realmExistingFlight.departure = data?.departure;
+          realmExistingFlight.flightNumber = data?.flightNumber;
+          realmExistingFlight.handlingType = data?.handlingType;
+          realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
+          realmExistingFlight.mtow = Number(data?.mtow);
+          realmExistingFlight.operatorName = data?.operatorName;
+          realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
+          realmExistingFlight.parkingPosition = data?.parkingPosition;
+          realmExistingFlight.providedServices = undefined;
+          realmExistingFlight.ramp = undefined;
+          realmExistingFlight.scheduleType = data?.scheduleType;
+          realmExistingFlight.status = data?.status;
         });
       }
     }
@@ -169,7 +171,7 @@ const Form: React.FC = () => {
                 mode={"outlined"}
                 visible={handleTypeDropdownVisible}
                 showDropDown={() =>
-                  !_existingFlight?.toJSON()?.handlingType &&
+                  !realmExistingFlight?.toJSON()?.handlingType &&
                   setHandleTypeDropdownVisible(true)
                 }
                 onDismiss={() => setHandleTypeDropdownVisible(false)}
@@ -469,7 +471,9 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {_existingFlight?.toJSON() ? "Save information" : "Create new flight"}
+          {realmExistingFlight?.toJSON()
+            ? "Save information"
+            : "Create new flight"}
         </Button>
       </ScrollView>
     </SafeAreaView>
