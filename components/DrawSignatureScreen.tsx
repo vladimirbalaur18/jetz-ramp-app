@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
-import { View } from "react-native";
+import { Image, ImageBackground, View } from "react-native";
 import { Button } from "react-native-paper";
 //@ts-expect-error
 import ExpoDraw from "expo-draw";
 import { captureRef as takeSnapshotAsync } from "react-native-view-shot";
+import { Text } from "./Themed";
 
 interface IDrawSignatureScreenProps {
   handleSignatureSave: React.Dispatch<React.SetStateAction<string>>;
@@ -29,8 +30,8 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
       const signatureResult = await takeSnapshotAsync(signatureRef.current, {
         format: "png",
         result: "base64",
-        height: 400,
-        width: 400,
+        height: 300,
+        width: 800,
       });
       // Here you can handle the captured signature image, e.g., upload it to a server
       handleSignatureSave(signatureResult);
@@ -53,21 +54,36 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
         <View
           style={{ borderWidth: 1, backgroundColor: "rgba(255,255,255,1) " }}
         >
-          <ExpoDraw
-            strokes={[]}
-            ref={signatureRef}
-            containerStyle={{
-              backgroundColor: "rgba(255,255,255,0.0001)",
-              height: 300,
-              width: 800,
-            }}
-            rewind={(undo: any) => console.log("undo", undo)}
-            clear={(clear: any) => console.log("clear", clear)}
-            color={"#000000"}
-            strokeWidth={4}
-            enabled={true}
-            onChangeStrokes={(strokes: any) => console.log(strokes)}
-          />
+          {!isSigned ? (
+            <ExpoDraw
+              strokes={[]}
+              ref={signatureRef}
+              containerStyle={{
+                backgroundColor: "rgba(255,255,255,0.0001)",
+                height: 300,
+                width: 800,
+              }}
+              rewind={(undo: any) => console.log("undo", undo)}
+              clear={(clear: any) => console.log("clear", clear)}
+              color={"#000000"}
+              strokeWidth={4}
+              enabled={true}
+              onChangeStrokes={(strokes: any) => console.log(strokes)}
+            />
+          ) : (
+            <View style={{ height: 130 }}>
+              <ImageBackground
+                style={{
+                  flex: 1, // This makes the ImageBackground take up the full space of the container
+                  width: 400,
+                  height: 160,
+                  justifyContent: "center", // Center the content vertically
+                  alignItems: "center", // Center the content horizontally
+                }}
+                source={{ uri: `data:image/png;base64,${signatureBase64}` }}
+              />
+            </View>
+          )}
         </View>
         <View
           style={{

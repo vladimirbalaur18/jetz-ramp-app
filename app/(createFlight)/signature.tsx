@@ -1,11 +1,15 @@
 import DrawSignatureScreen from "@/components/DrawSignatureScreen";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import { IFlight } from "@/models/Flight";
+import { PersonNameSignature } from "@/models/PersonNameSignature";
+import { RampAgent } from "@/models/RampAgentName";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useRealm } from "@realm/react";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -15,17 +19,40 @@ import { useSelector } from "react-redux";
 
 const SignaturePage = () => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const realm = useRealm();
   const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
+  if (!state.flights.currentFlightId) throw new Error("No current flight ID");
+
+  const realmExistingFlight = _selectCurrentFlight(
+    state.flights.currentFlightId || ""
+  );
+  const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IFlight>({
       mode: "onChange",
+      defaultValues: {
+        crew: existingFlightJSON.crew || { name: "", signature: "" },
+        ramp: existingFlightJSON.ramp || { name: "", signature: "" },
+      },
     });
   const { errors, isValid } = formState;
 
   const submit = (data: Partial<IFlight>) => {
-    dispatch(updateFlight({ ...existingFlight, ...data }));
+    if (realmExistingFlight)
+      realm.write(() => {
+        const ramp = new PersonNameSignature(realm, {
+          name: data.ramp?.name,
+          signature: data.ramp?.signature,
+        });
+
+        const crew = new PersonNameSignature(realm, {
+          name: data.crew?.name,
+          signature: data.crew?.signature,
+        });
+
+        realmExistingFlight.ramp = ramp;
+        realmExistingFlight.crew = crew;
+      });
     router.navigate("(tabs)/chargeNote");
   };
 
@@ -125,7 +152,7 @@ const SignaturePage = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <DrawSignatureScreen
-                signatureBase64={value}
+                signatureBase64={String(value)}
                 handleSignatureSave={onChange}
                 handleSignatureReset={() => onChange("")}
               />
