@@ -34,6 +34,7 @@ import uuid from "react-uuid";
 import { IServiceCategory } from "@/models/ServiceCategory";
 import { ObjectId } from "bson";
 import { IService, Service } from "@/models/Services";
+import { IAppData } from "@/models/AppData";
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -96,6 +97,7 @@ function RootLayoutNav() {
     useSelector((state: RootState) => state)
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
+  const [AppData] = realmWithoutSync.objects("AppData").toJSON() as IAppData[];
   const basicHandlingFees = realmWithoutSync.objects("BasicHandlingRule");
   const serviceCategories =
     realmWithoutSync.objects<IServiceCategory>("ServiceCategory");
@@ -105,44 +107,45 @@ function RootLayoutNav() {
     : "";
 
   useEffect(() => {
-    if (!configs) {
-      router.navigate("/(drawer)/config");
-    }
-
-    if (!basicHandlingFees?.length) {
-      realmWithoutSync.write(() => {
-        DefaultBasicHandlingFees.forEach((fee) => {
-          realmWithoutSync.create("BasicHandlingRule", { ...fee });
+    if (!AppData || !AppData.masterPassword) {
+      //initialize basic handling rules if none exists
+      if (!basicHandlingFees?.length) {
+        realmWithoutSync.write(() => {
+          DefaultBasicHandlingFees.forEach((fee) => {
+            realmWithoutSync.create("BasicHandlingRule", { ...fee });
+          });
         });
-      });
-    }
+      }
 
-    if (!serviceCategories?.length) {
-      DefaultServices.forEach(({ serviceCategoryName, services }) => {
-        const category = realmWithoutSync.write(() => {
-          const _cat = realmWithoutSync.create<IServiceCategory>(
-            "ServiceCategory",
-            {
-              _id: new ObjectId(),
-              categoryName: serviceCategoryName,
-            }
-          );
-
-          return _cat;
-        });
-
-        realmWithoutSync.write(() =>
-          services.map((s) =>
-            category.services.push(
-              new Service(realm, {
+      //initialize service and categories if none exist
+      if (!serviceCategories?.length) {
+        DefaultServices.forEach(({ serviceCategoryName, services }) => {
+          const category = realmWithoutSync.write(() => {
+            const _cat = realmWithoutSync.create<IServiceCategory>(
+              "ServiceCategory",
+              {
                 _id: new ObjectId(),
                 categoryName: serviceCategoryName,
-                ...s,
-              })
+              }
+            );
+
+            return _cat;
+          });
+
+          realmWithoutSync.write(() =>
+            services.map((s) =>
+              category.services.push(
+                new Service(realm, {
+                  _id: new ObjectId(),
+                  categoryName: serviceCategoryName,
+                  ...s,
+                })
+              )
             )
-          )
-        );
-      });
+          );
+        });
+      }
+      return router.navigate("/initial");
     }
   }, []);
 
@@ -192,6 +195,13 @@ function RootLayoutNav() {
               name="(createFlight)/(tabs)"
               options={{
                 headerShown: true,
+                title: `Generate PDF files ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="initial"
+              options={{
+                headerShown: false,
                 title: `Generate PDF files ${FlightNumberIndicator}`,
               }}
             />

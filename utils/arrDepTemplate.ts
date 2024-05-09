@@ -1,13 +1,16 @@
+import { GeneralConfigState } from "@/models/Config";
 import { IFlight } from "@/models/Flight";
+import { realmWithoutSync } from "@/realm";
+import { useQuery } from "@realm/react";
 import dayjs from "dayjs";
 
 export default function ArrDepTemplateRenderHTML(flight: IFlight) {
-  const arrivalDate =
-    flight?.arrival.arrivalDate &&
-    dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
-  const departureDate =
-    flight?.departure.departureDate &&
-    dayjs(flight?.departure.departureDate).format("DD-MMM-YY");
+  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
+  console.log("ArrDepTemplateRenderHTML", flight);
+  const arrivalDate = dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
+  const departureDate = dayjs(flight?.departure.departureDate).format(
+    "DD-MMM-YY"
+  );
   const {
     operatorName,
     aircraftRegistration,
@@ -16,8 +19,8 @@ export default function ArrDepTemplateRenderHTML(flight: IFlight) {
     flightNumber,
     crew,
   } = flight;
-  const arrivalRoute = `${flight?.arrival?.from}-LUKK`;
-  const departureRoute = `LUKK-${flight?.departure?.to}`;
+  const arrivalRoute = `${flight?.arrival?.from}-${config.defaultAirport}`;
+  const departureRoute = `${config.defaultAirport}-${flight?.departure?.to}`;
   const { departure, arrival } = flight;
   return `
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
@@ -1541,7 +1544,7 @@ td{
   //   <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
   //   height:14.4pt">ROUTE</td>
   //   <td colspan="3" class="xl83" style="border-right:1.0pt solid black;border-left:
-  //   none">LUKK-LUKH</td>
+  //   none">${config.defaultAirport}-LUKH</td>
   //  </tr>
   //  <tr height="19" style="height:14.4pt">
   //   <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;

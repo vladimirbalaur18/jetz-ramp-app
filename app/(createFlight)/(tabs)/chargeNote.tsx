@@ -7,6 +7,8 @@ import formStyles from "@/styles/formStyles";
 import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import printToFile from "@/utils/printToFile";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useRealm } from "@realm/react";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet } from "react-native";
@@ -15,23 +17,36 @@ import { useSelector } from "react-redux";
 type FormData = IFlight;
 
 export default function App() {
-  const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
-  const dispatch = useAppDispatch();
-  const submit = (data: any) => {
+  const realm = useRealm();
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
+  );
+  const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
+
+  const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
+  const submit = (data: Partial<IFlight>) => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
-    dispatch(updateFlight({ ...existingFlight, ...data }));
-    const pdfName = `${existingFlight?.flightNumber}_${existingFlight.aircraftRegistration}`;
+
+    if (realmExistingFlight)
+      realm.write(() => {
+        realmExistingFlight.chargeNote.billingTo =
+          data.chargeNote?.billingTo || "";
+        realmExistingFlight.chargeNote.date = new Date();
+        realmExistingFlight.chargeNote.paymentType =
+          data.chargeNote?.paymentType || "";
+        realmExistingFlight.chargeNote.remarks = data.chargeNote?.remarks || "";
+      });
+    const pdfName = `${existingFlightJSON?.flightNumber}_${existingFlightJSON.aircraftRegistration}`;
     printToFile({
-      html: chargeNoteTemplateHTML({ ...existingFlight, ...data }),
+      html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
       fileName: pdfName,
     });
   };
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: { ...existingFlight },
+    defaultValues: { ...existingFlightJSON },
   });
 
   const { errors } = formState;

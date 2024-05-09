@@ -20,10 +20,12 @@ type ChargeListService = {
   quantity?: number;
 };
 export default function chargeNoteTemplateHTML(flight: IFlight) {
+  if (!flight) throw new Error("Flight is undefined");
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
   const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
+  console.log("confa", config);
   const basicHandling = getBasicHandlingPrice(flight);
 
   const basicHandlingWithoutVAT = (() => {
@@ -58,7 +60,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     return result;
   })();
   const totalDisbursementFeesAmount = Object.values(
-    flight?.providedServices.disbursementFees
+    flight?.providedServices!.disbursementFees
   ).reduce(
     (accumulator, current) => Number(accumulator) + Number(current || 0),
     0
@@ -66,7 +68,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 
   if (
     basicHandlingWithVAT &&
-    !flight?.providedServices.basicHandling?.isPriceOverriden
+    !flight?.providedServices!.basicHandling?.isPriceOverriden
   ) {
     VATServicesList.push({
       serviceName: "Basic handling",
@@ -85,31 +87,29 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     });
   }
 
-  flight?.providedServices?.otherServices?.forEach((category) => {
-    category.services.forEach((s) => {
-      if (s?.isUsed) {
-        const quantity = Number(s?.quantity) || 0;
-        const basePrice = s?.pricing?.amount;
-        const amount = s?.isPriceOverriden
-          ? s.totalPriceOverride || 0
-          : basePrice || 0;
+  flight?.providedServices?.otherServices?.forEach((s) => {
+    if (s?.isUsed) {
+      const quantity = Number(s?.quantity) || 0;
+      const basePrice = s?.service.price;
+      const amount = s?.isPriceOverriden
+        ? s.totalPriceOverride || 0
+        : basePrice || 0;
 
-        if (!s.hasVAT) {
-          servicesListNoVAT.push({
-            serviceName: s.serviceName,
-            basePrice: Number(amount),
-            totalPrice: Number(amount * quantity),
-            quantity: Number(quantity),
-          });
-        } else
-          VATServicesList.push({
-            serviceName: s.serviceName,
-            basePrice: Number(amount),
-            totalPrice: Number(amount * quantity) * getVATMultiplier(),
-            quantity: Number(quantity),
-          });
-      }
-    });
+      if (!s.service.hasVAT) {
+        servicesListNoVAT.push({
+          serviceName: s.service.serviceName,
+          basePrice: Number(amount),
+          totalPrice: Number(amount * quantity),
+          quantity: Number(quantity),
+        });
+      } else
+        VATServicesList.push({
+          serviceName: s.service.serviceName,
+          basePrice: Number(amount),
+          totalPrice: Number(amount * quantity) * getVATMultiplier(),
+          quantity: Number(quantity),
+        });
+    }
   });
 
   const VIPTerminalPrice = getLoungeFeePrice({
@@ -2863,7 +2863,7 @@ ${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl184" style="height:14.4pt;border-top:none">Remarks:</td>
   <td colspan="9" rowspan="3" class="xl218" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black">${flight?.chargeNote?.remarks}</td>
+  border-bottom:1.0pt solid black">${flight?.chargeNote?.remarks || ""}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl139" style="height:14.4pt">&nbsp;</td>
@@ -2880,10 +2880,10 @@ ${VATApplicableServicesRenderHTML()}
  </tr>
  <tr>
  <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black">${
-   flight?.ramp.name
+   flight!.ramp!.name
  }</td>
  <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black"">${
-   flight?.crew.name
+   flight!.crew!.name
  }</td>
  </tr>
 

@@ -21,6 +21,7 @@ import Flight from "./models/Flight";
 import { BasicHandling } from "./models/BasicHandling";
 import { ProvidedService } from "./models/ProvidedService";
 import { ServiceCategory } from "./models/ServiceCategory";
+import { AppData } from "./models/AppData";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -49,6 +50,7 @@ export const realmConfig: Realm.Configuration = {
     Flight,
     BasicHandling,
     ServiceCategory,
+    AppData,
   ],
 };
 

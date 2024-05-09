@@ -7,6 +7,8 @@ import ArrDepTemplateRenderHTML from "@/utils/arrDepTemplate";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import printToFile from "@/utils/printToFile";
 import REGEX from "@/utils/regexp";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useRealm } from "@realm/react";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,42 +16,72 @@ import { ScrollView, StyleSheet } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 export default function Page() {
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const submit = (data: any) => {
-    dispatch(
-      updateFlight({
-        ...existingFlight,
-        ...data,
-      })
-    );
-  };
+  const realm = useRealm();
 
-  const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
+  );
+  const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
+  const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
+  const submit = (data: Partial<IFlight>) => {
+    // dispatch(
+    //   // updateFlight({
+    //   //   ...existingFlightJSON,
+    //   //   ...data,
+    //   // })
+    // );
+
+    if (realmExistingFlight)
+      realm.write(() => {
+        realmExistingFlight.arrival.crewNumber = Number(
+          data.arrival?.crewNumber
+        );
+        realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
+        realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
+        realmExistingFlight.arrival.specialInfo = data.arrival?.specialInfo;
+        realmExistingFlight.arrival.remarksInfo = data.arrival?.remarksInfo;
+
+        realmExistingFlight.departure.crewNumber = Number(
+          data.departure?.crewNumber
+        );
+        realmExistingFlight.departure.cargoInfo = data.departure?.cargoInfo;
+        realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
+        realmExistingFlight.departure.specialInfo = data.departure?.specialInfo;
+        realmExistingFlight.departure.remarksInfo = data.departure?.remarksInfo;
+      });
+
+    console.log("sugi", data);
+  };
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
     mode: "onChange",
-    defaultValues: { ...existingFlight },
+    defaultValues: {
+      arrival: existingFlightJSON.arrival || {
+        crewNumber: 1,
+        cargoInfo: "NIL",
+        mailInfo: "NIL",
+        specialInfo: "NIL",
+        remarksInfo: "NIL",
+      },
+      departure: existingFlightJSON.departure || {
+        crewNumber: 1,
+        cargoInfo: "NIL",
+        mailInfo: "NIL",
+        specialInfo: "NIL",
+        remarksInfo: "NIL",
+      },
+    },
   });
 
   const submitArrDeparture = (data: Partial<IFlight>) => {
     submit(data);
-    console.log("SIGA", data.crew?.signature);
     printToFile({
-      html: ArrDepTemplateRenderHTML({ ...existingFlight, ...data }),
-      fileName: `ArrDep_Information_${existingFlight?.flightNumber}_${existingFlight?.aircraftRegistration}`,
+      html: ArrDepTemplateRenderHTML({ ...existingFlightJSON, ...data }),
+      fileName: `ArrDep_Information_${existingFlightJSON?.flightNumber}_${existingFlightJSON?.aircraftRegistration}`,
       width: 800,
       height: 596,
     });
   };
 
-  const submitArrival = (data: any) => {
-    submit(data);
-    // printToFile(
-    //   "<h1>Arrival</h1>",
-    //   `Arrival_Information_${existingFlight?.flightNumber}_${existingFlight?.aircraftRegistration}`
-    // );
-  };
   const { errors } = formState;
   return (
     <ScrollView contentContainerStyle={styles.container}>
