@@ -4,10 +4,7 @@ import {
   getPassengerCount,
   isLightAircraft,
 } from "./utils";
-import isNightTime, {
-  isSummerNightTime,
-  isWinterNightTime,
-} from "@/utils/isNightTime";
+import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import { store } from "@/redux/store";
 import convertCurrency from "@/utils/convertCurrency";
