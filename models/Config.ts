@@ -1,4 +1,3 @@
-import { Flight } from "@/redux/types";
 import Realm, { ObjectSchema } from "realm";
 export type GeneralConfigState = {
   VAT: number;

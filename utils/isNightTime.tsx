@@ -30,4 +30,14 @@ const isNightTime = (dayjsDate: Dayjs) => {
     ? hour >= 18 || hour < 7
     : hour >= 20 || hour < 6;
 };
+
+export const isSummerNightTime = (dayjsDate: Dayjs) => {
+  const hour = dayjsDate.hour();
+  return !isWinterEurDST(dayjsDate) && (hour >= 18 || hour < 7);
+};
+
+export const isWinterNightTime = (dayjsDate: Dayjs) => {
+  const hour = dayjsDate.hour();
+  return isWinterEurDST(dayjsDate) && (hour >= 20 || hour < 6);
+};
 export default isNightTime;

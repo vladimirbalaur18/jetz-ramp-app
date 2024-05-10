@@ -29,6 +29,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="airportFees"
+        options={{
+          title: "Airport fees",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <FontAwesome6
+              name="plane"
+              size={24}
+              color={
+                focused ? iconColor.colors.primary : iconColor.colors.secondary
+              }
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="basicHandlingSettings"
         options={{
           title: "Basic handling settings",

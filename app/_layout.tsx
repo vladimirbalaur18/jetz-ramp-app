@@ -35,6 +35,11 @@ import { IServiceCategory } from "@/models/ServiceCategory";
 import { ObjectId } from "bson";
 import { IService, Service } from "@/models/Services";
 import { IAppData } from "@/models/AppData";
+import { AirportFees, IAirportFees } from "@/models/AirportFees";
+import { AirportFeeDefinition } from "@/models/AirportFeeDefinition";
+import { FeeQuota } from "@/models/FeeQuota";
+import DefaultAirportFees from "@/configs/airportFees.json";
+
 registerTranslation("en-GB", enGB);
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -98,6 +103,7 @@ function RootLayoutNav() {
   )?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
   const [AppData] = realmWithoutSync.objects("AppData").toJSON() as IAppData[];
+  const [AirportFees] = realmWithoutSync.objects<IAirportFees>("AirportFees");
   const basicHandlingFees = realmWithoutSync.objects("BasicHandlingRule");
   const serviceCategories =
     realmWithoutSync.objects<IServiceCategory>("ServiceCategory");
@@ -145,6 +151,48 @@ function RootLayoutNav() {
           );
         });
       }
+
+      if (!AirportFees) {
+        realmWithoutSync.write(() => {
+          realmWithoutSync.create<IAirportFees>("AirportFees", {
+            commercial: new AirportFeeDefinition(realmWithoutSync, {
+              landingFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.commercial.landingFee,
+              }),
+              takeoffFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.commercial.takeoffFee,
+              }),
+              passengerFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.commercial.passengerFee,
+              }),
+              securityFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.commercial.securityFee,
+              }),
+              parkingDay: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.commercial.parkingDay,
+              }),
+            }),
+            nonCommercial: new AirportFeeDefinition(realmWithoutSync, {
+              landingFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.nonCommercial.landingFee,
+              }),
+              takeoffFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.nonCommercial.takeoffFee,
+              }),
+              passengerFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.nonCommercial.passengerFee,
+              }),
+              securityFee: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.nonCommercial.securityFee,
+              }),
+              parkingDay: new FeeQuota(realmWithoutSync, {
+                ...DefaultAirportFees.nonCommercial.parkingDay,
+              }),
+            }),
+          });
+        });
+      }
+
       return router.navigate("/initial");
     }
   }, []);

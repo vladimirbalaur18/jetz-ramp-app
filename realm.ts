@@ -22,6 +22,9 @@ import { BasicHandling } from "./models/BasicHandling";
 import { ProvidedService } from "./models/ProvidedService";
 import { ServiceCategory } from "./models/ServiceCategory";
 import { AppData } from "./models/AppData";
+import { AirportFeeDefinition } from "./models/AirportFeeDefinition";
+import { AirportFees } from "./models/AirportFees";
+import { FeeQuota } from "./models/FeeQuota";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -51,6 +54,9 @@ export const realmConfig: Realm.Configuration = {
     BasicHandling,
     ServiceCategory,
     AppData,
+    AirportFeeDefinition,
+    AirportFees,
+    FeeQuota,
   ],
 };
 

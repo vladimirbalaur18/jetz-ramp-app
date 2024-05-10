@@ -115,7 +115,7 @@ function ServiceItem({ service }: { service: Service }) {
         href={{
           pathname: "/(drawer)/(confTabs)/(services)/[serviceId]",
           params: {
-            serviceId: (service._id as unknown as string | number) || "",
+            serviceId: service._id.toString(),
           },
         }}
       >

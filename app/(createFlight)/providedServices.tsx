@@ -1,6 +1,6 @@
 import formStyles from "@/styles/formStyles";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, View, Alert } from "react-native";
 
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import TotalServicesSection from "@/components/TotalServicesSection";
@@ -26,6 +26,7 @@ import {
   Button,
   Divider,
   HelperText,
+  Icon,
   Modal,
   Portal,
   Switch,
@@ -63,6 +64,8 @@ const Form: React.FC = () => {
   const router = useRouter();
   const basicHandlingPricePerLegs =
     existingFlight && getBasicHandlingPrice({ ...existingFlight });
+
+  const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
 
   const [showVIPDropdown, setShowVIPDropdown] = useState(false);
   const {
@@ -354,7 +357,34 @@ const Form: React.FC = () => {
 
         <SectionTitle>Support services</SectionTitle>
         <View>
-          <Text>Airport fee</Text>
+          <Text style={{ alignItems: "center" }}>
+            Airport fee{" "}
+            <Pressable
+              onPress={() =>
+                Alert.alert(
+                  "Airport fee details:",
+                  `Take-off: ${airportFeesDetails.takeOff.toFixed(
+                    2
+                  )}\nSecurity: ${airportFeesDetails.security.toFixed(
+                    2
+                  )} \nPassengers: ${airportFeesDetails.passengers.toFixed(
+                    2
+                  )} \nParking: ${airportFeesDetails.parking.toFixed(
+                    2
+                  )} \nLanding: ${airportFeesDetails.takeOff.toFixed(2)}`,
+                  [
+                    {
+                      text: "OK",
+                    },
+                  ],
+                  { cancelable: true }
+                )
+              }
+            >
+              <Icon source="information" size={16} color="white" />
+            </Pressable>
+          </Text>
+
           <Controller
             control={control}
             defaultValue={0}
@@ -389,7 +419,6 @@ const Form: React.FC = () => {
               </>
             )}
           />
-
           <Text>Fuel fee</Text>
           <Controller
             control={control}
@@ -477,7 +506,6 @@ const Form: React.FC = () => {
               </>
             )}
           />
-
           <Text>Catering fee</Text>
           <Controller
             control={control}

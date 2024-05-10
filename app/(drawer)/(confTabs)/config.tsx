@@ -18,6 +18,7 @@ const Form: React.FC = () => {
 
   let [configs] = useQuery<GeneralConfigState>("General");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
+
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
