@@ -50,6 +50,10 @@ type FormData = IFlight;
 const Form: React.FC = () => {
   // const allServices = getAllServices();
   const allServices = useQuery<IServiceCategory>("ServiceCategory");
+  const defaultServicesPerCategories = allServices.flatMap((sc) => [
+    ...sc.services,
+  ]);
+  console.log(defaultServicesPerCategories);
   const services = useQuery<IService>("Service");
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
@@ -147,7 +151,7 @@ const Form: React.FC = () => {
 
   useEffect(() => {
     if (!existingFlight.providedServices) {
-      services.map((s) => {
+      defaultServicesPerCategories.map((s) => {
         append({
           service: s,
           isUsed: false,
@@ -155,9 +159,8 @@ const Form: React.FC = () => {
           quantity: 1,
         });
       });
+      console.log("services count", services.length);
     } else {
-      alert("appending services");
-
       existingFlight.providedServices.otherServices?.forEach((s) => {
         append({
           service: s.service,

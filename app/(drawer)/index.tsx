@@ -48,7 +48,7 @@ export default function Page() {
   //agg flights by date
 
   return (
-    <View>
+    <>
       <FAB
         icon="plus"
         color={theme.colors.text}
@@ -61,35 +61,37 @@ export default function Page() {
           router.navigate("/(createFlight)/general");
         }}
       />
-      <ScrollView contentContainerStyle={styles.wrapper}>
-        {Object.entries(
-          reverseObjectProperties(parseFlightsByDate, (d1, d2) =>
-            dayjs(d1).diff(dayjs(d2))
-          )
-        ).map(([date, flights], index) => {
-          return (
-            <View style={{ marginVertical: 15 }}>
-              <FlightSection
-                key={date + index}
-                dateString={
-                  dayjs(date)?.isToday()
-                    ? "Today"
-                    : dayjs(date).format("MMM DD, YYYY")
-                }
-                flights={flights}
-              />
-            </View>
-          );
-        })}
-      </ScrollView>
-    </View>
+      <View>
+        <ScrollView contentContainerStyle={styles.wrapper}>
+          {Object.entries(
+            reverseObjectProperties(parseFlightsByDate, (d1, d2) =>
+              dayjs(d1).diff(dayjs(d2))
+            )
+          ).map(([date, flights], index) => {
+            return (
+              <View style={{ marginVertical: 15 }}>
+                <FlightSection
+                  key={date + index}
+                  dateString={
+                    dayjs(date)?.isToday()
+                      ? "Today"
+                      : dayjs(date).format("MMM DD, YYYY")
+                  }
+                  flights={flights}
+                />
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    right: 0,
+    right: 20,
     bottom: 20,
     zIndex: 999,
   },
