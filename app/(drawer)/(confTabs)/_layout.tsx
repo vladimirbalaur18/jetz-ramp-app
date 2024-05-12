@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs, useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { AppDispatch, RootState } from "@/redux/store";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "react-native-paper";
+import { useAuthContext } from "@/context/authContext";
 
 export default function TabLayout() {
   const iconColor = useTheme();
+  const { logout, isAuthenticated } = useAuthContext();
+  const router = useRouter();
 
-  return (
+  useEffect(() => {
+    return () => {
+      logout();
+    };
+  }, []);
+  return isAuthenticated ? (
     <Tabs>
       <Tabs.Screen
         name="config"
@@ -77,5 +85,7 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+  ) : (
+    <Redirect href={"/autorize"} />
   );
 }

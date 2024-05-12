@@ -12,6 +12,7 @@ export default function Layout() {
       />
       <Stack.Screen
         name="[serviceId]"
+        initialParams={{ serviceId: null }}
         options={{
           headerShown: true,
           title: "Services Settings:",

@@ -64,8 +64,6 @@ export const getLandingFees = (flight: IFlight): number => {
   const { arrivalDate, arrivalTime } = flight?.arrival;
   const fullArrivalDateTime = getParsedDateTime(arrivalDate, arrivalTime);
   const mtowTons = getFlightMTOWinTons(flight);
-  const { summerPeriodQuotaPercentage, winterPeriodQuotaPercentage } =
-    AirportFees.commercial.landingFee;
 
   if (flight.isCommercialFlight) {
     return (
@@ -109,14 +107,6 @@ export const getTakeOffFees = (flight: IFlight): number => {
   const fullDepartureDateTime = getParsedDateTime(departureDate, departureTime);
 
   if (flight.isCommercialFlight) {
-    console.log(
-      "the quota",
-      applyWinterSummerQuota(
-        fullDepartureDateTime,
-        AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage || 0,
-        AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage || 0
-      )
-    );
     return (
       mtowTons *
       AirportFees.commercial.takeoffFee.perTon *

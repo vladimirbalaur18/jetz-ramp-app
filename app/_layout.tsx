@@ -13,6 +13,7 @@ import {
   MD3LightTheme,
   MD3DarkTheme,
   adaptNavigationTheme,
+  Button,
 } from "react-native-paper";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import merge from "deepmerge";
@@ -39,6 +40,8 @@ import { AirportFees, IAirportFees } from "@/models/AirportFees";
 import { AirportFeeDefinition } from "@/models/AirportFeeDefinition";
 import { FeeQuota } from "@/models/FeeQuota";
 import DefaultAirportFees from "@/configs/airportFees.json";
+import { AuthProvider } from "@/context/authContext";
+import { MaterialIcons } from "@expo/vector-icons";
 
 registerTranslation("en-GB", enGB);
 
@@ -86,7 +89,9 @@ export default function RootLayout() {
   return (
     <RealmProvider schema={realmConfig.schema}>
       <Provider store={store}>
-        <RootLayoutNav />
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
       </Provider>
     </RealmProvider>
   );
@@ -251,6 +256,23 @@ function RootLayoutNav() {
               options={{
                 headerShown: false,
                 title: `Generate PDF files ${FlightNumberIndicator}`,
+              }}
+            />
+            <Stack.Screen
+              name="autorize"
+              options={{
+                headerShown: true,
+                title: ``,
+                headerLeft: () => (
+                  <Button
+                    icon="arrow-left"
+                    onPress={() => {
+                      router.navigate("/");
+                    }}
+                  >
+                    Home
+                  </Button>
+                ),
               }}
             />
           </Stack>

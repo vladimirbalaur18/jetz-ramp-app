@@ -31,6 +31,7 @@ export default function Layout() {
         <Drawer.Screen
           name="completedFlights" // This is the name of the page and must match the url from root
           options={{
+            unmountOnBlur: true, // UNTESTED
             drawerLabel: "Completed flights",
             title: "Completed flights",
             drawerIcon: () => (
@@ -45,6 +46,7 @@ export default function Layout() {
         <Drawer.Screen
           name="(confTabs)" // This is the name of the page and must match the url from root
           options={{
+            unmountOnBlur: true,
             drawerLabel: "Configuration",
             title: "Configurations",
             drawerIcon: () => (
