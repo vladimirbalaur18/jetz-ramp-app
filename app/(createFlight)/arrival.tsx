@@ -50,7 +50,7 @@ const Form: React.FC = () => {
     useForm<FormData>({
       mode: "onChange",
       defaultValues: _existingFlight?.toJSON().arrival
-        ? _existingFlight?.toJSON()
+        ? { ..._existingFlight?.toJSON() }
         : {
             ..._existingFlight?.toJSON(),
             arrival: {
@@ -207,7 +207,6 @@ const Form: React.FC = () => {
                 label="Arrival date"
                 value={value}
                 onChange={(d) => {
-                  alert(d);
                   onChange(d);
                 }}
                 inputMode="start"

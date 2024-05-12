@@ -113,7 +113,9 @@ const Form: React.FC = () => {
           console.log("departure data", data);
 
           _existingFlight.departure = departure;
-          _existingFlight.arrival = arrival;
+          if (_existingFlight.handlingType === "Departure") {
+            _existingFlight.arrival = arrival;
+          }
         }
     });
     dispatch(
