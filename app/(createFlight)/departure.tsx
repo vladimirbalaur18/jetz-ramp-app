@@ -36,11 +36,11 @@ const Form: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const state = useSelector((state: RootState) => state);
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
+  );
   const realm = useRealm();
-  const _existingFlight = _selectCurrentFlight(
-    state.flights.currentFlightId || ""
-  ); // alert(JSON.stringLUKify(currentFlight));
+  const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",

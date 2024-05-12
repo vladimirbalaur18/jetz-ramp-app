@@ -51,11 +51,11 @@ const Form: React.FC = () => {
   // const allServices = getAllServices();
   const allServices = useQuery<IServiceCategory>("ServiceCategory");
   const services = useQuery<IService>("Service");
-  const state = useSelector((state: RootState) => state);
-  const [general] = useQuery<GeneralConfigState>("General");
-  const realmExistingFlight = _selectCurrentFlight(
-    state.flights.currentFlightId || ""
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
   );
+  const [general] = useQuery<GeneralConfigState>("General");
+  const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlight = realmExistingFlight?.toJSON() as IFlight;
 
   console.log("HEY", existingFlight);

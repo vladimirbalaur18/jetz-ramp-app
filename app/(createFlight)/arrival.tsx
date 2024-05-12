@@ -1,9 +1,19 @@
+import { IArrival } from "@/models/DepartureArrival";
 import { IFlight } from "@/models/Flight";
 import { IProvidedServices } from "@/models/ProvidedServices";
-import { createFlight, updateFlight } from "@/redux/slices/flightsSlice";
+import { IRampAgent } from "@/models/RampAgentName";
+import { IRampInspection } from "@/models/RampInspection";
+import { ITime } from "@/models/Time";
+import {
+  createFlight,
+  setCurrentFlightById,
+  updateFlight,
+} from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
 import REGEX from "@/utils/regexp";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useRealm } from "@realm/react";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import _ from "lodash";
@@ -28,28 +38,34 @@ const ERROR_MESSAGES = {
 };
 const Form: React.FC = () => {
   const router = useRouter();
-  const state = useSelector((state: RootState) => state);
-  const existingFlight = selectCurrentFlight(state);
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
+  );
+  const realm = useRealm();
+  const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
 
   const dispatch = useDispatch();
 
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onChange",
-      defaultValues: (existingFlight as unknown as IFlight) || {
-        arrival: {
-          arrivalTime: { hours: 10, minutes: 12 },
-          arrivalDate: new Date(),
-          from: "LUKK",
-          adultCount: 1,
-          minorCount: 2,
-          rampInspectionBeforeArrival: {
-            status: true,
-            FOD: true,
-            agent: { fullname: "Costea" },
+      defaultValues: _existingFlight?.toJSON().arrival
+        ? _existingFlight?.toJSON()
+        : {
+            ..._existingFlight?.toJSON(),
+            arrival: {
+              arrivalTime: { hours: 10, minutes: 12 },
+              arrivalDate: new Date(),
+              from: "LUKK",
+              adultCount: 1,
+              minorCount: 2,
+              rampInspectionBeforeArrival: {
+                status: true,
+                FOD: true,
+                agent: { fullname: "Costea" },
+              },
+            },
           },
-        },
-      },
     });
 
   const adultPassengersCount = watch("arrival.adultCount");
@@ -58,20 +74,63 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: IFlight) => {
-    //nullyfy services if we update new data
-    if (existingFlight) {
-      if (!_.isEqual(existingFlight, data)) {
-        dispatch(
-          updateFlight({
-            ...data,
-            providedServices: null as unknown as IProvidedServices,
-          })
-        );
-      } else dispatch(updateFlight(data));
-    } else {
-      alert("creating a flight");
-      dispatch(createFlight(data));
-    }
+    // //nullyfy services if we update new data
+    // if (_existingFlight) {
+    //   if (!_.isEqual(_existingFlight, data)) {
+    //     dispatch(
+    //       updateFlight({
+    //         ...data,
+    //         providedServices: null as unknown as IProvidedServices,
+    //       })
+    //     );
+    //   } else dispatch(updateFlight(data));
+    // } else {
+    //   alert("creating a flight");
+    //   dispatch(createFlight(data));
+    // }
+
+    realm.write(() => {
+      const arrivalTime = realm.create<ITime>("Time", {
+        hours: Number(data.arrival.arrivalTime.hours),
+        minutes: Number(data.arrival.arrivalTime.minutes),
+      });
+      const rampAgent = realm.create<IRampAgent>("RampAgent", {
+        fullname: data.arrival.rampInspectionBeforeArrival.agent.fullname,
+      });
+      const rampInspection = realm.create<IRampInspection>("RampInspection", {
+        FOD: data.arrival.rampInspectionBeforeArrival.FOD,
+        agent: rampAgent,
+        status: data.arrival.rampInspectionBeforeArrival.status,
+      });
+      const arrival = realm.create<IArrival>("Arrival", {
+        adultCount: Number(data.arrival.adultCount),
+        arrivalDate: dayjs(data.arrival.arrivalDate).toDate(),
+        arrivalTime: arrivalTime,
+        isLocalFlight: data.arrival.isLocalFlight,
+        minorCount: Number(data.arrival.minorCount),
+        rampInspectionBeforeArrival: rampInspection,
+        from: data.arrival.from,
+      });
+
+      if (_existingFlight)
+        if (!_.isEqual(_existingFlight.toJSON(), data)) {
+          console.log("arrival data", data);
+          _existingFlight.arrival = arrival;
+        } else {
+          console.log(
+            "Nullyfying services because arrival date differs frmo previous arrival data",
+            "BEFORE",
+            JSON.stringify(_existingFlight.arrival, null, 3),
+            "AFTER",
+            JSON.stringify(arrival, null, 3)
+          );
+          _existingFlight.providedServices = undefined;
+          _existingFlight.arrival = arrival;
+        }
+    });
+    dispatch(
+      setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
+    );
 
     router.navigate(
       data?.handlingType === "Arrival"
@@ -371,7 +430,7 @@ const Form: React.FC = () => {
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
         >
-          {existingFlight
+          {_existingFlight
             ? "Save arrival information"
             : "Submit arrival information"}
         </Button>

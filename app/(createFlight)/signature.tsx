@@ -20,12 +20,12 @@ import { useSelector } from "react-redux";
 const SignaturePage = () => {
   const router = useRouter();
   const realm = useRealm();
-  const state = useSelector((state: RootState) => state);
-  if (!state.flights.currentFlightId) throw new Error("No current flight ID");
-
-  const realmExistingFlight = _selectCurrentFlight(
-    state.flights.currentFlightId || ""
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
   );
+  if (!currentFlightId) throw new Error("No current flight ID");
+
+  const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IFlight>({

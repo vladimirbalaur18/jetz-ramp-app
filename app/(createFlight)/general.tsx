@@ -42,10 +42,10 @@ const ERROR_MESSAGES = {
 
 const Form: React.FC = () => {
   const router = useRouter();
-  const state = useSelector((state: RootState) => state);
-  const realmExistingFlight = _selectCurrentFlight(
-    state.flights.currentFlightId || ""
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
   );
+  const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   console.log("existingFlightJSON", existingFlightJSON);
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =

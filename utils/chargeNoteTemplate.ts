@@ -2593,11 +2593,15 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl85" style="border-top:none">DATE</td>
   <td class="xl86" style="border-top:none">&nbsp;</td>
   <td class="xl93" style="border-top:none">${
-    dayjs(flight?.arrival?.arrivalDate).format("DD-MMM-YY") || "-"
+    flight?.arrival?.arrivalDate
+      ? dayjs(flight?.arrival?.arrivalDate).format("DD-MMM-YY")
+      : ""
   }</td>
   <td class="xl85" style="border-top:none;border-left:none">DATE</td>
   <td class="xl94" style="border-top:none;border-left:none">${
-    dayjs(flight?.departure?.departureDate).format("DD-MMM-YY") || "-"
+    flight?.departure?.departureDate
+      ? dayjs(flight?.departure?.departureDate).format("DD-MMM-YY")
+      : ""
   }</td>
  </tr>
  <tr height="20" style="height:15.0pt">
@@ -2607,15 +2611,21 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   }</td>
   <td class="xl100" style="border-top:none">UTC</td>
   <td class="xl101" style="border-top:none">&nbsp;</td>
-  <td class="xl102" style="border-top:none">${getParsedDateTime(
-    new Date(),
+  <td class="xl102" style="border-top:none">${
     flight?.arrival?.arrivalTime
-  ).format("HH:mm")}</td>
+      ? getParsedDateTime(new Date(), flight?.arrival?.arrivalTime).format(
+          "HH:mm"
+        )
+      : "-"
+  }</td>
   <td class="xl100" style="border-top:none;border-left:none">UTC</td>
-  <td class="xl103" style="border-top:none;border-left:none">${getParsedDateTime(
-    new Date(),
+  <td class="xl103" style="border-top:none;border-left:none">${
     flight?.departure?.departureTime
-  ).format("HH:mm")}</td>
+      ? getParsedDateTime(new Date(), flight?.departure?.departureTime).format(
+          "HH:mm"
+        )
+      : "-"
+  }</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" height="19" class="xl104" style="height:14.4pt">ITEMS with VAT = 0%</td>
