@@ -263,16 +263,17 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: ``,
-                headerLeft: () => (
-                  <Button
-                    icon="arrow-left"
-                    onPress={() => {
-                      router.navigate("/");
-                    }}
-                  >
-                    Home
-                  </Button>
-                ),
+                headerLeft: () =>
+                  configs ? (
+                    <Button
+                      icon="arrow-left"
+                      onPress={() => {
+                        router.navigate("/");
+                      }}
+                    >
+                      Home
+                    </Button>
+                  ) : null,
               }}
             />
           </Stack>
