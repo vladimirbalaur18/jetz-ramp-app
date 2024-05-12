@@ -247,7 +247,15 @@ const Form: React.FC = () => {
         {
           VIPLoungeServices: realm.create<IVIPLoungeService>(
             "VIPLoungeService",
-            { ...data.providedServices?.VIPLoungeServices }
+            {
+              adultPax: data.providedServices?.VIPLoungeServices.adultPax
+                ? Number(data.providedServices?.VIPLoungeServices.adultPax)
+                : undefined,
+              minorPax: data.providedServices?.VIPLoungeServices.adultPax
+                ? Number(data.providedServices?.VIPLoungeServices.adultPax)
+                : undefined,
+              typeOf: data.providedServices?.VIPLoungeServices?.typeOf,
+            }
           ),
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
             total: data?.providedServices?.basicHandling?.total,
@@ -258,15 +266,28 @@ const Form: React.FC = () => {
           disbursementFees: data.providedServices?.disbursementFees,
           supportServices: realm.create<ISupportServices>("SupportServices", {
             HOTAC: {
-              total: data?.providedServices?.supportServices.HOTAC.total,
+              total: Number(
+                data?.providedServices?.supportServices.HOTAC.total
+              ),
             },
             airportFee: {
-              total: data?.providedServices?.supportServices.airportFee.total,
+              total: Number(
+                data?.providedServices?.supportServices.airportFee.total
+              ),
             },
             catering: {
-              total: data?.providedServices?.supportServices.catering.total,
+              total: Number(
+                data?.providedServices?.supportServices.catering.total
+              ),
             },
-            fuel: { ...data.providedServices?.supportServices.fuel },
+            fuel: {
+              fuelDensity: Number(
+                data.providedServices?.supportServices.fuel.fuelDensity
+              ),
+              fuelLitersQuantity: Number(
+                data.providedServices?.supportServices.fuel.fuelLitersQuantity
+              ),
+            },
           }),
           otherServices: data?.providedServices?.otherServices?.map((s) => {
             return new ProvidedService(realm, {
