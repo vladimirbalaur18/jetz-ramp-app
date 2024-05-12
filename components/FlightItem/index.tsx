@@ -11,9 +11,10 @@ import {
 import dayjs from "dayjs";
 import { RootState } from "@/redux/store";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useQuery } from "@realm/react";
+import { useQuery, useRealm } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 import { IFlight } from "@/models/Flight";
+import { realmWithoutSync } from "@/realm";
 
 type Field = [
   label: ReactNode,
@@ -24,6 +25,12 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
+  const realm = useRealm();
+  const [realmCurrentFlight] = useQuery<IFlight>(
+    "Flight",
+    (collection) => collection.filtered("flightId == $0", flight.flightId),
+    [flight.flightId]
+  );
   const [configs] = useQuery<GeneralConfigState>("General");
   const baseAirport = configs.defaultAirport;
   const formatFlightTime = ({
@@ -77,7 +84,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
       </>,
       flight.handlingType !== "Arrival",
     ],
-    ["STATUS:", "TBD"],
+    ["STATUS:", flight.status || "Uncompleted"],
     ["HANDLING TYPE:", flight?.handlingType || "N/A"],
   ];
   return (
@@ -133,7 +140,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
               {
                 text: "Confirm",
                 onPress: () =>
-                  dispatch(removeFlight(flight?.flightId as string)),
+                  realm.write(() => realm.delete(realmCurrentFlight)),
                 style: "destructive",
               },
               {
@@ -244,7 +251,9 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
               {flight?.status !== "Completed" && (
                 <Menu.Item
                   onPress={() => {
-                    dispatch(updateFlight({ ...flight, status: "Completed" }));
+                    realm.write(() => {
+                      realmCurrentFlight.status = "Completed";
+                    });
                     // // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
                     // router.navigate("/(createFlight)/(tabs)/chargeNote");
                     // closeMenu();

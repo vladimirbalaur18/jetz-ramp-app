@@ -42,6 +42,7 @@ import { FeeQuota } from "@/models/FeeQuota";
 import DefaultAirportFees from "@/configs/airportFees.json";
 import { AuthProvider } from "@/context/authContext";
 import { MaterialIcons } from "@expo/vector-icons";
+import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 
 registerTranslation("en-GB", enGB);
 
@@ -103,9 +104,12 @@ function RootLayoutNav() {
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
   const dispatch = useDispatch<AppDispatch>();
-  const currentFlightNumber = selectCurrentFlight(
-    useSelector((state: RootState) => state)
-  )?.flightNumber;
+  const currentFlightId = useSelector(
+    (state: RootState) => state.flights.currentFlightId
+  );
+  const currentFlightNumber = _selectCurrentFlight(
+    currentFlightId || ""
+  )?.toJSON()?.flightNumber;
   const [configs] = realmWithoutSync.objects("General");
   const [AppData] = realmWithoutSync.objects("AppData").toJSON() as IAppData[];
   const [AirportFees] = realmWithoutSync.objects<IAirportFees>("AirportFees");

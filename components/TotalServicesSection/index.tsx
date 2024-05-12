@@ -101,19 +101,7 @@ const TotalServicesSection: React.FC<{
         0
       );
     };
-    alert(
-      Number(
-        Number(totalFuelPrice) +
-          (loungeFeeCurrency === "MDL"
-            ? convertCurrency(loungeFeeAmount, rateMDLtoEUR)
-            : Number(loungeFeeAmount)) +
-          Number(catering.total) +
-          Number(HOTAC.total) +
-          Number(airportFee.total) +
-          Number(basicHandling.total) +
-          calculateOtherServicesTotal()
-      )
-    );
+
     return Number(
       Number(totalFuelPrice) +
         (loungeFeeCurrency === "MDL"

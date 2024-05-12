@@ -112,7 +112,6 @@ const Form: React.FC = () => {
     } else {
       console.log("from db, existing flight");
       if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
-        alert("updaging");
         dispatch(setCurrentFlightById(data.flightId as any));
 
         realm.write(() => {
@@ -140,7 +139,6 @@ const Form: React.FC = () => {
       }
     }
 
-    alert(JSON.stringify(data));
     //need to see based on flight plan type
     router.navigate(
       data?.handlingType === "Departure"

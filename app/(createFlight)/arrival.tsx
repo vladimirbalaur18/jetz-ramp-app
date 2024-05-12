@@ -112,7 +112,7 @@ const Form: React.FC = () => {
         from: data.arrival.from,
       });
 
-      if (_existingFlight)
+      if (_existingFlight) {
         if (!_.isEqual(_existingFlight.toJSON(), data)) {
           console.log("arrival data", data);
           _existingFlight.arrival = arrival;
@@ -127,6 +127,7 @@ const Form: React.FC = () => {
           _existingFlight.providedServices = undefined;
           _existingFlight.arrival = arrival;
         }
+      } else return arrival;
     });
     dispatch(
       setCurrentFlightById(_existingFlight?.toJSON().flightId as string)

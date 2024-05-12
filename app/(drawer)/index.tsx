@@ -14,6 +14,7 @@ import { removeCurrentFlightById } from "@/redux/slices/flightsSlice";
 import FlightSection from "@/components/FlightSection";
 import { IFlight } from "@/models/Flight";
 import { useQuery } from "@realm/react";
+import reverseObjectProperties from "@/utils/reverseObjectKeys";
 dayjs.extend(isToday);
 
 export default function Page() {
@@ -21,7 +22,9 @@ export default function Page() {
   //   state.flights.flightsArray.filter((f) => f?.status !== "Completed")
   // );
 
-  const flightsArr = useQuery<IFlight>("Flight");
+  const flightsArr = useQuery<IFlight>("Flight", (collection) =>
+    collection.filtered("status != $0", "Completed")
+  );
   const theme = useTheme();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -45,7 +48,7 @@ export default function Page() {
   //agg flights by date
 
   return (
-    <ScrollView contentContainerStyle={styles.wrapper}>
+    <View>
       <FAB
         icon="plus"
         color={theme.colors.text}
@@ -58,28 +61,37 @@ export default function Page() {
           router.navigate("/(createFlight)/general");
         }}
       />
-      {Object.entries(parseFlightsByDate).map(([date, flights], index) => {
-        return (
-          <FlightSection
-            key={date + index}
-            dateString={
-              dayjs(date)?.isToday()
-                ? "Today"
-                : dayjs(date).format("MMM DD, YYYY")
-            }
-            flights={flights}
-          />
-        );
-      })}
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.wrapper}>
+        {Object.entries(
+          reverseObjectProperties(parseFlightsByDate, (d1, d2) =>
+            dayjs(d1).diff(dayjs(d2))
+          )
+        ).map(([date, flights], index) => {
+          return (
+            <View style={{ marginVertical: 15 }}>
+              <FlightSection
+                key={date + index}
+                dateString={
+                  dayjs(date)?.isToday()
+                    ? "Today"
+                    : dayjs(date).format("MMM DD, YYYY")
+                }
+                flights={flights}
+              />
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    right: 10,
+    right: 0,
     bottom: 20,
+    zIndex: 999,
   },
   verticalContainer: {
     display: "flex",
@@ -100,11 +112,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexWrap: "wrap",
     width: "100%",
-    height: "100%",
-    flex: 1,
     flexDirection: "column",
     padding: 10,
     gap: 30,
+    alignItems: "flex-start",
   },
 
   newFlightIcon: {

@@ -110,7 +110,6 @@ const Form: React.FC = () => {
 
       if (_existingFlight)
         if (!_.isEqual(_existingFlight.toJSON(), data)) {
-          alert("updaging");
           console.log("departure data", data);
 
           _existingFlight.departure = departure;
@@ -197,7 +196,6 @@ const Form: React.FC = () => {
                     label="Arrival date"
                     value={value}
                     onChange={(d) => {
-                      alert(d);
                       onChange(d);
                     }}
                     inputMode="start"
