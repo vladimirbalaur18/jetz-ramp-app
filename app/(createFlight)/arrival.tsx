@@ -113,7 +113,7 @@ const Form: React.FC = () => {
       });
 
       if (_existingFlight) {
-        if (!_.isEqual(_existingFlight.toJSON(), data)) {
+        if (_.isEqual(_existingFlight.toJSON(), data)) {
           console.log("arrival data", data);
           _existingFlight.arrival = arrival;
         } else {
@@ -124,7 +124,7 @@ const Form: React.FC = () => {
             "AFTER",
             JSON.stringify(arrival, null, 3)
           );
-          _existingFlight.providedServices = undefined;
+          realm.delete(_existingFlight.providedServices);
           _existingFlight.arrival = arrival;
         }
       } else return arrival;
@@ -337,22 +337,6 @@ const Form: React.FC = () => {
           Total passengers:
           {Number(adultPassengersCount) + Number(minorPassengersCount)}
         </Text>
-        <View style={styles.row}>
-          <Text variant="bodyLarge">Is commercial flight</Text>
-          <Controller
-            control={control}
-            defaultValue={false}
-            name="isCommercialFlight"
-            render={({ field: { value, onChange } }) => (
-              <>
-                <Switch
-                  value={value}
-                  onValueChange={(value) => onChange(value)}
-                />
-              </>
-            )}
-          />
-        </View>
         <View style={styles.row}>
           <Text variant="headlineSmall">Arrival ramp agent</Text>
         </View>

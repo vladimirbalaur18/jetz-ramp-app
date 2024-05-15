@@ -7,6 +7,8 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "react-native-paper";
 import { useAuthContext } from "@/context/authContext";
+import { useQuery } from "@realm/react";
+import { GeneralConfigState } from "@/models/Config";
 
 export default function TabLayout() {
   const iconColor = useTheme();

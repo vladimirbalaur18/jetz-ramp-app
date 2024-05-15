@@ -112,31 +112,31 @@ const Form: React.FC = () => {
     } else {
       console.log("from db, existing flight");
       if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
-        dispatch(setCurrentFlightById(data.flightId as any));
-
-        realm.write(() => {
-          realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
-          realmExistingFlight.aircraftType = data.aircraftType;
-          realmExistingFlight.chargeNote.date = data.chargeNote.date;
-          realmExistingFlight.chargeNote.currency.euroToMDL =
-            data.chargeNote.currency.euroToMDL;
-          realmExistingFlight.chargeNote.currency.usdToMDL =
-            data.chargeNote.currency.usdToMDL;
-          realmExistingFlight.crew = data?.crew;
-          realmExistingFlight.departure = data?.departure;
-          realmExistingFlight.flightNumber = data?.flightNumber;
-          realmExistingFlight.handlingType = data?.handlingType;
-          realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
-          realmExistingFlight.mtow = Number(data?.mtow);
-          realmExistingFlight.operatorName = data?.operatorName;
-          realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
-          realmExistingFlight.parkingPosition = data?.parkingPosition;
-          realmExistingFlight.providedServices = undefined;
-          realmExistingFlight.ramp = undefined;
-          realmExistingFlight.scheduleType = data?.scheduleType;
-          realmExistingFlight.status = data?.status;
-        });
+        realm.write(() => realm.delete(realmExistingFlight.providedServices));
       }
+      realm.write(() => {
+        realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
+        realmExistingFlight.aircraftType = data.aircraftType;
+        realmExistingFlight.chargeNote.date = data.chargeNote.date;
+        realmExistingFlight.chargeNote.currency.euroToMDL =
+          data.chargeNote.currency.euroToMDL;
+        realmExistingFlight.chargeNote.currency.usdToMDL =
+          data.chargeNote.currency.usdToMDL;
+        realmExistingFlight.crew = data?.crew;
+        realmExistingFlight.departure = data?.departure;
+        realmExistingFlight.flightNumber = data?.flightNumber;
+        realmExistingFlight.handlingType = data?.handlingType;
+        realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
+        realmExistingFlight.mtow = Number(data?.mtow);
+        realmExistingFlight.operatorName = data?.operatorName;
+        realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
+        realmExistingFlight.parkingPosition = data?.parkingPosition;
+        realmExistingFlight.providedServices = undefined;
+        realmExistingFlight.ramp = undefined;
+        realmExistingFlight.scheduleType = data?.scheduleType;
+        realmExistingFlight.status = data?.status;
+      });
+      dispatch(setCurrentFlightById(data.flightId as any));
     }
 
     //need to see based on flight plan type
@@ -195,10 +195,6 @@ const Form: React.FC = () => {
           name="operatorName"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Not a valid operator Name",
-              value: REGEX.operatorName,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -295,10 +291,6 @@ const Form: React.FC = () => {
           name="orderingCompanyName"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Not a valid company Name",
-              value: REGEX.operatorName,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>

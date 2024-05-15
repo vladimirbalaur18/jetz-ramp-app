@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import React, { ReactNode, useMemo } from "react";
 import SectionTitle from "../FormUtils/SectionTitle";
-import { Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLoungeFeePrice } from "@/services/servicesCalculator";
@@ -15,6 +15,7 @@ import { IFlight } from "@/models/Flight";
 import { IProvidedServices } from "@/models/ProvidedServices";
 import { IService } from "@/models/Services";
 import { IProvidedService } from "@/models/ProvidedService";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 function getCircularReplacer() {
   const ancestors: any[] = []; //@ts-expect-error
@@ -49,6 +50,24 @@ const TotalServicesSection: React.FC<{
     VIPLoungeServices,
     disbursementFees,
   } = providedServices;
+
+  const consumedServicesPerCategoryParsed = useMemo<
+    Record<string, Array<IProvidedService>>
+  >(() => {
+    let categoryServicesMap: Record<string, Array<IProvidedService>> = {};
+    if (providedServices?.otherServices?.length) {
+      for (const service of providedServices?.otherServices.filter(
+        (s) => s.isUsed
+      )) {
+        const category = service.service.categoryName;
+        if (!categoryServicesMap[category]) {
+          categoryServicesMap[category] = [service];
+        } else categoryServicesMap[category].push(service);
+      }
+    }
+
+    return categoryServicesMap;
+  }, [JSON.stringify(providedServices, null, 3)]);
 
   const [generalConfig] = useQuery<GeneralConfigState>("General");
   console.log("genCOnfig", generalConfig);
@@ -119,12 +138,13 @@ const TotalServicesSection: React.FC<{
   const renderBasicHandlingVAT = basicHandling?.total;
   return (
     <View>
-      <SectionTitle>Services list:</SectionTitle>
+      <SectionTitle>Total services provided:</SectionTitle>
       <Text style={styles.serviceListItem} variant="titleMedium">
         Basic handling (MTOW: {existingFlight?.mtow}kg):{" "}
         {renderBasicHandlingVAT}
         &euro;
       </Text>
+      <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
         VIP Lounge ({VIPLoungeServices?.typeOf}):{" "}
         {
@@ -135,17 +155,18 @@ const TotalServicesSection: React.FC<{
           }).displayedString
         }
       </Text>
-
-      {!providedServices?.otherServices?.some((service) => service.isUsed) ? (
+      <Divider />
+      {/* OLD RENDERING OF SERVICES WITHOUT CATEGORIES */}
+      {/* {!providedServices?.otherServices?.some((service) => service.isUsed) ? (
         <Text>None</Text>
       ) : (
         providedServices?.otherServices?.map((s) => {
           return s.isUsed ? (
             <Text>
               {" "}
-              {s?.isPriceOverriden &&
-                s?.totalPriceOverride &&
-                " **manual price "}
+              {s?.isPriceOverriden && s?.totalPriceOverride && (
+                <MaterialCommunityIcons name="pencil" size={14} />
+              )}{" "}
               {s?.service.serviceName} (x{s?.quantity}) :{" "}
               {((): ReactNode => {
                 let total: any;
@@ -169,8 +190,47 @@ const TotalServicesSection: React.FC<{
             </Text>
           ) : null;
         })
-      )}
+      )} */}
+      {Object.entries(consumedServicesPerCategoryParsed).map(
+        ([category, services]) => {
+          return (
+            <View style={{ marginVertical: 10 }}>
+              <Text variant="bodyLarge">{category}</Text>
+              {services?.map((s) => {
+                return s.isUsed ? (
+                  <Text style={{ marginVertical: 5 }}>
+                    {" "}
+                    {s?.isPriceOverriden && s?.totalPriceOverride && (
+                      <MaterialCommunityIcons name="pencil" size={14} />
+                    )}{" "}
+                    {s?.service.serviceName} (x{s?.quantity}) :{" "}
+                    {((): ReactNode => {
+                      let total: any;
+                      let totalWithVAT: number;
 
+                      if (s?.isPriceOverriden && s?.totalPriceOverride) {
+                        total = s.totalPriceOverride;
+                      } else total = (s?.quantity || 0) * s.service.price;
+
+                      if (s?.service.hasVAT) {
+                        totalWithVAT = total * (generalConfig?.VAT / 100 + 1);
+
+                        return (
+                          <>
+                            {Number(total).toFixed(2)} x {generalConfig?.VAT}%
+                            VAT = {totalWithVAT.toFixed(2)}
+                          </>
+                        );
+                      } else return <>{Number(total).toFixed(2)}</>;
+                    })()}
+                  </Text>
+                ) : null;
+              })}
+            </View>
+          );
+        }
+      )}
+      <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
         Airport fees: {airportFee?.total || 0}&euro;
       </Text>
@@ -183,6 +243,7 @@ const TotalServicesSection: React.FC<{
       <Text style={styles.serviceListItem} variant="titleMedium">
         Fuel fee: {totalFuelPrice || 0}&euro;
       </Text>
+      <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
         Disbursement fees:
       </Text>
@@ -199,6 +260,7 @@ const TotalServicesSection: React.FC<{
       <Text>
         Express/VIP Lounge fee: {disbursementFees.VIPLoungeFee.toFixed(2)}&euro;
       </Text>
+      <Divider style={{ marginVertical: 10 }} />
       <Text variant="titleLarge">
         Total: {totalAmountOfServices.toFixed(2)}&euro;
       </Text>

@@ -25,9 +25,6 @@ export default function App() {
 
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    // alert(JSON.stringify(data));
-    //nullyfy services if we update new data
-
     if (realmExistingFlight)
       realm.write(() => {
         realmExistingFlight.chargeNote.billingTo =

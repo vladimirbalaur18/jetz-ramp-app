@@ -108,15 +108,15 @@ const Form: React.FC = () => {
         arrivalTime: data.arrival.arrivalTime,
       });
 
-      if (_existingFlight)
+      if (_existingFlight) {
         if (!_.isEqual(_existingFlight.toJSON(), data)) {
-          console.log("departure data", data);
-
-          _existingFlight.departure = departure;
-          if (_existingFlight.handlingType === "Departure") {
-            _existingFlight.arrival = arrival;
-          }
+          realm.delete(_existingFlight.providedServices);
         }
+        _existingFlight.departure = departure;
+        if (_existingFlight.handlingType === "Departure") {
+          _existingFlight.arrival = arrival;
+        }
+      }
     });
     dispatch(
       setCurrentFlightById(_existingFlight?.toJSON().flightId as string)

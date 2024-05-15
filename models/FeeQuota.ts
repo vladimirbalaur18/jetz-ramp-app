@@ -1,5 +1,4 @@
 import Realm, { ObjectSchema } from "realm";
-import { Object } from "realm/dist/public-types/Object";
 
 export class FeeQuota extends Realm.Object<IFeeQuota> {
   perTon?: number;

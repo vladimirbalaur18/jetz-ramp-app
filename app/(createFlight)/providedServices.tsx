@@ -1,5 +1,5 @@
 import formStyles from "@/styles/formStyles";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, View, Alert } from "react-native";
 
 import SectionTitle from "@/components/FormUtils/SectionTitle";
@@ -738,11 +738,7 @@ const Form: React.FC = () => {
             />
           </View>
         )}
-        <View>
-          {allServices.map(({ categoryName }) => {
-            return <SectionTitle>{categoryName}</SectionTitle>;
-          })}
-        </View>
+
         <View>
           {/* {fields?.map(() => {
             return (
@@ -1009,7 +1005,7 @@ const Form: React.FC = () => {
               </>
             );
           })} */}
-          {fields.map((field, serviceIndex) => {
+          {fields.map((field, serviceIndex, array) => {
             const {
               service,
               isPriceOverriden,
@@ -1020,8 +1016,13 @@ const Form: React.FC = () => {
             } = field;
 
             const { serviceName, hasVAT, price } = service;
+
             return (
               <>
+                {field.service.categoryName !==
+                  array[serviceIndex - 1]?.service?.categoryName && (
+                  <SectionTitle>{field.service.categoryName}</SectionTitle>
+                )}
                 <View style={{ ...formStyles.row, marginVertical: 30 }}>
                   <Text variant="bodyLarge">
                     {isPriceOverriden && (
