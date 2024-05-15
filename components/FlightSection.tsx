@@ -11,7 +11,7 @@ const FlightSection: React.FC<{
       <Text variant="titleMedium">{dateString}</Text>
       <View style={styles.horizontalContainer}>
         {flights?.map((flight) => {
-          return <FlightItem flight={flight} />;
+          return <FlightItem key={flight?.flightId} flight={flight} />;
         })}
       </View>
     </View>

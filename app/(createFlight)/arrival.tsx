@@ -124,7 +124,8 @@ const Form: React.FC = () => {
             "AFTER",
             JSON.stringify(arrival, null, 3)
           );
-          realm.delete(_existingFlight.providedServices);
+          _existingFlight.providedServices &&
+            realm.delete(_existingFlight.providedServices);
           _existingFlight.arrival = arrival;
         }
       } else return arrival;

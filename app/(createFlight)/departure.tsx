@@ -110,7 +110,8 @@ const Form: React.FC = () => {
 
       if (_existingFlight) {
         if (!_.isEqual(_existingFlight.toJSON(), data)) {
-          realm.delete(_existingFlight.providedServices);
+          _existingFlight.providedServices &&
+            realm.delete(_existingFlight.providedServices);
         }
         _existingFlight.departure = departure;
         if (_existingFlight.handlingType === "Departure") {

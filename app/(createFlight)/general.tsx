@@ -67,6 +67,8 @@ const Form: React.FC = () => {
       chargeNote: {
         currency: {
           date: new Date(),
+          euroToMDL: "16.24",
+          usdToMDL: "15.34",
         },
       },
     },
@@ -112,7 +114,11 @@ const Form: React.FC = () => {
     } else {
       console.log("from db, existing flight");
       if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
-        realm.write(() => realm.delete(realmExistingFlight.providedServices));
+        realm.write(
+          () =>
+            realmExistingFlight.providedServices &&
+            realm.delete(realmExistingFlight.providedServices)
+        );
       }
       realm.write(() => {
         realmExistingFlight.aircraftRegistration = data.aircraftRegistration;

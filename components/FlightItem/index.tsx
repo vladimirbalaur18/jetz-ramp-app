@@ -15,6 +15,7 @@ import { useQuery, useRealm } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 import { IFlight } from "@/models/Flight";
 import { realmWithoutSync } from "@/realm";
+import { Animated } from "react-native";
 
 type Field = [
   label: ReactNode,
@@ -87,192 +88,212 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
     ["STATUS:", flight.status || "Uncompleted"],
     ["HANDLING TYPE:", flight?.handlingType || "N/A"],
   ];
+
+  const [opacity, setOpacity] = useState(new Animated.Value(Number(1)));
+  const [isVisible, setIsVisible] = useState(true);
+
   return (
-    <Menu
-      visible={visible}
-      onDismiss={closeMenu}
-      anchorPosition="bottom"
-      anchor={
-        <TouchableOpacity
-          style={{
-            backgroundColor: "transparent",
-            borderRadius: 25,
-          }}
-          onPress={() => {
-            if (flight?.status !== "Completed") {
-              dispatch(setCurrentFlightById(flight?.flightId as string));
-              router.navigate("/(createFlight)/general");
-            }
-          }}
-          onLongPress={() => openMenu()}
-        >
-          <View
-            style={{
-              ...styles.container,
-              backgroundColor: theme.colors.surfaceVariant,
-              elevation: 5,
-            }}
-          >
-            {fieldsArray
-              ?.filter(([label, value, display]) => display !== false)
-              .map(([label, value]) => {
-                return (
-                  <Text
-                    variant="bodySmall"
-                    style={{
-                      color: theme.colors.onSurfaceVariant,
-                    }}
-                  >
-                    <Text style={{ fontWeight: "900" }}>{label}</Text> {value}
-                  </Text>
-                );
-              })}
-          </View>
-        </TouchableOpacity>
-      }
-    >
-      <Menu.Item
-        onPress={() => {
-          Alert.alert(
-            "Remove flight?",
-            `Are you sure you want to remove flight ${flight?.flightNumber}?`,
-            [
-              {
-                text: "Confirm",
-                onPress: () =>
-                  realm.write(() => realm.delete(realmCurrentFlight)),
-                style: "destructive",
-              },
-              {
-                text: "Cancel",
-                style: "cancel",
-              },
-            ],
-            {
-              cancelable: true,
-            }
-          );
-        }}
-        leadingIcon={() => (
-          <MaterialCommunityIcons
-            name="trash-can"
-            color={theme?.colors?.error}
-            size={18}
-          />
-        )}
-        titleStyle={{
-          color: theme.colors.error,
-          columnGap: 3,
-        }}
-        title={"Remove flight"}
-      />
-      {(flight.handlingType === "Arrival" || flight.handlingType === "FULL") &&
-        flight?.arrival &&
-        flight?.status !== "Completed" && (
-          <Menu.Item
-            onPress={() => {
-              dispatch(setCurrentFlightById(flight?.flightId as string));
-
-              // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-              router.navigate("/(createFlight)/arrival");
-              closeMenu();
-            }}
-            leadingIcon={() => (
-              <MaterialCommunityIcons
-                name="airplane-landing"
-                color={theme?.colors?.primary}
-                size={18}
-              />
-            )}
-            title="Go to Arrival"
-          />
-        )}
-      {(flight.handlingType === "Departure" ||
-        flight.handlingType === "FULL") &&
-        flight?.departure &&
-        flight?.status !== "Completed" && (
-          <Menu.Item
-            onPress={() => {
-              // dispatch(removeFlight(flight?.flightId as string));
-              dispatch(setCurrentFlightById(flight?.flightId as string));
-              router.navigate("/(createFlight)/departure");
-              closeMenu();
-            }}
-            leadingIcon={() => (
-              <MaterialCommunityIcons
-                name="airplane-takeoff"
-                color={theme?.colors?.primary}
-                size={18}
-              />
-            )}
-            title="Go to Departure"
-          />
-        )}
-      {flight.providedServices && (
-        <>
-          {flight?.status !== "Completed" && (
-            <Menu.Item
-              onPress={() => {
-                dispatch(setCurrentFlightById(flight?.flightId as string));
-
-                // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-                router.navigate("/(createFlight)/providedServices");
-                closeMenu();
+    isVisible && (
+      <Animated.View key={flight?.flightId} style={{ opacity }}>
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchorPosition="bottom"
+          anchor={
+            <TouchableOpacity
+              style={{
+                backgroundColor: "transparent",
+                borderRadius: 25,
               }}
-              leadingIcon={() => (
-                <MaterialCommunityIcons
-                  name="clipboard-list-outline"
-                  color={theme?.colors?.primary}
-                  size={18}
-                />
-              )}
-              title="Go to Provided Services"
-            />
-          )}
-          {flight?.crew && flight?.ramp && (
-            <>
+              onPress={() => {
+                if (flight?.status !== "Completed") {
+                  dispatch(setCurrentFlightById(flight?.flightId as string));
+                  router.navigate("/(createFlight)/general");
+                }
+              }}
+              onLongPress={() => openMenu()}
+            >
+              <View
+                style={{
+                  ...styles.container,
+                  backgroundColor: theme.colors.surfaceVariant,
+                  elevation: 5,
+                }}
+              >
+                {fieldsArray
+                  ?.filter(([label, value, display]) => display !== false)
+                  .map(([label, value]) => {
+                    return (
+                      <Text
+                        variant="bodySmall"
+                        style={{
+                          color: theme.colors.onSurfaceVariant,
+                        }}
+                      >
+                        <Text style={{ fontWeight: "900" }}>{label}</Text>{" "}
+                        {value}
+                      </Text>
+                    );
+                  })}
+              </View>
+            </TouchableOpacity>
+          }
+        >
+          <Menu.Item
+            onPress={() => {
+              Alert.alert(
+                "Remove flight?",
+                `Are you sure you want to remove flight ${flight?.flightNumber}?`,
+                [
+                  {
+                    text: "Confirm",
+                    onPress: () =>
+                      Animated.timing(opacity, {
+                        toValue: 0,
+                        duration: 500,
+                        useNativeDriver: true, // Add this line
+                      }).start(() => {
+                        // setOpacity(new Animated.Value(1));
+                        setIsVisible(false);
+                        realm.write(() => realm.delete(realmCurrentFlight));
+                      }),
+                    style: "destructive",
+                  },
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                ],
+                {
+                  cancelable: true,
+                }
+              );
+            }}
+            leadingIcon={() => (
+              <MaterialCommunityIcons
+                name="trash-can"
+                color={theme?.colors?.error}
+                size={18}
+              />
+            )}
+            titleStyle={{
+              color: theme.colors.error,
+              columnGap: 3,
+            }}
+            title={"Remove flight"}
+          />
+          {(flight.handlingType === "Arrival" ||
+            flight.handlingType === "FULL") &&
+            flight?.arrival &&
+            flight?.status !== "Completed" && (
               <Menu.Item
                 onPress={() => {
                   dispatch(setCurrentFlightById(flight?.flightId as string));
 
                   // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-                  router.navigate("/(createFlight)/(tabs)/chargeNote");
+                  router.navigate("/(createFlight)/arrival");
                   closeMenu();
                 }}
                 leadingIcon={() => (
                   <MaterialCommunityIcons
-                    name="cloud-print-outline"
+                    name="airplane-landing"
                     color={theme?.colors?.primary}
                     size={18}
                   />
                 )}
-                title="Go to PDF files generation"
+                title="Go to Arrival"
               />
+            )}
+          {(flight.handlingType === "Departure" ||
+            flight.handlingType === "FULL") &&
+            flight?.departure &&
+            flight?.status !== "Completed" && (
+              <Menu.Item
+                onPress={() => {
+                  // dispatch(removeFlight(flight?.flightId as string));
+                  dispatch(setCurrentFlightById(flight?.flightId as string));
+                  router.navigate("/(createFlight)/departure");
+                  closeMenu();
+                }}
+                leadingIcon={() => (
+                  <MaterialCommunityIcons
+                    name="airplane-takeoff"
+                    color={theme?.colors?.primary}
+                    size={18}
+                  />
+                )}
+                title="Go to Departure"
+              />
+            )}
+          {flight.providedServices && (
+            <>
               {flight?.status !== "Completed" && (
                 <Menu.Item
                   onPress={() => {
-                    realm.write(() => {
-                      realmCurrentFlight.status = "Completed";
-                    });
-                    // // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-                    // router.navigate("/(createFlight)/(tabs)/chargeNote");
-                    // closeMenu();
+                    dispatch(setCurrentFlightById(flight?.flightId as string));
+
+                    // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                    router.navigate("/(createFlight)/providedServices");
+                    closeMenu();
                   }}
                   leadingIcon={() => (
                     <MaterialCommunityIcons
-                      name="tooltip-check-outline"
+                      name="clipboard-list-outline"
                       color={theme?.colors?.primary}
                       size={18}
                     />
                   )}
-                  title="Mark flight as completed"
+                  title="Go to Provided Services"
                 />
+              )}
+              {flight?.crew && flight?.ramp && (
+                <>
+                  <Menu.Item
+                    onPress={() => {
+                      dispatch(
+                        setCurrentFlightById(flight?.flightId as string)
+                      );
+
+                      // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                      router.navigate("/(createFlight)/(tabs)/chargeNote");
+                      closeMenu();
+                    }}
+                    leadingIcon={() => (
+                      <MaterialCommunityIcons
+                        name="cloud-print-outline"
+                        color={theme?.colors?.primary}
+                        size={18}
+                      />
+                    )}
+                    title="Go to PDF files generation"
+                  />
+                  {flight?.status !== "Completed" && (
+                    <Menu.Item
+                      onPress={() => {
+                        realm.write(() => {
+                          realmCurrentFlight.status = "Completed";
+                        });
+                        // // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
+                        // router.navigate("/(createFlight)/(tabs)/chargeNote");
+                        // closeMenu();
+                      }}
+                      leadingIcon={() => (
+                        <MaterialCommunityIcons
+                          name="tooltip-check-outline"
+                          color={theme?.colors?.primary}
+                          size={18}
+                        />
+                      )}
+                      title="Mark flight as completed"
+                    />
+                  )}
+                </>
               )}
             </>
           )}
-        </>
-      )}
-    </Menu>
+        </Menu>
+      </Animated.View>
+    )
   );
 };
 
