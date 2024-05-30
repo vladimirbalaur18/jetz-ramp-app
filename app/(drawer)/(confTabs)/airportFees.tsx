@@ -134,7 +134,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -157,9 +157,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Winter period quota percentage:"
+                label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -187,9 +187,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Summer period quota percentage:"
+                label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -222,7 +222,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -247,7 +247,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -269,9 +269,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Winter period quota percentage:"
+                label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -299,9 +299,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Summer period quota percentage:"
+                label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -335,7 +335,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -362,7 +362,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -386,7 +386,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -413,7 +413,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -444,7 +444,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -469,7 +469,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -491,9 +491,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Winter period quota percentage:"
+                label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -521,9 +521,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Summer period quota percentage:"
+                label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -556,7 +556,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -581,7 +581,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -603,9 +603,9 @@ const Form: React.FC = () => {
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Winter period quota percentage:"
+                label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -635,7 +635,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Summer period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -669,7 +669,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -696,7 +696,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -720,7 +720,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -747,7 +747,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}

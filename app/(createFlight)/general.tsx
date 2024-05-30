@@ -224,10 +224,6 @@ const Form: React.FC = () => {
           name="flightNumber"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-            pattern: {
-              message: "Not a Valid Flight number",
-              value: REGEX.flightNumber,
-            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -263,7 +259,9 @@ const Form: React.FC = () => {
                   }}
                 >
                   {Object.entries(FlightSchedule).map(([key, value]) => {
-                    return <RadioButton.Item label={key} value={key} />;
+                    return (
+                      <RadioButton.Item key={key} label={key} value={key} />
+                    );
                   })}
                 </RadioButton.Group>
               </List.Section>

@@ -45,6 +45,7 @@ import { ISupportServices } from "@/models/SupportServices";
 import { ObjectId } from "bson";
 import { IServiceCategory } from "@/models/ServiceCategory";
 import { IProvidedService, ProvidedService } from "@/models/ProvidedService";
+import uuid from "react-uuid";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -254,14 +255,14 @@ const Form: React.FC = () => {
               adultPax: data.providedServices?.VIPLoungeServices.adultPax
                 ? Number(data.providedServices?.VIPLoungeServices.adultPax)
                 : undefined,
-              minorPax: data.providedServices?.VIPLoungeServices.adultPax
-                ? Number(data.providedServices?.VIPLoungeServices.adultPax)
+              minorPax: data.providedServices?.VIPLoungeServices.minorPax
+                ? Number(data.providedServices?.VIPLoungeServices.minorPax)
                 : undefined,
               typeOf: data.providedServices?.VIPLoungeServices?.typeOf,
             }
           ),
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
-            total: data?.providedServices?.basicHandling?.total,
+            total: Number(data?.providedServices?.basicHandling?.total),
             isPriceOverriden:
               data?.providedServices?.basicHandling?.total !==
               existingFlight?.providedServices?.basicHandling?.total,
@@ -599,7 +600,7 @@ const Form: React.FC = () => {
                   keyboardType="numeric"
                   onChangeText={(text) => {
                     if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
+                      onChange(text.replace(/[^0-9.]/g, ""));
                     } else {
                       setValue(name, "" as any); //prevent throwing undefined errors
                     }

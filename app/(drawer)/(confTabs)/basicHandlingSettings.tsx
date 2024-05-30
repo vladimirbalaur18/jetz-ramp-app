@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import {
   Button,
   Divider,
@@ -39,7 +45,7 @@ const Form: React.FC = () => {
     return () => fieldArray.remove();
   }, [basicHandlingFees.length, forceRenderIndex]);
   const { showSnackbar } = useSnackbar();
-
+  const realm = useRealm();
   return (
     <SafeAreaView>
       <ScrollView
@@ -53,6 +59,7 @@ const Form: React.FC = () => {
           return (
             <BasicHandlingInput
               {...fee}
+              key={fee.id}
               disabled={fee.alreadyExists}
               onFieldCreatePress={() => {
                 showSnackbar("Rule created successfully");
@@ -67,22 +74,54 @@ const Form: React.FC = () => {
                 fieldArray.remove();
               }}
               onFieldRemovePress={() => {
-                showSnackbar("Rule has been removed successfully");
-                setSnackbarVisible(true);
-                setForceRender(forceRenderIndex + 1);
+                const feeToRemove = basicHandlingFees.find(
+                  (f) =>
+                    f.maxMTOW == Number(fee.maxMTOW) &&
+                    f.minMTOW == Number(fee.minMTOW) &&
+                    f.pricePerLeg == Number(fee.pricePerLeg)
+                );
+                if (feeToRemove)
+                  Alert.alert(
+                    "Remove rule?",
+                    `Are you sure you want to remove this rule?`,
+                    [
+                      {
+                        text: "Confirm",
+                        onPress: () => {
+                          realm.write(() => {
+                            if (feeToRemove) {
+                              realm.delete(feeToRemove);
+                              showSnackbar(
+                                "Rule has been removed successfully"
+                              );
+                              setSnackbarVisible(true);
+                            }
+                          });
+                        },
+                        style: "destructive",
+                      },
+                      {
+                        text: "Cancel",
+                        style: "cancel",
+                      },
+                    ],
+                    {
+                      cancelable: true,
+                    }
+                  );
                 fieldArray.remove();
+                setForceRender(forceRenderIndex + 1);
               }} //removes all fields to re-render them again from the database accordingly from useEffect
             />
           );
         })}
         <Button
-          mode="contained"
+          mode="elevated"
           disabled={fieldArray.fields.at(-1)?.alreadyExists === false}
           icon={"clipboard-plus-outline"}
           onPress={() =>
             fieldArray.append({
-              //@ts-expect-error: Passing empty data instead of type number
-              minMTOW: "",
+              minMTOW: +Number(fieldArray.fields.at(-1)?.maxMTOW) + 1,
               //@ts-expect-error: Passing empty data instead of type number
               maxMTOW: "", //@ts-expect-error: Passing empty data instead of type number
               pricePerLeg: "",
@@ -101,10 +140,12 @@ function BasicHandlingInput({
   minMTOW,
   maxMTOW,
   pricePerLeg,
+  notes,
   onFieldRemovePress,
   onFieldCreatePress,
   onFieldUpdatePress,
   disabled: alreadyExistingRule = false,
+  n,
 }: any) {
   const theme = useTheme();
   const { control, formState, handleSubmit, getValues, watch, getFieldState } =
@@ -114,6 +155,7 @@ function BasicHandlingInput({
         minMTOW,
         maxMTOW,
         pricePerLeg,
+        notes,
       },
     });
   const formValues = watch();
@@ -124,27 +166,7 @@ function BasicHandlingInput({
     alreadyExistingRule ? "view" : "create"
   );
   const handleRemoveRule = () => {
-    //remove uncompleted inputs before touching DB
-    if (
-      !alreadyExistingRule ||
-      isNaN(formValues.maxMTOW) ||
-      isNaN(formValues.minMTOW)
-    ) {
-      return onFieldRemovePress();
-    } else {
-      realm.write(() => {
-        const feeToRemove = fees.find(
-          (f) =>
-            f.maxMTOW == Number(maxMTOW) &&
-            f.minMTOW == Number(minMTOW) &&
-            f.pricePerLeg == Number(pricePerLeg)
-        );
-        if (feeToRemove) {
-          realm.delete(feeToRemove);
-          onFieldRemovePress && onFieldRemovePress();
-        }
-      });
-    }
+    onFieldRemovePress && onFieldRemovePress();
   };
 
   const handleRuleSubmit = () => {
@@ -165,24 +187,28 @@ function BasicHandlingInput({
         }
 
         onFieldCreatePress && onFieldCreatePress();
+        console.log(formValues.notes);
         realm.create("BasicHandlingRule", {
           minMTOW: Number(formValues.minMTOW),
           maxMTOW: Number(formValues.maxMTOW),
           pricePerLeg: Number(formValues.pricePerLeg),
+          notes: formValues.notes,
         });
         setScope("view");
       });
   };
 
   const handleRuleEdit = () => {
-    for (let fee of fees) {
-      realm.write(() => {
+    realm.write(() => {
+      for (let fee of fees) {
         if (compareBasicHandlingFees(fee, formValues)) {
           fee.pricePerLeg = Number(formValues.pricePerLeg);
+          fee.notes = formValues.notes;
+          console.log("editing fee", formValues);
           return;
         }
-      });
-    }
+      }
+    });
 
     onFieldUpdatePress && onFieldUpdatePress();
   };
@@ -307,6 +333,30 @@ function BasicHandlingInput({
           </>
         )}
       />
+      <Controller
+        control={control}
+        name="notes"
+        rules={{
+          required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+        }}
+        render={({ field: { onBlur, onChange, value } }) => (
+          <>
+            <TextInput
+              label="Notes:"
+              style={styles.input}
+              value={value}
+              disabled={alreadyExistingRule && scope !== "edit"}
+              onBlur={onBlur}
+              onChangeText={(text) => onChange(text)}
+              error={errors.notes && true}
+              multiline={true}
+              maxLength={250}
+              numberOfLines={5} // Optional: Set the number of lines to display
+            />
+            <HelperText type="error">{errors.notes?.message}</HelperText>
+          </>
+        )}
+      />
       <View
         style={{
           justifyContent: "space-between",
@@ -353,6 +403,7 @@ const compareBasicHandlingFees = (
     Number(maxMTOW) === Number(compareFee.maxMTOW)
   );
 };
+
 export default Form;
 
 const styles = StyleSheet.create({

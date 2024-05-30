@@ -127,7 +127,7 @@ function RootLayoutNav() {
       if (!basicHandlingFees?.length) {
         realmWithoutSync.write(() => {
           DefaultBasicHandlingFees.forEach((fee) => {
-            realmWithoutSync.create("BasicHandlingRule", { ...fee });
+            realmWithoutSync.create("BasicHandlingRule", { ...fee, notes: "" });
           });
         });
       }

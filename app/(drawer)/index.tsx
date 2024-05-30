@@ -69,9 +69,9 @@ export default function Page() {
             )
           ).map(([date, flights], index) => {
             return (
-              <View style={{ marginVertical: 15 }}>
+              <View key={date + index} style={{ marginVertical: 15 }}>
                 <FlightSection
-                  key={date + index}
+                  key={date}
                   dateString={
                     dayjs(date)?.isToday()
                       ? "Today"

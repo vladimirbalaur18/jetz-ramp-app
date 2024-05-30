@@ -122,9 +122,10 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
               >
                 {fieldsArray
                   ?.filter(([label, value, display]) => display !== false)
-                  .map(([label, value]) => {
+                  .map(([label, value], i) => {
                     return (
                       <Text
+                        key={i}
                         variant="bodySmall"
                         style={{
                           color: theme.colors.onSurfaceVariant,

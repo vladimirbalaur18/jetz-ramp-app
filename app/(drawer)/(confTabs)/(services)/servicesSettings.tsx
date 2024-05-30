@@ -65,9 +65,9 @@ const Form: React.FC = () => {
         contentContainerStyle={styles.container}
         alwaysBounceVertical={false}
       >
-        {serviceCategories.map((s) => {
+        {serviceCategories.map((s, i) => {
           return (
-            <View>
+            <View key={i}>
               <SectionTitle>{s.categoryName}</SectionTitle>
               {s.services.map((service) => {
                 return (
