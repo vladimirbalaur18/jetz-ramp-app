@@ -101,6 +101,8 @@ const Form: React.FC = () => {
         realm.create<IFlight>("Flight", {
           ...data,
           chargeNote: realm.create<IChargeNoteDetails>("ChargeNoteDetails", {
+            paymentType: data.chargeNote.paymentType,
+            billingTo: data.chargeNote.billingTo,
             currency: realm.create<ICurrencyRates>("CurrencyRates", {
               date: data.chargeNote.currency.date,
               usdToMDL: data.chargeNote.currency.usdToMDL,
@@ -129,6 +131,9 @@ const Form: React.FC = () => {
         realmExistingFlight.chargeNote.currency.usdToMDL =
           data.chargeNote.currency.usdToMDL;
         realmExistingFlight.crew = data?.crew;
+        realmExistingFlight.chargeNote.paymentType =
+          data?.chargeNote.paymentType;
+        realmExistingFlight.chargeNote.billingTo = data.chargeNote.billingTo;
         realmExistingFlight.departure = data?.departure;
         realmExistingFlight.flightNumber = data?.flightNumber;
         realmExistingFlight.handlingType = data?.handlingType;
@@ -409,6 +414,55 @@ const Form: React.FC = () => {
                 error={errors.mtow && true}
               />
               <HelperText type="error">{errors.mtow?.message}</HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.paymentType"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Payment type:"
+                style={formStyles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.from && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.from?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.billingTo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Billing to:"
+                style={{ ...formStyles.input }}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.billingTo && true}
+                multiline={true}
+                maxLength={250}
+                numberOfLines={5} // Optional: Set the number of lines to display
+              />
+              <HelperText type="error">
+                {errors?.chargeNote?.billingTo?.message}
+              </HelperText>
             </>
           )}
         />
