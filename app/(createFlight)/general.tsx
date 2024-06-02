@@ -11,6 +11,11 @@ import {
 } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
+import {
+  Autocomplete,
+  FlatDropdown,
+  ModalDropdown,
+} from "@telenko/react-native-paper-autocomplete";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +37,7 @@ import { useQuery, useRealm } from "@realm/react";
 import uuid from "react-uuid";
 import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
 import { ICurrencyRates } from "@/models/CurrencyRates";
+import { IBillingOperator } from "@/models/billingOperators";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -50,7 +56,14 @@ const Form: React.FC = () => {
   console.log("existingFlightJSON", existingFlightJSON);
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
+  const [
+    handleOperatorNameDropdownVisible,
+    setHandleOperatorNameDropdownVisible,
+  ] = useState(false);
   const dispatch = useDispatch();
+
+  const operatorBillingInformations =
+    useQuery<IBillingOperator>("BillingOperator");
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
     mode: "onChange",
@@ -74,27 +87,12 @@ const Form: React.FC = () => {
     },
   });
   const { errors } = formState;
+  const [id, setId] = useState("");
+
   const realm = useRealm();
   const allFlight = useQuery<IFlight>("Flight");
   console.log("allFlight", allFlight);
   const submit = (data: IFlight) => {
-    //nullyfy services if we update new data
-
-    //OLD REDUX LOGIC
-    // if (existingFlight) {
-    //   if (!_.isEqual(existingFlight, data)) {
-    //     dispatch(
-    //       updateFlight({
-    //         ...data,
-    //         providedServices: null as unknown as IProvidedServices,
-    //       })
-    //     );
-    //   }
-    // } else {
-    //   alert("creating a flight");
-    //   dispatch(createFlight(data));
-    // }
-
     if (!realmExistingFlight) {
       realm.write(() => {
         const newFlightId = uuid();
@@ -114,7 +112,6 @@ const Form: React.FC = () => {
         dispatch(setCurrentFlightById(newFlightId));
       });
     } else {
-      console.log("from db, existing flight");
       if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
         realm.write(
           () =>
@@ -209,13 +206,42 @@ const Form: React.FC = () => {
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
-              <TextInput
+              {/* <TextInput
                 label="Operator Name"
                 style={styles.input}
                 value={value}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 error={errors.operatorName && true}
+              /> */}
+              {/* <DropDown
+                label={"Operator name"}
+                mode={"outlined"}
+                visible={handleOperatorNameDropdownVisible}
+                showDropDown={() => setHandleOperatorNameDropdownVisible(true)}
+                onDismiss={() => setHandleOperatorNameDropdownVisible(false)}
+                value={value}
+                setValue={(value) => {
+                  onChange(value);
+                }}
+                list={(
+                  operatorBillingInformations.toJSON() as IBillingOperator[]
+                ).map((o) => ({
+                  label: o.operatorName,
+                  value: o.operatorName,
+                }))}
+              /> */}
+              <Autocomplete
+                multiple={false}
+                value={value}
+                inputLabel={"Operator Name"}
+                onChange={(v) => onChange(v)}
+                options={(
+                  operatorBillingInformations.toJSON() as IBillingOperator[]
+                ).map((o) => ({
+                  label: o.operatorName,
+                  value: o.operatorName,
+                }))}
               />
               <HelperText type="error">
                 {errors.operatorName?.message}

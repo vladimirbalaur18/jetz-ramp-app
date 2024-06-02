@@ -86,6 +86,22 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="billingOperators"
+        options={{
+          title: "Operators",
+          headerShown: true,
+          tabBarIcon: ({ focused }) => (
+            <FontAwesome6
+              name="file-invoice"
+              size={24}
+              color={
+                focused ? iconColor.colors.primary : iconColor.colors.secondary
+              }
+            />
+          ),
+        }}
+      />
     </Tabs>
   ) : (
     <Redirect href={"/autorize"} />

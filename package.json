@@ -19,6 +19,7 @@
     "@react-navigation/native": "^6.0.2",
     "@realm/react": "^0.6.2",
     "@reduxjs/toolkit": "^2.2.1",
+    "@telenko/react-native-paper-autocomplete": "^1.0.3",
     "dayjs": "^1.11.10",
     "deepmerge": "^4.3.1",
     "expo": "~50.0.8",

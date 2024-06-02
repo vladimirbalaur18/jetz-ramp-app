@@ -25,6 +25,7 @@ import { AppData } from "./models/AppData";
 import { AirportFeeDefinition } from "./models/AirportFeeDefinition";
 import { AirportFees } from "./models/AirportFees";
 import { FeeQuota } from "./models/FeeQuota";
+import { BillingOperator } from "./models/billingOperators";
 
 export const realmConfig: Realm.Configuration = {
   schema: [
@@ -57,6 +58,7 @@ export const realmConfig: Realm.Configuration = {
     AirportFeeDefinition,
     AirportFees,
     FeeQuota,
+    BillingOperator,
   ],
 };
 
