@@ -111,7 +111,6 @@ export const OperatorInput: React.FC<IOperatorInput> = ({
                 value={String(value)}
                 disabled={scope === "view"}
                 onBlur={onBlur}
-                keyboardType="numeric"
                 onChangeText={(text) => onChange(text)}
                 error={errors.operatorName && true}
               />

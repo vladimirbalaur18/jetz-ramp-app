@@ -1,0 +1,40 @@
+{
+  "name": "@telenko/react-native-paper-autocomplete",
+  "version": "1.0.3",
+  "description": "Customizable components to organize autocomplete functionality based on react-native-paper components",
+  "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telenko/react-native-paper-autocomplete.git"
+  },
+  "keywords": [
+    "react-native",
+    "react-native-paper",
+    "material",
+    "autocomplete"
+  ],
+  "author": "Andrii Telenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/telenko/react-native-paper-autocomplete/issues"
+  },
+  "homepage": "https://github.com/telenko/react-native-paper-autocomplete#readme",
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "peerDependencies": {
+    "@expo/vector-icons": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-paper": "*"
+  },
+  "devDependencies": {
+    "@types/react": "~16.9.35",
+    "@types/react-native": "~0.63.2",
+    "typescript": "~4.0.0",
+    "@expo/vector-icons": "^12.0.4",
+    "react": "^16.13.1",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native-paper": "^4.7.2"
+  }
+}

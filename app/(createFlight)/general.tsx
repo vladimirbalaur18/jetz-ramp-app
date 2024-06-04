@@ -15,15 +15,11 @@ import {
   Autocomplete,
   FlatDropdown,
   ModalDropdown,
-} from "@telenko/react-native-paper-autocomplete";
+} from "@/dependency/@telenko/react-native-paper-autocomplete";
 import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  createFlight,
-  setCurrentFlightById,
-  updateFlight,
-} from "@/redux/slices/flightsSlice";
+import { setCurrentFlightById } from "@/redux/slices/flightsSlice";
 import { RootState } from "@/redux/store";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
@@ -56,16 +52,8 @@ const Form: React.FC = () => {
   console.log("existingFlightJSON", existingFlightJSON);
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
-  const [
-    handleOperatorNameDropdownVisible,
-    setHandleOperatorNameDropdownVisible,
-  ] = useState(false);
-  const dispatch = useDispatch();
 
-  const operatorBillingInformations =
-    useQuery<IBillingOperator>("BillingOperator");
-
-  const { control, formState, handleSubmit, getValues } = useForm<FormData>({
+  const { control, formState, handleSubmit, setValue } = useForm<FormData>({
     mode: "onChange",
     defaultValues: existingFlightJSON || {
       aircraftRegistration: "LY-TBA",
@@ -86,8 +74,20 @@ const Form: React.FC = () => {
       },
     },
   });
+  const dispatch = useDispatch();
+
+  const operatorBillingInformations =
+    useQuery<IBillingOperator>("BillingOperator");
+
+  const handleOperatorNameOptionSelect = (v: string) => {
+    for (let operatorBill of operatorBillingInformations.toJSON() as IBillingOperator[]) {
+      if (v === operatorBill.operatorName) {
+        setValue("chargeNote.billingTo", operatorBill.billingInfo);
+      }
+    }
+  };
+
   const { errors } = formState;
-  const [id, setId] = useState("");
 
   const realm = useRealm();
   const allFlight = useQuery<IFlight>("Flight");
@@ -234,8 +234,13 @@ const Form: React.FC = () => {
               <Autocomplete
                 multiple={false}
                 value={value}
+                defaultValue={value}
                 inputLabel={"Operator Name"}
-                onChange={(v) => onChange(v)}
+                onChange={(v) => {
+                  handleOperatorNameOptionSelect(v);
+                  onChange(v);
+                }}
+                onChangeText={(v) => onChange(v)}
                 options={(
                   operatorBillingInformations.toJSON() as IBillingOperator[]
                 ).map((o) => ({
@@ -329,13 +334,19 @@ const Form: React.FC = () => {
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
-              <TextInput
-                label="Ordering company name"
-                style={styles.input}
+              <Autocomplete
+                multiple={false}
                 value={value}
-                onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
-                error={errors.orderingCompanyName && true}
+                defaultValue={value}
+                inputLabel={"Ordering company name"}
+                onChange={(v) => onChange(v)}
+                onChangeText={(v) => onChange(v)}
+                options={(
+                  operatorBillingInformations.toJSON() as IBillingOperator[]
+                ).map((o) => ({
+                  label: o.operatorName,
+                  value: o.operatorName,
+                }))}
               />
               <HelperText type="error">
                 {errors.orderingCompanyName?.message}
