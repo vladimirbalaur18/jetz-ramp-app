@@ -1,10 +1,11 @@
 import { View, FlatList, StyleSheet } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "react-native-paper";
+import { Button, Divider, Searchbar } from "react-native-paper";
 import { IBillingOperator } from "@/models/billingOperators";
 import { useQuery, useRealm } from "@realm/react";
 import { ObjectId } from "bson";
 import { IOperatorInput, OperatorInput } from "@/components/OperatorInput";
+import { IFlight } from "@/models/Flight";
 
 //issue: create button disappears when adding more than 2
 const BillingOperators = () => {
@@ -14,6 +15,7 @@ const BillingOperators = () => {
   const scrollToBottom = () => {
     flatListRef?.current.scrollToEnd({ animated: true });
   };
+  const allFlightsData = useQuery<IFlight>("Flight");
   const [data, setData] = useState<Array<IOperatorInput>>([]);
 
   const [isPendingItemCreate, setIsPendingItemCreate] = useState(false);
@@ -41,6 +43,17 @@ const BillingOperators = () => {
 
       if (updatedField) {
         console.log("updating field");
+
+        for (let flight of allFlightsData) {
+          if (flight.operatorName === updatedField.operatorName) {
+            flight.operatorName = operatorName;
+            flight.chargeNote.billingTo = billingInfo;
+          }
+
+          if (flight.orderingCompanyName === updatedField.operatorName) {
+            flight.orderingCompanyName = operatorName;
+          }
+        }
         updatedField.billingInfo = billingInfo;
         updatedField.operatorName = operatorName;
       } else {
@@ -118,12 +131,30 @@ const BillingOperators = () => {
       </Button>
     </View>
   );
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   return (
     <View>
+      <Searchbar
+        style={{ marginHorizontal: 30, marginVertical: 15 }}
+        placeholder="Search"
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+      />
+      <Divider />
       <FlatList
         ref={flatListRef}
-        data={[...data]}
+        data={
+          searchQuery.length
+            ? [
+                ...data.filter((item) =>
+                  item.operatorName
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
+                ),
+              ]
+            : [...data]
+        }
         renderItem={renderItem}
         keyExtractor={(item, index) => item.id.toString()}
         contentContainerStyle={styles.container}
