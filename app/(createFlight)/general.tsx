@@ -101,6 +101,9 @@ const Form: React.FC = () => {
           chargeNote: realm.create<IChargeNoteDetails>("ChargeNoteDetails", {
             paymentType: data.chargeNote.paymentType,
             billingTo: data.chargeNote.billingTo,
+            disbursementPercentage: Number(
+              data.chargeNote.disbursementPercentage
+            ),
             currency: realm.create<ICurrencyRates>("CurrencyRates", {
               date: data.chargeNote.currency.date,
               usdToMDL: data.chargeNote.currency.usdToMDL,
@@ -547,6 +550,30 @@ const Form: React.FC = () => {
               />
               <HelperText type="error">
                 {errors.chargeNote?.currency?.usdToMDL?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue={10}
+          name="chargeNote.disbursementPercentage"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Disbursement percentage:"
+                style={styles.input}
+                value={String(value)}
+                inputMode="numeric"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.disbursementPercentage && true}
+              />
+              <HelperText type="error">
+                {errors?.chargeNote?.disbursementPercentage?.message}
               </HelperText>
             </>
           )}

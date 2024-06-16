@@ -130,7 +130,7 @@ export const OperatorInput: React.FC<IOperatorInput> = ({
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
-                label="Billinf information"
+                label="Billing information"
                 style={styles.input}
                 disabled={scope === "view"}
                 value={String(value)}

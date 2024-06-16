@@ -69,6 +69,8 @@ const Form: React.FC = () => {
   const router = useRouter();
   const basicHandlingPricePerLegs =
     existingFlight && getBasicHandlingPrice({ ...existingFlight });
+  const disbursementPercentage =
+    existingFlight.chargeNote.disbursementPercentage;
 
   const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
 
@@ -176,7 +178,7 @@ const Form: React.FC = () => {
   }, []);
   //disbursement calculation
   useEffect(() => {
-    const disbursementFeeMultplier = general?.disbursementPercentage / 100;
+    const disbursementFeeMultplier = disbursementPercentage / 100;
     const disbursementFees = {
       airportFee:
         (providedServicesObj?.supportServices.airportFee.total || 0) *
@@ -227,21 +229,6 @@ const Form: React.FC = () => {
 
   // HELPERS
   const submit = (data: IFlight) => {
-    // dispatch(
-    //   updateFlight({
-    //     ...existingFlight,
-    //     providedServices: {
-    //       ...data.providedServices,
-    //       basicHandling: {
-    //         total: data?.providedServices?.basicHandling?.total,
-    //         isPriceOverriden:
-    // data?.providedServices?.basicHandling?.total !==
-    //   existingFlight?.providedServices?.basicHandling?.total,
-    //       },
-    //     },
-    //   })
-    // );
-
     console.log("providedServicesSubmit", data);
     console.log("services", data.providedServices?.otherServices);
 
@@ -306,24 +293,6 @@ const Form: React.FC = () => {
               totalPriceOverride: Number(s.totalPriceOverride),
             });
           }),
-          // ?.map((s) => {
-          //   return realm.create<ServiceCategorySchema>("Services", {
-          //     serviceCategoryName: s.serviceCategoryName,
-          //     services: s.services.map((_service) => {
-          //       return realm.create<IService>("Service", {
-          //         serviceName: _service.serviceName,
-          //         hasVAT: _service.hasVAT,
-          //         isDisbursed: _service.isDisbursed,
-          //         isPriceOverriden: _service.isPriceOverriden,
-          //         isUsed: _service.isUsed,
-          //         notes: _service.notes,
-          //         pricing: _service.pricing,
-          //         quantity: _service.quantity,
-          //         totalPriceOverride: _service.totalPriceOverride,
-          //       });
-          //     }),
-          //   });
-          // })
         }
       );
       console.log("pushind provided services", providedServices);

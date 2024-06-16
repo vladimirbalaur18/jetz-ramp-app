@@ -7,6 +7,7 @@ export type IChargeNoteDetails = {
   remarks: string;
   paymentType: string;
   currency: ICurrencyRates;
+  disbursementPercentage:number;
 };
 
 export class ChargeNoteDetails extends Realm.Object<IChargeNoteDetails> {
@@ -15,6 +16,7 @@ export class ChargeNoteDetails extends Realm.Object<IChargeNoteDetails> {
   remarks!: string;
   paymentType!: string;
   currency!: ICurrencyRates;
+  disursedPercentage!:number;
 
   static schema: ObjectSchema = {
     name: "ChargeNoteDetails",
@@ -23,6 +25,7 @@ export class ChargeNoteDetails extends Realm.Object<IChargeNoteDetails> {
       billingTo: "string?",
       remarks: "string?",
       paymentType: "string?",
+      disbursementPercentage:"int",
       currency: {
         type: "object",
         objectType: "CurrencyRates",

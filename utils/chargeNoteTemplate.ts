@@ -112,6 +112,9 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     }
   });
 
+    const disbursementPercentage =
+    flight.chargeNote.disbursementPercentage;
+
   const VIPTerminalPrice = getLoungeFeePrice({
     ...flight?.providedServices?.VIPLoungeServices,
   }).amount;
@@ -2691,7 +2694,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl155" style="border-top:none">${
-    config.disbursementPercentage
+    disbursementPercentage
   }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
@@ -2706,7 +2709,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl155" style="border-top:none">${
-    config.disbursementPercentage
+    disbursementPercentage
   }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
@@ -2721,7 +2724,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl155" style="border-top:none">${
-    config.disbursementPercentage
+   disbursementPercentage
   }%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
@@ -2736,7 +2739,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl157" style="border-top:none">${
-    config.disbursementPercentage
+   disbursementPercentage
   }%</td>
   <td class="xl158" style="border-top:none">&nbsp;</td>
   <td class="xl159" style="border-top:none">&nbsp;</td>
@@ -2749,7 +2752,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">Express/VIP
   Terminal</td>
   <td class="xl157" style="border-top:none">${
-    config.disbursementPercentage
+    disbursementPercentage
   }%</td>
   <td class="xl160" style="border-top:none">&nbsp;</td>
   <td class="xl161" style="border-top:none">&nbsp;</td>

@@ -26,39 +26,6 @@ const Form: React.FC = () => {
   });
   const { errors } = formState;
 
-  const submit = (data: FormData) => {
-    // try {
-    //   realm.write(() => {
-    //     if (configs) {
-    //       configs.VAT = Number(data.VAT);
-    //       configs.disbursementPercentage = Number(data.disbursementPercentage);
-    //       configs.defaultAirport = String(data.defaultAirport);
-    //     } else {
-    //       realm.create("General", {
-    //         VAT: Number(data.VAT),
-    //         disbursementPercentage: Number(data.disbursementPercentage),
-    //         defaultAirport: String(data.defaultAirport),
-    //       });
-    //     }
-    //     if (fuelFee) {
-    //       const isPriceDifferent =
-    //         Number(data?.priceUSDperKG) !== Number(fuelFee?.priceUSDperKG);
-    //       fuelFee.priceUSDperKG = Number(data.priceUSDperKG);
-    //       fuelFee.lastUpdated = isPriceDifferent
-    //         ? new Date()
-    //         : fuelFee.lastUpdated;
-    //     } else {
-    //       realm.create("FuelFees", {
-    //         priceUSDperKG: Number(data.priceUSDperKG),
-    //         lastUpdated: new Date(),
-    //       });
-    //     }
-    //   });
-    // } catch (err) {
-    //   console.warn(err);
-    // }
-  };
-
   return (
     <SafeAreaView>
       <ScrollView

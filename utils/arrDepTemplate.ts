@@ -1585,7 +1585,11 @@ td{
     <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">PAX No.</td>
     <td colspan="3" class="xl80" style="border-right:1.0pt solid black;border-left:
-    none"></td>
+    none">${
+      handlingType === "Departure"
+        ? Number(departure?.adultCount) + Number(departure?.minorCount)
+        : Number(arrival?.adultCount) + Number(arrival?.minorCount)
+    }</td>
    </tr>
    <tr height="19" style="height:14.4pt">
     <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;

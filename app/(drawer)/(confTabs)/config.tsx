@@ -35,12 +35,10 @@ const Form: React.FC = () => {
       realm.write(() => {
         if (configs) {
           configs.VAT = Number(data.VAT);
-          configs.disbursementPercentage = Number(data.disbursementPercentage);
           configs.defaultAirport = String(data.defaultAirport);
         } else {
           realm.create("General", {
             VAT: Number(data.VAT),
-            disbursementPercentage: Number(data.disbursementPercentage),
             defaultAirport: String(data.defaultAirport),
           });
         }
@@ -96,30 +94,7 @@ const Form: React.FC = () => {
             </>
           )}
         />
-        <Controller
-          control={control}
-          defaultValue={0}
-          name="disbursementPercentage"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <TextInput
-                label="Disbursement percentage:"
-                style={styles.input}
-                value={String(value)}
-                inputMode="numeric"
-                onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
-                error={errors?.disbursementPercentage && true}
-              />
-              <HelperText type="error">
-                {errors?.disbursementPercentage?.message}
-              </HelperText>
-            </>
-          )}
-        />
+
         <Controller
           control={control}
           defaultValue=""
