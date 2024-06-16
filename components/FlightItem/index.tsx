@@ -66,6 +66,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
   const fieldsArray: Array<Field> = [
     ["ROUTE:", <>{parseRouteString() || "N/A"}</>],
     ["FLIGHT NUMBER:", <>{flight?.flightNumber}</>],
+    ["OPERATOR:", <>{flight?.operatorName}</>],
     [
       "ETA:",
       <>

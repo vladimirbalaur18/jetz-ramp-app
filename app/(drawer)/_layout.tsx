@@ -16,17 +16,17 @@ export default function Layout() {
       <Drawer screenOptions={!config ? { headerLeft: () => null } : undefined}>
         <Drawer.Screen
           name="index" // This is the name of the page and must match the url from root
-          options={{
-            drawerLabel: "Home",
-            title: "Active flights",
-            drawerIcon: () => (
-              <MaterialCommunityIcons
-                name="airport"
-                size={24}
-                color={iconColor}
-              />
-            ),
-          }}
+          // options={{
+          //   drawerLabel: "Home",
+          //   title: "Active flights",
+          //   drawerIcon: () => (
+          //     <MaterialCommunityIcons
+          //       name="airport"
+          //       size={24}
+          //       color={iconColor}
+          //     />
+          //   ),
+          // }}
         />
         <Drawer.Screen
           name="completedFlights" // This is the name of the page and must match the url from root
