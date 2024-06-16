@@ -6,6 +6,8 @@ import { Controller, useForm } from "react-hook-form";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import { useAuthContext } from "@/context/authContext";
 import { router } from "expo-router";
+import { JetzSvg } from "@/components/JetzSVG";
+import { useTheme } from "@react-navigation/native";
 
 type FormData = {
   password: string;
@@ -16,6 +18,7 @@ const Page = () => {
       mode: "onChange",
     });
   const { login } = useAuthContext();
+  const iconColor = useTheme().colors.text;
 
   const submit = (data: FormData) => {
     login(data.password)
@@ -42,6 +45,9 @@ const Page = () => {
           }}
         >
           <View>
+            <View style={{ alignSelf: "center" }}>
+              <JetzSvg color={iconColor} />
+            </View>
             <Text variant="headlineSmall">
               Insert master password to access configurations
             </Text>

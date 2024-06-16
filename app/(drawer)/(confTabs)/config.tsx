@@ -1,6 +1,11 @@
 import { useSnackbar } from "@/context/snackbarContext";
 import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
+import {
+  DepartureArrival,
+  IDepartureArrival,
+  ILoungeFee,
+} from "@/models/LoungeFees";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
 import { useQuery, useRealm } from "@realm/react";
@@ -11,13 +16,18 @@ import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 
-type FormData = GeneralConfigState & FuelFeesState;
+type FormData = GeneralConfigState & FuelFeesState & ILoungeFee;
 const Form: React.FC = () => {
   const realm = useRealm();
   const router = useRouter();
 
   let [configs] = useQuery<GeneralConfigState>("General");
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
+  let [loungeFee] = useQuery<ILoungeFee>("LoungeFees");
+
+  const loungeFeeJSON = loungeFee?.toJSON() as ILoungeFee;
+
+  console.log("loungeFee JSON", loungeFeeJSON);
 
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
@@ -26,6 +36,8 @@ const Form: React.FC = () => {
       VAT: configs?.VAT,
       defaultAirport: configs?.defaultAirport,
       priceUSDperKG: fuelFee?.priceUSDperKG,
+      arrival: loungeFeeJSON?.arrival,
+      departure: loungeFeeJSON?.departure,
     },
   });
   const { errors } = formState;
@@ -40,6 +52,48 @@ const Form: React.FC = () => {
           realm.create("General", {
             VAT: Number(data.VAT),
             defaultAirport: String(data.defaultAirport),
+          });
+        }
+
+        if (loungeFee) {
+          console.log(JSON.stringify(data, null, 4));
+
+          loungeFee.arrival.pricePerAdult.amount = Number(
+            data.arrival.pricePerAdult.amount
+          );
+          loungeFee.arrival.pricePerMinor.amount = Number(
+            data.arrival.pricePerMinor.amount
+          );
+
+          loungeFee.departure.pricePerAdult.amount = Number(
+            data.departure.pricePerAdult.amount
+          );
+          loungeFee.departure.pricePerMinor.amount = Number(
+            data.departure.pricePerMinor.amount
+          );
+        } else {
+          console.log(JSON.stringify(data, null, 4));
+          realm.create<ILoungeFee>("LoungeFees", {
+            arrival: new DepartureArrival(realm, {
+              pricePerAdult: {
+                currency: "MDL",
+                amount: Number(data.arrival.pricePerAdult.amount),
+              },
+              pricePerMinor: {
+                currency: "MDL",
+                amount: Number(data.arrival.pricePerMinor.amount),
+              },
+            }),
+            departure: new DepartureArrival(realm, {
+              pricePerAdult: {
+                currency: "MDL",
+                amount: Number(data.departure.pricePerAdult.amount),
+              },
+              pricePerMinor: {
+                currency: "MDL",
+                amount: Number(data.departure.pricePerMinor.amount),
+              },
+            }),
           });
         }
 
@@ -156,7 +210,107 @@ const Form: React.FC = () => {
             </>
           )}
         />
-
+        <View style={styles.row}>
+          <Text variant="headlineSmall">VIP Lounge fees:</Text>
+        </View>
+        <View style={styles.row}>
+          <Text variant="bodyMedium">Arrival:</Text>
+        </View>
+        <Controller
+          control={control}
+          name="arrival.pricePerAdult.amount"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Price per adult (MDL)"
+                style={styles.input}
+                value={String(value)}
+                keyboardType="numeric"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.pricePerAdult?.amount && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.pricePerAdult?.amount?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          name="arrival.pricePerMinor.amount"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Price per minor (MDL)"
+                style={styles.input}
+                value={String(value)}
+                keyboardType="numeric"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.pricePerMinor?.amount && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.pricePerMinor?.amount?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <View style={styles.row}>
+          <Text variant="bodyMedium">Departure:</Text>
+        </View>
+        <Controller
+          control={control}
+          name="departure.pricePerAdult.amount"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Price per adult (MDL)"
+                style={styles.input}
+                value={String(value)}
+                keyboardType="numeric"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.departure?.pricePerAdult?.amount && true}
+              />
+              <HelperText type="error">
+                {errors.departure?.pricePerAdult?.amount?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          name="departure.pricePerMinor.amount"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Price per minor (MDL)"
+                style={styles.input}
+                value={String(value)}
+                keyboardType="numeric"
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.departure?.pricePerMinor?.amount && true}
+              />
+              <HelperText type="error">
+                {errors.departure?.pricePerMinor?.amount?.message}
+              </HelperText>
+            </>
+          )}
+        />
         <Button
           mode="contained"
           onPress={handleSubmit(submit)}

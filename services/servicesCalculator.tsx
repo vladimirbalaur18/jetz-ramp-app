@@ -1,4 +1,3 @@
-import loungeFees from "@/configs/loungeFees.json";
 import serviceDefinitions from "@/configs/serviceDefinitions.json";
 import { IBasicHandlingRule } from "@/models/BasicHandlingRule";
 import { GeneralConfigState } from "@/models/Config";
@@ -16,6 +15,7 @@ import {
   getTakeOffFees,
 } from "./AirportFeesManager";
 import { applyVAT, getVATMultiplier } from "./AirportFeesManager/utils";
+import { ILoungeFee } from "@/models/LoungeFees";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -114,8 +114,7 @@ export const getLoungeFeePrice = ({
   adultPax = 0,
   typeOf = "",
 }) => {
-  const [general] = realmWithoutSync.objects<GeneralConfigState>("General");
-  const VATMultiplier = general.VAT / 100 + 1;
+  const [loungeFees] = realmWithoutSync.objects<ILoungeFee>("LoungeFees");
   let result = 0;
   switch (typeOf) {
     case "Departure": {

@@ -2,10 +2,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useColorScheme } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
+import { JetzSvg } from "@/components/JetzSVG";
 
 export default function Layout() {
   const themeStyle = useColorScheme();
@@ -16,17 +17,17 @@ export default function Layout() {
       <Drawer screenOptions={!config ? { headerLeft: () => null } : undefined}>
         <Drawer.Screen
           name="index" // This is the name of the page and must match the url from root
-          // options={{
-          //   drawerLabel: "Home",
-          //   title: "Active flights",
-          //   drawerIcon: () => (
-          //     <MaterialCommunityIcons
-          //       name="airport"
-          //       size={24}
-          //       color={iconColor}
-          //     />
-          //   ),
-          // }}
+          options={{
+            // drawerLabel: "Home",
+            title: "Active flights",
+            drawerIcon: () => (
+              <MaterialCommunityIcons
+                name="airport"
+                size={24}
+                color={iconColor}
+              />
+            ),
+          }}
         />
         <Drawer.Screen
           name="completedFlights" // This is the name of the page and must match the url from root
@@ -54,6 +55,7 @@ export default function Layout() {
             ),
           }}
         />
+
         {/* <Drawer.Screen
           name="user/[id]" // This is the name of the page and must match the url from root
           options={{

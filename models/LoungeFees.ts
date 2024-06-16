@@ -1,5 +1,15 @@
 import Realm, { ObjectSchema } from "realm";
 
+export type IPrice = {
+  amount: number;
+  currency: string;
+}
+
+export type IDepartureArrival  ={
+  pricePerAdult: Price;
+  pricePerMinor: Price;
+}
+
 export class DepartureArrival extends Realm.Object {
   pricePerAdult!: Price;
   pricePerMinor!: Price;
@@ -7,8 +17,14 @@ export class DepartureArrival extends Realm.Object {
     name: "DepartureArrival",
     properties: {
       pricePerAdult: { type: "object", objectType: "Price" },
+      pricePerMinor: { type: "object", objectType: "Price" },
     },
   };
+}
+
+export type ILoungeFee = {
+  departure: IDepartureArrival;
+  arrival: IDepartureArrival;
 }
 export class LoungeFee extends Realm.Object {
   departure!: DepartureArrival;

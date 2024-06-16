@@ -60,8 +60,8 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
               ref={signatureRef}
               containerStyle={{
                 backgroundColor: "rgba(255,255,255,0.0001)",
-                height: 300,
-                width: 800,
+                height: 100,
+                width: 600,
               }}
               rewind={(undo: any) => console.log("undo", undo)}
               clear={(clear: any) => console.log("clear", clear)}
@@ -75,8 +75,8 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
               <ImageBackground
                 style={{
                   flex: 1, // This makes the ImageBackground take up the full space of the container
-                  width: 400,
-                  height: 160,
+                  width: 600,
+                  height: 200,
                   justifyContent: "center", // Center the content vertically
                   alignItems: "center", // Center the content horizontally
                 }}

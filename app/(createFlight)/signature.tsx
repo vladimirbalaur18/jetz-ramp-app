@@ -1,5 +1,6 @@
 import DrawSignatureScreen from "@/components/DrawSignatureScreen";
 import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { JetzSvg } from "@/components/JetzSVG";
 import { IFlight } from "@/models/Flight";
 import { PersonNameSignature } from "@/models/PersonNameSignature";
 import { RampAgent } from "@/models/RampAgentName";
@@ -9,6 +10,7 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useTheme } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
@@ -26,6 +28,8 @@ const SignaturePage = () => {
   if (!currentFlightId) throw new Error("No current flight ID");
 
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
+  const iconColor = useTheme().colors.text;
+
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IFlight>({
@@ -68,11 +72,13 @@ const SignaturePage = () => {
     </View>
   );
   return (
-    <ScrollView contentContainerStyle={{ ...formStyles.container, flex: 1 }}>
+    <ScrollView contentContainerStyle={{ ...formStyles.container }}>
       <Stack.Screen
         options={{ headerRight: () => <_GenerateInvoiceButton /> }}
       />
-
+      <View style={{ alignSelf: "center" }}>
+        <JetzSvg width={110} height={100} color={iconColor} />
+      </View>
       <View style={{ ...styles.signatureContainer }}>
         <SectionTitle>Ramp agent signature:</SectionTitle>
         <Controller

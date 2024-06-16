@@ -49,23 +49,7 @@ const Form: React.FC = () => {
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onChange",
-      defaultValues: _existingFlight?.toJSON().arrival
-        ? { ..._existingFlight?.toJSON() }
-        : {
-            ..._existingFlight?.toJSON(),
-            arrival: {
-              arrivalTime: { hours: 10, minutes: 12 },
-              arrivalDate: new Date(),
-              from: "LUKK",
-              adultCount: 1,
-              minorCount: 2,
-              rampInspectionBeforeArrival: {
-                status: true,
-                FOD: true,
-                agent: { fullname: "Costea" },
-              },
-            },
-          },
+      defaultValues: { ..._existingFlight?.toJSON() },
     });
 
   const adultPassengersCount = watch("arrival.adultCount");
@@ -74,6 +58,7 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: IFlight) => {
+    console.log("yeah", JSON.stringify(data, null, 4));
     // //nullyfy services if we update new data
     // if (_existingFlight) {
     //   if (!_.isEqual(_existingFlight, data)) {
@@ -98,7 +83,7 @@ const Form: React.FC = () => {
         fullname: data.arrival.rampInspectionBeforeArrival.agent.fullname,
       });
       const rampInspection = realm.create<IRampInspection>("RampInspection", {
-        FOD: data.arrival.rampInspectionBeforeArrival.FOD,
+        FOD: !!data.arrival.rampInspectionBeforeArrival.FOD,
         agent: rampAgent,
         status: data.arrival.rampInspectionBeforeArrival.status,
       });
@@ -187,7 +172,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -245,11 +230,17 @@ const Form: React.FC = () => {
                   label="Arrival time:"
                   editable={false}
                   style={{ ...styles.input, flex: 3 }}
-                  value={`${
-                    value.hours < 10 ? "0" + value.hours : value.hours
-                  }:${
-                    value.minutes < 10 ? "0" + value.minutes : value.minutes
-                  }`}
+                  value={
+                    value?.hours && value?.minutes
+                      ? `${
+                          value?.hours < 10 ? "0" + value?.hours : value?.hours
+                        }:${
+                          value?.minutes < 10
+                            ? "0" + value?.minutes
+                            : value?.minutes
+                        }`
+                      : undefined
+                  }
                 />
                 <Button
                   onPress={() => setArrivalTimerVisible(true)}
@@ -294,7 +285,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Adult passenger count"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
                 onChangeText={(text) => onChange(text)}
@@ -322,7 +313,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Minor passenger count"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
                 onChangeText={(text) => onChange(text)}
@@ -353,7 +344,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Ramp agent name"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : ""}
                 onBlur={onBlur}
                 keyboardType="default"
                 onChangeText={(text) => onChange(text)}
@@ -380,7 +371,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -399,7 +390,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>

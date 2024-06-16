@@ -42,30 +42,28 @@ const Form: React.FC = () => {
   const realm = useRealm();
   const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
 
-  const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
-    defaultValues: _existingFlight?.toJSON().departure
-      ? _existingFlight?.toJSON()
-      : {
-          ..._existingFlight?.toJSON(),
-          departure: {
-            departureTime: { hours: 10, minutes: 12 },
-            departureDate: new Date(),
-            to: "LUKK",
-            adultCount: 1,
-            minorCount: 2,
-            rampInspectionBeforeDeparture: {
-              status: true,
-              FOD: true,
-              agent: {
-                fullname: "Costea Andrei",
+  const { control, formState, handleSubmit, getValues, watch } =
+    useForm<FormData>({
+      mode: "onChange",
+      defaultValues: _existingFlight?.toJSON().departure
+        ? _existingFlight?.toJSON()
+        : {
+            ..._existingFlight?.toJSON(),
+            departure: {
+              departureTime: { hours: 0, minutes: 0 },
+              departureDate: new Date(),
+              adultCount: 0,
+              minorCount: 0,
+              rampInspectionBeforeDeparture: {
+                status: false,
+                FOD: false,
               },
             },
           },
-        },
-  });
+    });
   const { errors } = formState;
-
+  const adultPassengersCount = watch("departure.adultCount");
+  const minorPassengersCount = watch("departure.minorCount");
   const submit = (data: IFlight) => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
@@ -90,7 +88,7 @@ const Form: React.FC = () => {
         fullname: data.departure.rampInspectionBeforeDeparture.agent.fullname,
       });
       const rampInspection = realm.create<IRampInspection>("RampInspection", {
-        FOD: data.departure.rampInspectionBeforeDeparture.FOD,
+        FOD: !!data.departure.rampInspectionBeforeDeparture.FOD,
         agent: rampAgent,
         status: data.departure.rampInspectionBeforeDeparture.status,
       });
@@ -136,9 +134,7 @@ const Form: React.FC = () => {
         alwaysBounceVertical={false}
       >
         <View style={styles.row}>
-          <Text variant="headlineSmall">
-            Departure {_existingFlight?.flightId}
-          </Text>
+          <Text variant="headlineSmall">Departure</Text>
         </View>
         <Controller
           control={control}
@@ -176,7 +172,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -237,14 +233,17 @@ const Form: React.FC = () => {
                       editable={false}
                       style={{ ...styles.input, flex: 3 }}
                       value={
-                        value &&
-                        `${
-                          value.hours < 10 ? "0" + value.hours : value.hours
-                        }:${
-                          value.minutes < 10
-                            ? "0" + value.minutes
-                            : value.minutes
-                        }`
+                        value?.hours && value?.minutes
+                          ? `${
+                              value?.hours < 10
+                                ? "0" + value?.hours
+                                : value?.hours
+                            }:${
+                              value?.minutes < 10
+                                ? "0" + value?.minutes
+                                : value?.minutes
+                            }`
+                          : undefined
                       }
                     />
                     <Button
@@ -328,11 +327,17 @@ const Form: React.FC = () => {
                   label="Departure time"
                   editable={false}
                   style={{ ...styles.input, flex: 3 }}
-                  value={`${
-                    value.hours < 10 ? "0" + value.hours : value.hours
-                  }:${
-                    value.minutes < 10 ? "0" + value.minutes : value.minutes
-                  }`}
+                  value={
+                    value?.hours && value?.minutes
+                      ? `${
+                          value?.hours < 10 ? "0" + value?.hours : value?.hours
+                        }:${
+                          value?.minutes < 10
+                            ? "0" + value?.minutes
+                            : value?.minutes
+                        }`
+                      : undefined
+                  }
                 />
                 <Button
                   onPress={() => setDepartureTimerVisible(true)}
@@ -377,10 +382,12 @@ const Form: React.FC = () => {
               <TextInput
                 label="Adult passenger count"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
+                onChangeText={(text) => {
+                  onChange(text);
+                }}
                 error={errors.departure?.adultCount && true}
               />
               <HelperText type="error">
@@ -391,8 +398,8 @@ const Form: React.FC = () => {
         />
         <Controller
           control={control}
-          defaultValue={0}
           name="departure.minorCount"
+          defaultValue={0}
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
@@ -405,10 +412,12 @@ const Form: React.FC = () => {
               <TextInput
                 label="Minor passenger count"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
+                onChangeText={(text) => {
+                  onChange(text);
+                }}
                 error={errors.departure?.minorCount && true}
               />
               <HelperText type="error">
@@ -419,8 +428,7 @@ const Form: React.FC = () => {
         />
         <Text variant="bodyLarge">
           Total passengers:
-          {Number(getValues("departure.adultCount")) +
-            Number(getValues("departure.minorCount"))}
+          {Number(adultPassengersCount) + Number(minorPassengersCount)}
         </Text>
         <View style={styles.row}>
           <Text variant="headlineSmall">Departure ramp agent</Text>
@@ -437,7 +445,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Ramp agent name"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="default"
                 onChangeText={(text) => onChange(text)}
@@ -464,7 +472,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>
@@ -483,7 +491,7 @@ const Form: React.FC = () => {
             render={({ field: { value, onChange } }) => (
               <>
                 <Switch
-                  value={value}
+                  value={value || false}
                   onValueChange={(value) => onChange(value)}
                 />
               </>

@@ -56,20 +56,9 @@ const Form: React.FC = () => {
   const { control, formState, handleSubmit, setValue } = useForm<FormData>({
     mode: "onChange",
     defaultValues: existingFlightJSON || {
-      aircraftRegistration: "LY-TBA",
-      aircraftType: "SFR22",
-      isCommercialFlight: true,
-      parkingPosition: "22",
-      flightNumber: "TY123",
-      operatorName: "OperatorName",
-      orderingCompanyName: "OrderingOperator",
-      scheduleType: FlightSchedule.NonScheduled,
-      mtow: 2417,
       chargeNote: {
         currency: {
           date: new Date(),
-          euroToMDL: "16.24",
-          usdToMDL: "15.34",
         },
       },
     },

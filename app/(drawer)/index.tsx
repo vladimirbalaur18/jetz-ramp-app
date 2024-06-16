@@ -18,6 +18,7 @@ import { IFlight } from "@/models/Flight";
 import { useQuery } from "@realm/react";
 import reverseObjectProperties from "@/utils/reverseObjectKeys";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { JetzSvg } from "@/components/JetzSVG";
 dayjs.extend(isToday);
 
 export default function Page() {

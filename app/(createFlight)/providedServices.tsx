@@ -144,10 +144,6 @@ const Form: React.FC = () => {
           { label: "None", value: "None" },
           { label: "Departure", value: "Departure" },
           { label: "Arrival", value: "Arrival" },
-          {
-            label: "Departure & Arrival",
-            value: "Departure & Arrival",
-          },
         ];
 
   let providedServicesObj = watch("providedServices");

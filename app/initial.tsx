@@ -9,13 +9,7 @@ import {
 import React from "react";
 import formStyles from "@/styles/formStyles";
 
-import {
-  Button,
-  useTheme,
-  Text,
-  TextInput,
-  HelperText,
-} from "react-native-paper";
+import { Button, Text, TextInput, HelperText } from "react-native-paper";
 import { useRouter } from "expo-router";
 import Svg, { G, Path } from "react-native-svg";
 import { Controller, useForm } from "react-hook-form";
@@ -23,6 +17,8 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
 import { useRealm } from "@realm/react";
 import { IAppData } from "@/models/AppData";
+import { JetzSvg } from "@/components/JetzSVG";
+import { useTheme } from "@react-navigation/native";
 
 type FormData = {
   password: string;
@@ -38,7 +34,7 @@ const Page = () => {
   const { errors } = formState;
   const password = watch("password");
   const confirmPassword = watch("confirmPassword");
-
+  const iconColor = useTheme().colors.text;
   const submit = (data: FormData) => {
     realm.write(() => {
       realm.create<IAppData>("AppData", {
@@ -63,7 +59,7 @@ const Page = () => {
             alignItems: "center",
           }}
         >
-          <View style={{ marginBottom: 100, marginTop: 50 }}>
+          <View style={{ marginBottom: 50, marginTop: 50 }}>
             <Text
               style={{ marginBottom: 10, alignSelf: "center" }}
               variant="displayLarge"
@@ -71,7 +67,7 @@ const Page = () => {
               Welcome to
             </Text>
             <View style={{ alignSelf: "center" }}>
-              <Text variant="displayLarge">JetZ</Text>
+              <JetzSvg color={iconColor} />
             </View>
           </View>
           <View style={{ alignSelf: "center" }}>

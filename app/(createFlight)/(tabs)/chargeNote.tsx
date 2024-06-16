@@ -1,4 +1,5 @@
 import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { JetzSvg } from "@/components/JetzSVG";
 import { IFlight } from "@/models/Flight";
 import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
@@ -8,10 +9,11 @@ import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import printToFile from "@/utils/printToFile";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
+import { useTheme } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 type FormData = IFlight;
@@ -38,6 +40,8 @@ export default function App() {
     printToFile({
       html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
       fileName: pdfName,
+      width: 500,
+      height: 642,
     });
   };
 
@@ -45,12 +49,16 @@ export default function App() {
     mode: "onChange",
     defaultValues: { ...existingFlightJSON },
   });
+  const iconColor = useTheme().colors.text;
 
   const { errors } = formState;
 
   return (
     <ScrollView contentContainerStyle={{ ...styles.container }}>
-      <SectionTitle>Charge note details</SectionTitle>
+      <View style={{ alignSelf: "center" }}>
+        <JetzSvg width={110} height={100} color={iconColor} />
+      </View>
+      <SectionTitle>Charge note details:</SectionTitle>
       <Controller
         control={control}
         defaultValue=""
