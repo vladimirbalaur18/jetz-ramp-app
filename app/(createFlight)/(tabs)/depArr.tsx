@@ -116,7 +116,7 @@ export default function Page() {
                 <TextInput
                   label="Crew members count"
                   style={styles.input}
-                  value={String(value)}
+                  value={value ? String(value) : undefined}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(text) => onChange(text)}
@@ -253,7 +253,7 @@ export default function Page() {
                 <TextInput
                   label="Crew members count"
                   style={styles.input}
-                  value={String(value)}
+                  value={value ? String(value) : undefined}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(text) => onChange(text)}

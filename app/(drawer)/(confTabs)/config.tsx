@@ -36,8 +36,14 @@ const Form: React.FC = () => {
       VAT: configs?.VAT,
       defaultAirport: configs?.defaultAirport,
       priceUSDperKG: fuelFee?.priceUSDperKG,
-      arrival: loungeFeeJSON?.arrival,
-      departure: loungeFeeJSON?.departure,
+      arrival: loungeFeeJSON?.arrival || {
+        pricePerAdult: { amount: 0, currency: "MDL" },
+        pricePerMinor: { amount: 0, currency: "MDL" },
+      },
+      departure: loungeFeeJSON?.departure || {
+        pricePerAdult: { amount: 0, currency: "MDL" },
+        pricePerMinor: { amount: 0, currency: "MDL" },
+      },
     },
   });
   const { errors } = formState;

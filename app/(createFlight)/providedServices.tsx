@@ -503,10 +503,6 @@ const Form: React.FC = () => {
             name="providedServices.supportServices.catering.total"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-              pattern: {
-                message: "Please insert correct format",
-                value: REGEX.price,
-              },
             }}
             render={({ field: { onBlur, onChange, value, name } }) => (
               <>
@@ -521,7 +517,7 @@ const Form: React.FC = () => {
                   keyboardType="numeric"
                   onChangeText={(text) => {
                     if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
+                      onChange(text.replace(/[^0-9.]/g, ""));
                     } else {
                       setValue(name, "" as any); //prevent throwing undefined errors
                     }

@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { router, Stack } from "expo-router";
+import { router, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import {
@@ -101,6 +101,8 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const realm = useRealm();
+  const router = useRouter();
+
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
   const dispatch = useDispatch<AppDispatch>();
@@ -203,6 +205,10 @@ function RootLayoutNav() {
       }
 
       return router.navigate("/initial");
+    }
+
+    if (!configs) {
+      router.navigate("(drawer)/(confTabs)/config");
     }
   }, []);
 

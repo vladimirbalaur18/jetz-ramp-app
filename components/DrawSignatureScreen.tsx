@@ -60,8 +60,8 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
               ref={signatureRef}
               containerStyle={{
                 backgroundColor: "rgba(255,255,255,0.0001)",
-                height: 100,
-                width: 600,
+                height: 200,
+                width: 800,
               }}
               rewind={(undo: any) => console.log("undo", undo)}
               clear={(clear: any) => console.log("clear", clear)}
@@ -71,18 +71,16 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
               onChangeStrokes={(strokes: any) => console.log(strokes)}
             />
           ) : (
-            <View style={{ height: 130 }}>
-              <ImageBackground
-                style={{
-                  flex: 1, // This makes the ImageBackground take up the full space of the container
-                  width: 600,
-                  height: 200,
-                  justifyContent: "center", // Center the content vertically
-                  alignItems: "center", // Center the content horizontally
-                }}
-                source={{ uri: `data:image/png;base64,${signatureBase64}` }}
-              />
-            </View>
+            <ImageBackground
+              style={{
+                flex: 1, // This makes the ImageBackground take up the full space of the container
+                width: 800,
+                height: 200,
+                justifyContent: "center", // Center the content vertically
+                alignItems: "center", // Center the content horizontally
+              }}
+              source={{ uri: `data:image/png;base64,${signatureBase64}` }}
+            />
           )}
         </View>
         <View

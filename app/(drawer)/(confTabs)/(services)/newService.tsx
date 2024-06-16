@@ -339,11 +339,13 @@ const AddCategoryModal = ({
             }}
           >
             <Button
+              mode="outlined"
               onPress={() => {
                 onDismiss();
               }}
+              style={{ width: 190 }}
             >
-              Close
+              <Text> Close</Text>
             </Button>
             <Button
               mode="contained"
