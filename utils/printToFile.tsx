@@ -2,7 +2,7 @@ import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
+import { shareAsync, isAvailableAsync } from "expo-sharing";
 
 const printToFile = async ({
   html = "",
@@ -17,28 +17,39 @@ const printToFile = async ({
 }) => {
   const { uri } = await Print.printToFileAsync({ html, height, width });
 
+  if (!uri) {
+    alert("There was an error generating the file");
+  }
+
   const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${fileName}.pdf`;
 
-  // Rename the file
   await FileSystem.moveAsync({
     from: uri,
     to: pdfName,
   });
   console.log("File has been saved to:", uri);
 
-  try {
-    const contentUri = await FileSystem.getContentUriAsync(pdfName);
-    if (Platform.OS === "ios") {
-      await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-    } else {
-      await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-        data: contentUri,
-        flags: 1,
-        type: "application/pdf",
-      });
-    }
-  } catch (e) {
-    console.error(e);
-  }
+  if (await isAvailableAsync()) {
+    console.log("Sharing is available");
+    await shareAsync(pdfName, {
+      dialogTitle: "Share file",
+      mimeType: "application/pdf",
+    });
+  } else return alert("Sharing is not supported");
+
+  // try {
+  // const contentUri = await FileSystem.getContentUriAsync(pdfName);
+  //   if (Platform.OS === "ios") {
+  //     await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
+  //   } else {
+  //     await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+  //       data: contentUri,
+  //       flags: 1,
+  //       type: "application/pdf",
+  //     });
+  //   }
+  // } catch (e) {
+  //   console.error(e);
+  // }
 };
 export default printToFile;
