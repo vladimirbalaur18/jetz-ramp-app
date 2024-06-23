@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { AppDispatch, RootState } from "@/redux/store";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+export { ErrorBoundary } from "expo-router";
 
 export default function TabLayout() {
   const dispatch = useDispatch<AppDispatch>();

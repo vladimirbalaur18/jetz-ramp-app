@@ -65,7 +65,6 @@ const Form: React.FC = () => {
 
   console.log("HEY", existingFlight);
   const realm = useRealm();
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const basicHandlingPricePerLegs =
     existingFlight && getBasicHandlingPrice({ ...existingFlight });
@@ -116,7 +115,10 @@ const Form: React.FC = () => {
           HOTAC: { total: 0 },
         },
         VIPLoungeServices: {
-          typeOf: "None",
+          departureAdultPax: 0,
+          departureMinorPax: 0,
+          arrivalAdultPax: 0,
+          arrivalMinorPax: 0,
         },
       },
     },
@@ -128,23 +130,6 @@ const Form: React.FC = () => {
     control,
     name: "providedServices.otherServices",
   });
-
-  const VIPLoungeOptions =
-    existingFlight?.handlingType === "Departure"
-      ? [
-          { label: "None", value: "None" },
-          { label: "Departure", value: "Departure" },
-        ]
-      : existingFlight?.handlingType === "Arrival"
-      ? [
-          { label: "None", value: "None" },
-          { label: "Arrival", value: "Arrival" },
-        ]
-      : [
-          { label: "None", value: "None" },
-          { label: "Departure", value: "Departure" },
-          { label: "Arrival", value: "Arrival" },
-        ];
 
   let providedServicesObj = watch("providedServices");
 
@@ -235,13 +220,18 @@ const Form: React.FC = () => {
           VIPLoungeServices: realm.create<IVIPLoungeService>(
             "VIPLoungeService",
             {
-              adultPax: data.providedServices?.VIPLoungeServices.adultPax
-                ? Number(data.providedServices?.VIPLoungeServices.adultPax)
-                : undefined,
-              minorPax: data.providedServices?.VIPLoungeServices.minorPax
-                ? Number(data.providedServices?.VIPLoungeServices.minorPax)
-                : undefined,
-              typeOf: data.providedServices?.VIPLoungeServices?.typeOf,
+              departureAdultPax: Number(
+                data.providedServices?.VIPLoungeServices.departureAdultPax || 0
+              ),
+              departureMinorPax: Number(
+                data.providedServices?.VIPLoungeServices.departureMinorPax || 0
+              ),
+              arrivalAdultPax: Number(
+                data.providedServices?.VIPLoungeServices.arrivalAdultPax || 0
+              ),
+              arrivalMinorPax: Number(
+                data.providedServices?.VIPLoungeServices.arrivalMinorPax || 0
+              ),
             }
           ),
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
@@ -434,7 +424,7 @@ const Form: React.FC = () => {
                   keyboardType="numeric"
                   onChangeText={(text) => {
                     if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
+                      onChange(text.replace(/[,]/g, "."));
                     } else {
                       setValue(name, "" as any); //prevent throwing undefined errors
                     }
@@ -477,7 +467,7 @@ const Form: React.FC = () => {
                   keyboardType="numeric"
                   onChangeText={(text) => {
                     if (text) {
-                      onChange(text.replace(/[^0-9.]/g, ""));
+                      onChange(text.replace(/[,]/g, "."));
                     } else {
                       setValue(name, "" as any); //prevent throwing undefined errors
                     }
@@ -583,390 +573,185 @@ const Form: React.FC = () => {
         </View>
 
         <SectionTitle>VIP Lounge services</SectionTitle>
-        <Controller
-          control={control}
-          defaultValue={"None"}
-          name="providedServices.VIPLoungeServices.typeOf"
-          rules={{
-            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-          }}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <>
-              <DropDown
-                label={"VIP Lounge"}
-                mode={"outlined"}
-                visible={showVIPDropdown}
-                showDropDown={() => setShowVIPDropdown(true)}
-                onDismiss={() => setShowVIPDropdown(false)}
-                value={value}
-                setValue={(value) => {
-                  onChange(value);
-                }}
-                list={VIPLoungeOptions}
-              />
-              <HelperText type="error">
-                {errors?.providedServices?.VIPLoungeServices?.typeOf?.message}
-              </HelperText>
-            </>
-          )}
-        />
-        {providedServicesObj?.VIPLoungeServices?.typeOf !== "None" && (
-          <View>
-            <Controller
-              control={control}
-              defaultValue={0}
-              name="providedServices.VIPLoungeServices.adultPax"
-              rules={{
-                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                pattern: {
-                  message: "Please insert correct format",
-                  value: REGEX.number,
-                },
-              }}
-              render={({ field: { onBlur, onChange, value, name } }) => (
-                <>
-                  <TextInput
-                    label="Adult passengers:"
-                    style={formStyles.input}
-                    value={String(value)}
-                    onBlur={(e) => {
-                      if (!value) onChange(0);
-                      onBlur();
-                    }}
-                    keyboardType="numeric"
-                    onChangeText={(text) => {
-                      if (text) {
-                        onChange(text.replace(/[^0-9]/g, ""));
-                      } else {
-                        setValue(name, "" as any); //prevent throwing undefined errors
-                      }
-                    }}
-                    error={
-                      errors?.providedServices?.VIPLoungeServices?.adultPax &&
-                      true
-                    }
-                  />
-                  <HelperText type="error">
-                    {
-                      errors?.providedServices?.VIPLoungeServices?.adultPax
-                        ?.message
-                    }
-                  </HelperText>
-                </>
-              )}
-            />
-            <Controller
-              control={control}
-              defaultValue={0}
-              name="providedServices.VIPLoungeServices.minorPax"
-              rules={{
-                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                pattern: {
-                  message: "Please insert correct format",
-                  value: REGEX.number,
-                },
-              }}
-              render={({ field: { onBlur, onChange, value, name } }) => (
-                <>
-                  <TextInput
-                    label="Minor passengers:"
-                    style={formStyles.input}
-                    value={String(value)}
-                    onBlur={(e) => {
-                      if (!value) onChange(0);
-                      onBlur();
-                    }}
-                    keyboardType="numeric"
-                    onChangeText={(text) => {
-                      if (text) {
-                        onChange(text.replace(/[^0-9]/g, ""));
-                      } else {
-                        setValue(name, "" as any); //prevent throwing undefined errors
-                      }
-                    }}
-                    error={
-                      errors?.providedServices?.VIPLoungeServices?.minorPax &&
-                      true
-                    }
-                  />
-                  <HelperText type="error">
-                    {
-                      errors?.providedServices?.VIPLoungeServices?.minorPax
-                        ?.message
-                    }
-                  </HelperText>
-                </>
-              )}
-            />
-          </View>
-        )}
 
         <View>
-          {/* {fields?.map(() => {
-            return (
+          <Text variant="bodyMedium">Departure</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.VIPLoungeServices.departureAdultPax"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value, name } }) => (
               <>
-                <SectionTitle>{category?.serviceCategoryName}</SectionTitle>
-                {category?.services?.map((service, serviceIndex) => {
-                  const {
-                    isUsed,
-                    notes,
-                    quantity,
-                    serviceName,
-                    hasVAT,
-                    isPriceOverriden,
-                    pricing: { amount, currency },
-                  } = service;
-                  return (
-                    <>
-                      <View style={{ ...formStyles.row, marginVertical: 30 }}>
-                        <Text variant="bodyLarge">
-                          {isPriceOverriden && (
-                            <MaterialCommunityIcons
-                              name="pencil"
-                              size={14}
-                              color={theme.colors.onSurface}
-                            />
-                          )}{" "}
-                          {serviceName} {hasVAT && `(with VAT)`}
-                          {"  "}
-                        </Text>
-                        <Controller
-                          control={control}
-                          defaultValue={isUsed}
-                          name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.isUsed`}
-                          render={({ field: { value, onChange } }) => (
-                            <>
-                              <Switch
-                                value={value}
-                                onValueChange={(value) => {
-                                  //if there is at least oen erroneous field, dont' allow selecting dynamic fields
-                                  //this causees race conditions
-                                  if (
-                                    Object.entries(errors).some(
-                                      ([key, value]) => {
-                                        if (value) {
-                                          alert(
-                                            "Please complete the erroneous fields first"
-                                          );
-                                          return value;
-                                        }
-                                      }
-                                    )
-                                  )
-                                    return;
-
-                                  update(categoryIndex, {
-                                    ...category,
-                                    services: (category?.services).map(
-                                      (service, i) =>
-                                        i === serviceIndex
-                                          ? { ...service, isUsed: value }
-                                          : service
-                                    ),
-                                  });
-                                  onChange(value);
-                                }}
-                              />
-                            </>
-                          )}
-                        />
-                      </View>
-                      <View>
-                        {isUsed === true && (
-                          <>
-                            {
-                              <>
-                                <Controller
-                                  control={control}
-                                  defaultValue={1}
-                                  name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.quantity`}
-                                  rules={{
-                                    required: {
-                                      value: true,
-                                      message: ERROR_MESSAGES.REQUIRED,
-                                    },
-                                    pattern: {
-                                      message: "Please insert correct format",
-                                      value: REGEX.number,
-                                    },
-                                  }}
-                                  render={({
-                                    field: { onBlur, onChange, value },
-                                  }) => (
-                                    <>
-                                      <TextInput
-                                        label="Quantity:"
-                                        style={formStyles.input}
-                                        value={String(value)}
-                                        onBlur={onBlur}
-                                        keyboardType="numeric"
-                                        onChangeText={(text) => onChange(text)}
-                                        error={
-                                          //@ts-ignore
-                                          errors?.providedServices
-                                            ?.otherServices[categoryIndex]
-                                            ?.services[serviceIndex]
-                                            ?.quantity && true
-                                        }
-                                      />
-                                    </>
-                                  )}
-                                />
-                                <Controller
-                                  control={control}
-                                  defaultValue={""}
-                                  name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.notes`}
-                                  render={({
-                                    field: { onBlur, onChange, value },
-                                  }) => (
-                                    <>
-                                      <TextInput
-                                        label="notes:"
-                                        style={formStyles.input}
-                                        value={String(value)}
-                                        onBlur={onBlur}
-                                        onChangeText={(text) => onChange(text)}
-                                      />
-                                    </>
-                                  )}
-                                />
-                                <View
-                                  style={{
-                                    ...formStyles.row,
-                                    marginVertical: 0,
-                                  }}
-                                >
-                                  <Text
-                                    style={{
-                                      marginVertical: 5,
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    Amount:{" "}
-                                    {isPriceOverriden
-                                      ? service?.totalPriceOverride
-                                      : (quantity || 0) * amount}
-                                    {currency}
-                                  </Text>
-                                  <Button
-                                    onPress={() =>
-                                      setPriceOverrideModalVisible(true)
-                                    }
-                                  >
-                                    <MaterialCommunityIcons
-                                      name="pencil"
-                                      size={14}
-                                    />
-                                  </Button>
-                                </View>
-                                <View
-                                  style={{
-                                    ...formStyles.row,
-                                    marginVertical: 0,
-                                  }}
-                                >
-                                  <PriceOverrideModal
-                                    visible={priceOverrideModalVisible}
-                                    onDismiss={() =>
-                                      setPriceOverrideModalVisible(false)
-                                    }
-                                  >
-                                    <Text variant="bodyMedium">
-                                      {serviceName}
-                                    </Text>
-                                    <Controller
-                                      control={control}
-                                      defaultValue={undefined}
-                                      name={`providedServices.otherServices.${categoryIndex}.services.${serviceIndex}.totalPriceOverride`}
-                                      render={({
-                                        field: { onBlur, onChange, value },
-                                      }) => (
-                                        <>
-                                          <TextInput
-                                            label="Manual price override:"
-                                            style={formStyles.input}
-                                            onBlur={onBlur}
-                                            onChangeText={(text) =>
-                                              onChange(text)
-                                            }
-                                          />
-
-                                          <View
-                                            style={{
-                                              justifyContent: "space-between",
-                                              flexDirection: "row",
-                                              marginVertical: 10,
-                                              alignItems: "center",
-                                            }}
-                                          >
-                                            <Button
-                                              onPress={() => {
-                                                update(categoryIndex, {
-                                                  ...category,
-                                                  services:
-                                                    (category?.services).map(
-                                                      (service, i) =>
-                                                        i === serviceIndex
-                                                          ? {
-                                                              ...service,
-                                                              isPriceOverriden:
-                                                                false,
-                                                            }
-                                                          : service
-                                                    ),
-                                                });
-                                                setPriceOverrideModalVisible(
-                                                  false
-                                                );
-                                              }}
-                                            >
-                                              Reset
-                                            </Button>
-                                            <Button
-                                              style={{ marginVertical: 20 }}
-                                              mode="contained"
-                                              onPress={() => {
-                                                update(categoryIndex, {
-                                                  ...category,
-                                                  services:
-                                                    (category?.services).map(
-                                                      (service, i) =>
-                                                        i === serviceIndex
-                                                          ? {
-                                                              ...service,
-                                                              isPriceOverriden:
-                                                                true,
-                                                              totalPriceOverride:
-                                                                value,
-                                                            }
-                                                          : service
-                                                    ),
-                                                });
-                                                setPriceOverrideModalVisible(
-                                                  false
-                                                );
-                                              }}
-                                            >
-                                              Submit
-                                            </Button>
-                                          </View>
-                                        </>
-                                      )}
-                                    />
-                                  </PriceOverrideModal>
-                                </View>
-                              </>
-                            }
-                          </>
-                        )}
-                      </View>
-                      <Divider />
-                    </>
-                  );
-                })}
+                <TextInput
+                  label="Departure adult passengers:"
+                  style={formStyles.input}
+                  value={String(value)}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
+                  keyboardType="numeric"
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
+                  error={
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.departureAdultPax && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.departureAdultPax?.message
+                  }
+                </HelperText>
               </>
-            );
-          })} */}
+            )}
+          />
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.VIPLoungeServices.departureMinorPax"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value, name } }) => (
+              <>
+                <TextInput
+                  label="Departure minor passengers:"
+                  style={formStyles.input}
+                  value={String(value)}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
+                  keyboardType="numeric"
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
+                  error={
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.departureMinorPax && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.departureMinorPax?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+          <Text variant="bodyMedium">Arrival</Text>
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.VIPLoungeServices.arrivalAdultPax"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value, name } }) => (
+              <>
+                <TextInput
+                  label="Arrival adult passengers:"
+                  style={formStyles.input}
+                  value={String(value)}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
+                  keyboardType="numeric"
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
+                  error={
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.arrivalAdultPax && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.VIPLoungeServices?.arrivalAdultPax
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+          <Controller
+            control={control}
+            defaultValue={0}
+            name="providedServices.VIPLoungeServices.arrivalMinorPax"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Please insert correct format",
+                value: REGEX.number,
+              },
+            }}
+            render={({ field: { onBlur, onChange, value, name } }) => (
+              <>
+                <TextInput
+                  label="Arrival minor passengers:"
+                  style={formStyles.input}
+                  value={String(value)}
+                  onBlur={(e) => {
+                    if (!value) onChange(0);
+                    onBlur();
+                  }}
+                  keyboardType="numeric"
+                  onChangeText={(text) => {
+                    if (text) {
+                      onChange(text.replace(/[^0-9]/g, ""));
+                    } else {
+                      setValue(name, "" as any); //prevent throwing undefined errors
+                    }
+                  }}
+                  error={
+                    errors?.providedServices?.VIPLoungeServices
+                      ?.arrivalMinorPax && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.VIPLoungeServices?.arrivalMinorPax
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+        </View>
+
+        <View>
           {fields.map((field, serviceIndex, array) => {
             const {
               service,

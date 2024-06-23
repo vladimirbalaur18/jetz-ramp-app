@@ -110,32 +110,22 @@ export const getTotalAirportFeesPrice = (flight: IFlight) => {
 };
 
 export const getLoungeFeePrice = ({
-  minorPax = 0,
-  adultPax = 0,
-  typeOf = "",
+  departureMinorPax = 0,
+  departureAdultPax = 0,
+  arrivalAdultPax = 0,
+  arrivalMinorPax = 0,
 }) => {
   const [loungeFees] = realmWithoutSync.objects<ILoungeFee>("LoungeFees");
   let result = 0;
-  switch (typeOf) {
-    case "Departure": {
-      result =
-        adultPax * loungeFees.departure.pricePerAdult.amount +
-        minorPax * loungeFees.departure.pricePerMinor.amount;
-      break;
-    }
-    case "Arrival": {
-      result =
-        adultPax * loungeFees.arrival.pricePerAdult.amount +
-        minorPax * loungeFees.arrival.pricePerMinor.amount;
-      break;
-    }
-  }
 
-  console.log("type: ", typeOf);
+  result =
+    arrivalAdultPax * loungeFees.arrival.pricePerAdult.amount +
+    arrivalMinorPax * loungeFees.arrival.pricePerMinor.amount +
+    departureAdultPax * loungeFees.departure.pricePerAdult.amount +
+    departureMinorPax * loungeFees.departure.pricePerMinor.amount;
+
   return {
     amount: result * getVATMultiplier(),
     currency: "MDL",
   };
 };
-
-export const getAllServices = () => serviceDefinitions;

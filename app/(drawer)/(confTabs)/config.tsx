@@ -173,7 +173,7 @@ const Form: React.FC = () => {
                 style={styles.input}
                 value={value}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 error={errors?.defaultAirport && true}
               />
               <HelperText type="error">

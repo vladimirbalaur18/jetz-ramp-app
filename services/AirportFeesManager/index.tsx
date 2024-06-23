@@ -47,6 +47,7 @@ export const getFuelFeeAmount = ({
   );
   const fuelTons = ((fuelDensity || 0) * (fuelLitersQuantity || 0)) / 1000;
   const fuelEURAmount = priceEURPerTon * fuelTons;
+
   return VATRateMultiplier * fuelEURAmount;
 };
 export const getLandingFees = (flight: IFlight): number => {

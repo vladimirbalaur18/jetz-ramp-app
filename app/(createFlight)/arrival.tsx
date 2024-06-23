@@ -11,6 +11,7 @@ import {
 } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
+import { formatTime } from "@/utils/formatTime";
 import REGEX from "@/utils/regexp";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useRealm } from "@realm/react";
@@ -49,7 +50,21 @@ const Form: React.FC = () => {
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onChange",
-      defaultValues: { ..._existingFlight?.toJSON() },
+      defaultValues: _existingFlight?.toJSON().arrival
+        ? _existingFlight?.toJSON()
+        : {
+            ..._existingFlight?.toJSON(),
+            arrival: {
+              arrivalTime: { hours: 0, minutes: 0 },
+              arrivalDate: new Date(),
+              adultCount: 0,
+              minorCount: 0,
+              rampInspectionBeforeArrival: {
+                status: false,
+                FOD: false,
+              },
+            },
+          },
     });
 
   const adultPassengersCount = watch("arrival.adultCount");
@@ -154,7 +169,7 @@ const Form: React.FC = () => {
                 style={styles.input}
                 value={value}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 error={errors?.arrival?.from && true}
               />
               <HelperText type="error">
@@ -230,17 +245,7 @@ const Form: React.FC = () => {
                   label="Arrival time:"
                   editable={false}
                   style={{ ...styles.input, flex: 3 }}
-                  value={
-                    value?.hours && value?.minutes
-                      ? `${
-                          value?.hours < 10 ? "0" + value?.hours : value?.hours
-                        }:${
-                          value?.minutes < 10
-                            ? "0" + value?.minutes
-                            : value?.minutes
-                        }`
-                      : undefined
-                  }
+                  value={value && formatTime(value)}
                 />
                 <Button
                   onPress={() => setArrivalTimerVisible(true)}
@@ -288,7 +293,7 @@ const Form: React.FC = () => {
                 value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) => onChange(text)}
+                onChangeText={(value) => onChange(value.replace(/[,.]/g, ""))}
                 error={errors.arrival?.adultCount && true}
               />
               <HelperText type="error">

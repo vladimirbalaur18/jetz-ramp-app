@@ -10,7 +10,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
-import { useRouter } from "expo-router";
+import { ErrorBoundaryProps, useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
 import {
   setCurrentFlightById,
@@ -30,7 +30,10 @@ import { ITime } from "@/models/Time";
 import { IRampInspection } from "@/models/RampInspection";
 import { IRampAgent, RampAgent } from "@/models/RampAgentName";
 import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
+import { formatTime } from "@/utils/formatTime";
 type FormData = IFlight;
+
+export { ErrorBoundary } from "expo-router";
 
 const Form: React.FC = () => {
   const router = useRouter();
@@ -154,7 +157,7 @@ const Form: React.FC = () => {
                 style={styles.input}
                 value={value}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 error={errors?.departure?.to && true}
               />
               <HelperText type="error">
@@ -197,6 +200,9 @@ const Form: React.FC = () => {
                     onChange={(d) => {
                       onChange(d);
                     }}
+                    validRange={{
+                      endDate: dayjs().toDate(),
+                    }}
                     inputMode="start"
                     style={{ width: 200 }}
                     mode="outlined"
@@ -232,19 +238,7 @@ const Form: React.FC = () => {
                       label="Arrival time:"
                       editable={false}
                       style={{ ...styles.input, flex: 3 }}
-                      value={
-                        value?.hours && value?.minutes
-                          ? `${
-                              value?.hours < 10
-                                ? "0" + value?.hours
-                                : value?.hours
-                            }:${
-                              value?.minutes < 10
-                                ? "0" + value?.minutes
-                                : value?.minutes
-                            }`
-                          : undefined
-                      }
+                      value={value && formatTime(value)}
                     />
                     <Button
                       onPress={() => setArrivalTimerVisible(true)}
@@ -327,17 +321,7 @@ const Form: React.FC = () => {
                   label="Departure time"
                   editable={false}
                   style={{ ...styles.input, flex: 3 }}
-                  value={
-                    value?.hours && value?.minutes
-                      ? `${
-                          value?.hours < 10 ? "0" + value?.hours : value?.hours
-                        }:${
-                          value?.minutes < 10
-                            ? "0" + value?.minutes
-                            : value?.minutes
-                        }`
-                      : undefined
-                  }
+                  value={value && formatTime(value)}
                 />
                 <Button
                   onPress={() => setDepartureTimerVisible(true)}
@@ -355,7 +339,11 @@ const Form: React.FC = () => {
                   onDismiss={() => setDepartureTimerVisible(false)}
                   onConfirm={(value) => {
                     setDepartureTimerVisible(false);
-                    onChange(value);
+                    console.warn(value.minutes);
+                    onChange({
+                      hours: Number(value.hours),
+                      minutes: Number(value.minutes),
+                    });
                   }}
                 />
               </View>
@@ -385,9 +373,7 @@ const Form: React.FC = () => {
                 value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) => {
-                  onChange(text);
-                }}
+                onChangeText={(value) => onChange(value.replace(/[,.]/g, ""))}
                 error={errors.departure?.adultCount && true}
               />
               <HelperText type="error">

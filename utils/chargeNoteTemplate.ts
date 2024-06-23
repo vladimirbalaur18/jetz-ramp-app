@@ -134,6 +134,9 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     ...flight?.providedServices?.supportServices?.fuel,
     flight,
   });
+
+    console.warn("FUEL", fuelFeeTotal,JSON.stringify(flight.providedServices?.supportServices.fuel,null,2));
+
   const hotacFeeTotal = Number(
     flight?.providedServices?.supportServices.HOTAC.total
   );
@@ -145,7 +148,8 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     let resultHTML = "";
 
     servicesListNoVAT.map((s) => {
-      resultHTML += `
+
+		if(s.serviceName!=='Basic handling' ){  resultHTML += `
  <tr height="19" style="height:14.4pt">
   <td height="19" class="xl118" style="height:14.4pt;">&nbsp;</td>
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">${
@@ -160,8 +164,19 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
     s?.totalPrice
   ).toFixed(2)}</td>
+ </tr>`;}else if(s.serviceName==='Basic handling' && servicesListNoVAT.length<=1) {
+		 resultHTML += `
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl118" style="height:14.4pt;">&nbsp;</td>
+  <td colspan="4" class="xl134" style="border-right:.5pt solid black">&nbsp;</td>
+  <td class="xl121" style=";border-left:none">&nbsp;</td>
+  <td colspan="2" class="xl114" style="border-right:.5pt solid black">&nbsp;</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">&nbsp;</td>
  </tr>`;
+	}
+    
     });
+	
 
     return resultHTML;
   };
@@ -2672,7 +2687,7 @@ height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAAADVCAMAAABX
   <td class="xl92" style="border-left:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" >&nbsp;</td>
-  <td class="xl116"></td>
+  <td class="xl114"></td>
   <td class="xl138">&nbsp;</td>
  </tr>
  ${thirdPartyServiceProvidersRenderHTML()}

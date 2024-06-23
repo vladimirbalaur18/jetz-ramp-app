@@ -29,13 +29,34 @@ const printToFile = async ({
   });
   console.log("File has been saved to:", uri);
 
-  if (await isAvailableAsync()) {
-    console.log("Sharing is available");
-    await shareAsync(pdfName, {
-      dialogTitle: "Share file",
-      mimeType: "application/pdf",
-    });
-  } else return alert("Sharing is not supported");
+  if (Platform.OS === "android") {
+    const permissions =
+      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (permissions.granted) {
+      const base64 = await FileSystem.readAsStringAsync(pdfName, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        fileName,
+        "application/pdf"
+      )
+        .then(async (uri) => {
+          await FileSystem.writeAsStringAsync(uri, base64, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          alert("File saved successfully");
+        })
+        .catch((e) => alert("ERROR saving file"));
+    }
+  } else alert("File cannot be generated. Invalid platform");
+  // if (await isAvailableAsync()) {
+  //   console.log("Sharing is available");
+  //   await shareAsync(pdfName, {
+  //     dialogTitle: "Share file",
+  //     mimeType: "application/pdf",
+  //   });
+  // } else return alert("Sharing is not supported");
 
   // try {
   // const contentUri = await FileSystem.getContentUriAsync(pdfName);

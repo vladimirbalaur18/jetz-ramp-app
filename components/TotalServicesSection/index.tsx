@@ -146,7 +146,7 @@ const TotalServicesSection: React.FC<{
       </Text>
       <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
-        VIP Lounge ({VIPLoungeServices?.typeOf}):{" "}
+        VIP Lounge:{" "}
         {
           formatMDLPriceToEuro({
             amount: loungeFeeAmount,

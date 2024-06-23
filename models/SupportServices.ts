@@ -18,7 +18,7 @@ export class SupportServices extends Realm.Object<SupportServices> {
     name: "SupportServices",
     properties: {
       airportFee: { type: "object", objectType: "FeeTotal" },
-      fuel: { type: "object", objectType: "FeeTotal" },
+      fuel: { type: "object", objectType: "Fuel" },
       catering: { type: "object", objectType: "FeeTotal" },
       HOTAC: { type: "object", objectType: "FeeTotal" },
     },

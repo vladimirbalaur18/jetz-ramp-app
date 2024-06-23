@@ -1,0 +1,11 @@
+ISSUES:
+
+VIP departure and VIP arrival to have two different inputs for adult and minor pax - done
+10:00 bug - done
+Airfield default Uppercase - done
+2 times basic handling in chargeNote - done
+NaN calculations - couldn't find
+Numbers to not allow comma - done, need doublecheck
+Fuel calculation is NaN (possibly related to fuel) - couldn't reproduce
+
+Ramp checklist

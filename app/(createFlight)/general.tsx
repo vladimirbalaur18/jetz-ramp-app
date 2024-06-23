@@ -123,6 +123,9 @@ const Form: React.FC = () => {
         realmExistingFlight.chargeNote.paymentType =
           data?.chargeNote.paymentType;
         realmExistingFlight.chargeNote.billingTo = data.chargeNote.billingTo;
+        realmExistingFlight.chargeNote.disbursementPercentage = Number(
+          data.chargeNote.disbursementPercentage
+        );
         realmExistingFlight.departure = data?.departure;
         realmExistingFlight.flightNumber = data?.flightNumber;
         realmExistingFlight.handlingType = data?.handlingType;
@@ -383,9 +386,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Aircraft registration"
                 style={styles.input}
-                value={value}
+                value={String(value?.toUpperCase())}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 error={errors.aircraftRegistration && true}
               />
               <HelperText type="error">
@@ -436,7 +439,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="MTOW (kg)"
                 style={styles.input}
-                value={String(value)}
+                value={value ? String(value) : ""}
                 keyboardType="number-pad"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(Number(value))}
@@ -510,7 +513,7 @@ const Form: React.FC = () => {
                 value={value}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(value.replace(/,/g, "."))}
                 error={errors?.chargeNote?.currency?.euroToMDL && true}
               />
               <HelperText type="error">
@@ -534,7 +537,7 @@ const Form: React.FC = () => {
                 value={value}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(value.replace(/,/g, "."))}
                 error={errors?.chargeNote?.currency?.usdToMDL && true}
               />
               <HelperText type="error">
@@ -558,7 +561,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(value.replace(/[,.]/g, ""))}
                 error={errors?.chargeNote?.disbursementPercentage && true}
               />
               <HelperText type="error">

@@ -1,22 +1,25 @@
 import Realm, { ObjectSchema } from "realm";
 
 export type IVIPLoungeService = {
-  adultPax: number;
-  minorPax: number;
-  typeOf: string;
+  departureAdultPax: number;
+  departureMinorPax: number;
+  arrivalAdultPax: number;
+  arrivalMinorPax: number;
 };
 
 export class VIPLoungeService extends Realm.Object<IVIPLoungeService> {
-  adultPax?: number;
-  minorPax?: number;
-  typeOf?: string;
+  departureAdultPax!: number;
+  departureMinorPax!: number;
+  arrivalAdultPax!: number;
+  arrivalMinorPax!: number;
 
   static schema: ObjectSchema = {
     name: "VIPLoungeService",
     properties: {
-      adultPax: "int?",
-      minorPax: "int?",
-      typeOf: "string?",
+      departureAdultPax: 'int',
+      departureMinorPax: 'int',
+      arrivalAdultPax: 'int',
+      arrivalMinorPax: 'int',
     },
   };
 }
