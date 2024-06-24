@@ -41,6 +41,19 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="rampCheck"
+        options={{
+          title: "Ramp checklist",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="format-list-checks"
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

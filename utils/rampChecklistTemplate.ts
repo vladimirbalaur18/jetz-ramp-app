@@ -48,7 +48,7 @@ export default function reampChecklistHTML(flight: IFlight){
     category.services.map(service =>{
 
         flight?.providedServices?.otherServices?.forEach(s => {if(s.service.serviceName === service.serviceName){
-             resultHTML+= renderServiceRow(service.serviceName, s.quantity,s.notes)
+             resultHTML+= renderServiceRow(service.serviceName, s?.isUsed? s.quantity:0 ,s.notes)
         }})
 
        
@@ -64,6 +64,11 @@ export default function reampChecklistHTML(flight: IFlight){
 
  const renderSupportServices = () => {
 
+	const fueling = !!(flight?.providedServices?.supportServices?.fuel?.fuelLitersQuantity) || '&nbsp;'
+	const hotac = !!flight?.providedServices?.supportServices?.HOTAC.total || '&nbsp;'
+	const catering = !!flight?.providedServices?.supportServices?.catering.total|| '&nbsp;'
+	const airportFees = !!flight?.providedServices?.supportServices.airportFee.total|| '&nbsp;'
+
     return `<tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl135" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Support Services</td>
@@ -75,14 +80,14 @@ export default function reampChecklistHTML(flight: IFlight){
   <td colspan="3" height="20" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Fueling</td>
   <td colspan="2" class="xl112" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">1</td>
+  border-left:none;width:96pt">${fueling === true?1:fueling}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   border-left:none;width:192pt">&nbsp;</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Catering</td>
-  <td colspan="2" class="xl127" width="128" style="border-left:none;width:96pt">&nbsp;</td>
+  <td colspan="2" class="xl127" width="128" style="border-left:none;width:96pt">${catering === true?1:catering}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   width:192pt">&nbsp;</td>
  </tr>
@@ -90,7 +95,15 @@ export default function reampChecklistHTML(flight: IFlight){
   <td colspan="3" height="21" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.6pt;width:152pt">Airport fees</td>
   <td colspan="2" class="xl127" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">1</td>
+  border-left:none;width:96pt">${airportFees === true?1:airportFees}</td>
+  <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
+  border-left:none;width:192pt">&nbsp;</td>
+ </tr>
+  <tr height="21" style="height:15.6pt">
+  <td colspan="3" height="21" class="xl137" width="204" style="border-right:.5pt solid black;
+  height:15.6pt;width:152pt">HOTAC</td>
+  <td colspan="2" class="xl127" width="128" style="border-right:.5pt solid black;
+  border-left:none;width:96pt">${hotac === true?1:hotac}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   border-left:none;width:192pt">&nbsp;</td>
  </tr>`
@@ -124,7 +137,7 @@ function fnUpdateTabs()
   else
    window.setTimeout("fnUpdateTabs();",150);
  }
-}
+
 
 if (window.name!="frSheet")
  window.location.replace("../Ramp%20check.htm");
@@ -1299,14 +1312,14 @@ td
   width:192pt">&nbsp;</td>
  </tr>
 ${renderServices()}
-${renderSupportServices()}}
+${renderSupportServices()}
  <tr height="19" style="height:14.4pt">
   <td colspan="9" height="19" class="xl135" width="588" style="border-right:1.0pt solid black;
   height:14.4pt;width:440pt">Remarks</td>
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="9" rowspan="3" height="58" class="xl138" width="588" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:43.8pt;width:440pt">&nbsp;</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:43.8pt;width:440pt">${flight?.providedServices?.remarks}</td>
  </tr>
  <tr height="19" style="height:14.4pt">
  </tr>
@@ -1320,9 +1333,13 @@ ${renderSupportServices()}}
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl139" width="332" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:248pt">&nbsp;</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:248pt"><img width="150" height="50" src="data:image/png;base64,${
+    flight?.ramp?.signature
+  }"></td>
   <td colspan="4" rowspan="2" class="xl139" width="256" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:192pt">&nbsp;</td>
+  border-bottom:1.0pt solid black;width:192pt"><img width="150" height="50" src="data:image/png;base64,${
+    flight?.crew?.signature
+  }"></td>
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>

@@ -40,8 +40,8 @@ export default function App() {
     printToFile({
       html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
       fileName: pdfName,
-      width: 500,
-      height: 642,
+      width: 485,
+      height: 742,
     });
   };
 

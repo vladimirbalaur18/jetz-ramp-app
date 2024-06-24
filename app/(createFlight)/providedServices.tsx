@@ -144,7 +144,7 @@ const Form: React.FC = () => {
           service: s,
           isUsed: false,
           isPriceOverriden: false,
-          quantity: 1,
+          quantity: 0,
         });
       });
       console.log("services count", services.length);
@@ -859,7 +859,9 @@ const Form: React.FC = () => {
                               Amount:{" "}
                               {isPriceOverriden
                                 ? totalPriceOverride
-                                : (quantity || 0) * price}
+                                : (watch(
+                                    `providedServices.otherServices.${serviceIndex}.quantity`
+                                  ) || 0) * price}
                               &euro;
                             </Text>
                             <Button

@@ -29,15 +29,29 @@ export default function Page() {
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    // dispatch(
-    //   // updateFlight({
-    //   //   ...existingFlightJSON,
-    //   //   ...data,
-    //   // })
-    // );
+    console.warn(JSON.stringify(data, null, 5));
+    realm.write(() => {
+      if (realmExistingFlight) {
+        realmExistingFlight!.providedServices!.otherServices?.map((service) => {
+          data.providedServices?.otherServices?.map((s) => {
+            if (
+              service.service.serviceName === s.service.serviceName &&
+              s.isUsed
+            ) {
+              service.notes = s.notes;
+              service.quantity = Number(s.quantity);
+            }
+          });
+        });
+
+        realmExistingFlight!.providedServices!.remarks =
+          data.providedServices?.remarks || "";
+      }
+    });
 
     if (realmExistingFlight) realm.write(() => {});
   };
+
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
     mode: "onChange",
     defaultValues: {
@@ -54,58 +68,36 @@ export default function Page() {
     });
   };
 
-  const { fields, append, update } = useFieldArray({
+  const { fields, append, update, remove } = useFieldArray({
     control,
     name: "providedServices.otherServices",
   });
 
-  const mapServicesPerCategories = useMemo(() => {
-    let result: Record<
-      string,
-      {
-        serviceName: string;
-        notes: IProvidedService["notes"];
-        quantity: IProvidedService["quantity"];
-        isUsed: IProvidedService["isUsed"];
-      }[]
-    > = {};
-
-    realmExistingFlight?.providedServices?.otherServices?.map((s) => {
-      const serviceObj = {
-        serviceName: s.service.serviceName,
-        notes: s.notes,
-        quantity: s.quantity,
-        isUsed: s.isUsed,
-      };
-
-      if (result[s.service.categoryName]) {
-        result[s.service.categoryName].push({
-          ...serviceObj,
-        });
-      } else result[s.service.categoryName] = [{ ...serviceObj }];
-    });
-  }, [realmExistingFlight]);
-
   useEffect(() => {
-    existingFlightJSON?.providedServices?.otherServices?.forEach((s) => {
-      append({
-        service: s.service,
-        isUsed: s.isUsed,
-        isPriceOverriden: s.isPriceOverriden,
-        quantity: s.quantity,
-        notes: s.notes || "",
+    const areThereFieldsToRender =
+      fields?.length <=
+      existingFlightJSON!.providedServices!.otherServices!.filter(
+        (s) => s && s.isUsed
+      ).length;
+
+    areThereFieldsToRender &&
+      existingFlightJSON?.providedServices?.otherServices?.forEach((s) => {
+        s.isUsed &&
+          append({
+            service: s.service,
+            isUsed: s.isUsed,
+            isPriceOverriden: s.isPriceOverriden,
+            quantity: s.quantity,
+            notes: s.notes || "",
+          });
       });
-    });
+
+    return () => remove();
   }, []);
 
   const { errors } = formState;
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text>
-        {existingFlightJSON.providedServices?.otherServices?.map((s) =>
-          JSON.stringify(s, null, 3)
-        )}
-      </Text>
       {fields.map((field, serviceIndex, array) => {
         const {
           service,
@@ -194,6 +186,27 @@ export default function Page() {
           )
         );
       })}
+      <Controller
+        control={control}
+        defaultValue=""
+        name="providedServices.remarks"
+        render={({ field: { onBlur, onChange, value } }) => (
+          <>
+            <TextInput
+              label="Remarks:"
+              style={formStyles.input}
+              value={value}
+              onBlur={onBlur}
+              onChangeText={(value) => onChange(value)}
+              error={errors?.chargeNote?.remarks && true}
+              maxLength={100}
+            />
+            <HelperText type="error">
+              {errors?.chargeNote?.remarks?.message}
+            </HelperText>
+          </>
+        )}
+      />
       <Button
         mode="contained"
         onPress={handleSubmit(submitRampChecklist)}
