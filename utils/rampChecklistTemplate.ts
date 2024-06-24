@@ -13,8 +13,8 @@ export default function reampChecklistHTML(flight: IFlight){
     const parsedRoute = flight?.handlingType ==='FULL'? `${flight?.arrival.from}-${config.defaultAirport}-${flight?.departure.to}`: 
     flight?.handlingType==='Departure'?`${config.defaultAirport}-${flight?.departure.to}`:`${flight?.arrival.from}-${config.defaultAirport}`
 
-    const depPaxCount =flight?.handlingType!=='Arrival'? flight?.departure.adultCount + flight?.departure.minorCount:0
-    const arrPaxCount =flight?.handlingType!=='Departure'? flight?.arrival.adultCount + flight?.arrival.minorCount:0
+    const depPaxCount =flight?.handlingType!='Arrival'? flight?.departure.adultCount + flight?.departure.minorCount:0
+    const arrPaxCount =flight?.handlingType!='Departure'? flight?.arrival.adultCount + flight?.arrival.minorCount:0
 
     const renderCategoryRow = (serviceCategoryName ='') => `<tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl118" width="204" style="border-right:.5pt solid black;
@@ -1224,9 +1224,9 @@ td
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl98" width="326" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${flight?.arrival?.rampInspectionBeforeArrival.agent.fullname}</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname?'&nbsp;':flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname}</td>
   <td colspan="2" rowspan="2" class="xl100" width="128" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:96pt">${flight?.arrival.rampInspectionBeforeArrival.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
+  border-bottom:1.0pt solid black;width:96pt">${flight?.arrival?.rampInspectionBeforeArrival?.FOD === undefined?'&nbsp;':flight?.arrival?.rampInspectionBeforeArrival?.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td colspan="2" rowspan="4" height="78" class="xl100" width="134" style="border-right:
@@ -1241,9 +1241,9 @@ td
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl98" width="326" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${flight?.departure?.rampInspectionBeforeDeparture.agent.fullname}</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname?'&nbsp;':flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname}</td>
   <td colspan="2" rowspan="2" class="xl100" width="128" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:96pt">${flight?.departure.rampInspectionBeforeDeparture.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
+  border-bottom:1.0pt solid black;width:96pt">${flight?.departure.rampInspectionBeforeDeparture.FOD === undefined? '&nbsp;':flight?.departure.rampInspectionBeforeDeparture.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>
