@@ -7,6 +7,10 @@ import {
   ILoungeFee,
 } from "@/models/LoungeFees";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import {
+  onlyIntNumber,
+  replaceCommaWithDot,
+} from "@/utils/numericInputFormatter";
 import REGEX from "@/utils/regexp";
 import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
@@ -200,7 +204,7 @@ const Form: React.FC = () => {
                 inputMode="numeric"
                 value={String(value)}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.priceUSDperKG && true}
               />
               <Text variant="labelSmall">
@@ -236,7 +240,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors?.arrival?.pricePerAdult?.amount && true}
               />
               <HelperText type="error">
@@ -259,7 +263,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors?.arrival?.pricePerMinor?.amount && true}
               />
               <HelperText type="error">
@@ -285,7 +289,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors?.departure?.pricePerAdult?.amount && true}
               />
               <HelperText type="error">
@@ -308,7 +312,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors?.departure?.pricePerMinor?.amount && true}
               />
               <HelperText type="error">

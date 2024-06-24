@@ -3,7 +3,6 @@ import { IAirportFees } from "@/models/AirportFees";
 import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
-import { replaceCommaWithDot } from "@/utils/numericInputFormatter";
 import REGEX from "@/utils/regexp";
 import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
@@ -129,16 +128,20 @@ const Form: React.FC = () => {
           name="commercial.landingFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.landingFee?.perTon && true}
               />
               <HelperText type="error">
@@ -154,16 +157,20 @@ const Form: React.FC = () => {
           name="commercial.landingFee.winterPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.commercial?.landingFee?.winterPeriodQuotaPercentage &&
                   true
@@ -184,16 +191,20 @@ const Form: React.FC = () => {
           name="commercial.landingFee.summerPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.commercial?.landingFee?.summerPeriodQuotaPercentage &&
                   true
@@ -217,16 +228,20 @@ const Form: React.FC = () => {
           name="commercial.takeoffFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.takeoffFee?.perTon && true}
               />
               <HelperText type="error">
@@ -242,16 +257,20 @@ const Form: React.FC = () => {
           name="commercial.takeoffFee.lightAircraft"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.takeoffFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -266,16 +285,20 @@ const Form: React.FC = () => {
           name="commercial.takeoffFee.winterPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.commercial?.takeoffFee?.winterPeriodQuotaPercentage &&
                   true
@@ -296,16 +319,20 @@ const Form: React.FC = () => {
           name="commercial.takeoffFee.summerPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.commercial?.takeoffFee?.summerPeriodQuotaPercentage &&
                   true
@@ -330,16 +357,20 @@ const Form: React.FC = () => {
           name="commercial.passengerFee.perPax"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.passengerFee?.perPax && true}
               />
               <HelperText type="error">
@@ -357,16 +388,20 @@ const Form: React.FC = () => {
           name="commercial.securityFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.securityFee?.perTon && true}
               />
               <HelperText type="error">
@@ -381,16 +416,20 @@ const Form: React.FC = () => {
           name="commercial.securityFee.perPax"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.securityFee?.perPax && true}
               />
               <HelperText type="error">
@@ -408,16 +447,20 @@ const Form: React.FC = () => {
           name="commercial.parkingDay.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.commercial?.parkingDay?.perTon && true}
               />
               <HelperText type="error">
@@ -439,16 +482,20 @@ const Form: React.FC = () => {
           name="nonCommercial.landingFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.landingFee?.perTon && true}
               />
               <HelperText type="error">
@@ -464,16 +511,20 @@ const Form: React.FC = () => {
           name="nonCommercial.landingFee.lightAircraft"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.landingFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -488,16 +539,20 @@ const Form: React.FC = () => {
           name="nonCommercial.landingFee.winterPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.nonCommercial?.landingFee
                     ?.winterPeriodQuotaPercentage && true
@@ -518,16 +573,20 @@ const Form: React.FC = () => {
           name="nonCommercial.landingFee.summerPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.nonCommercial?.landingFee
                     ?.summerPeriodQuotaPercentage && true
@@ -551,16 +610,20 @@ const Form: React.FC = () => {
           name="nonCommercial.takeoffFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.takeoffFee?.perTon && true}
               />
               <HelperText type="error">
@@ -576,16 +639,20 @@ const Form: React.FC = () => {
           name="nonCommercial.takeoffFee.lightAircraft"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.takeoffFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -600,16 +667,20 @@ const Form: React.FC = () => {
           name="nonCommercial.takeoffFee.winterPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.nonCommercial?.takeoffFee
                     ?.winterPeriodQuotaPercentage && true
@@ -630,16 +701,20 @@ const Form: React.FC = () => {
           name="nonCommercial.takeoffFee.summerPeriodQuotaPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Summer period quota percentage:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={
                   errors?.nonCommercial?.takeoffFee
                     ?.summerPeriodQuotaPercentage && true
@@ -664,16 +739,20 @@ const Form: React.FC = () => {
           name="nonCommercial.passengerFee.perPax"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.passengerFee?.perPax && true}
               />
               <HelperText type="error">
@@ -691,16 +770,20 @@ const Form: React.FC = () => {
           name="nonCommercial.securityFee.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.securityFee?.perTon && true}
               />
               <HelperText type="error">
@@ -715,16 +798,20 @@ const Form: React.FC = () => {
           name="nonCommercial.securityFee.perPax"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.securityFee?.perPax && true}
               />
               <HelperText type="error">
@@ -742,16 +829,20 @@ const Form: React.FC = () => {
           name="nonCommercial.parkingDay.perTon"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              value: REGEX.number,
+              message: "Invalid number format",
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value?.toFixed(2) || "")}
+                value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
+                onChangeText={(value) => onChange(value)}
                 error={errors?.nonCommercial?.parkingDay?.perTon && true}
               />
               <HelperText type="error">

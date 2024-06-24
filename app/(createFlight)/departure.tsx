@@ -32,6 +32,7 @@ import { IRampAgent, RampAgent } from "@/models/RampAgentName";
 import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
 import { formatTime } from "@/utils/formatTime";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
+import { useSnackbar } from "@/context/snackbarContext";
 type FormData = IFlight;
 
 export { ErrorBoundary } from "expo-router";
@@ -68,6 +69,7 @@ const Form: React.FC = () => {
   const { errors } = formState;
   const adultPassengersCount = watch("departure.adultCount");
   const minorPassengersCount = watch("departure.minorCount");
+  const snackbar = useSnackbar();
   const submit = (data: IFlight) => {
     // alert(JSON.stringify(data));
     //nullyfy services if we update new data
@@ -83,49 +85,54 @@ const Form: React.FC = () => {
     // } else dispatch(updateFlight(data));
 
     console.log("from db, existing flight");
-    realm.write(() => {
-      const departureTime = realm.create<ITime>("Time", {
-        hours: Number(data.departure.departureTime.hours),
-        minutes: Number(data.departure.departureTime.minutes),
-      });
-      const rampAgent = realm.create<IRampAgent>("RampAgent", {
-        fullname: data.departure.rampInspectionBeforeDeparture.agent.fullname,
-      });
-      const rampInspection = realm.create<IRampInspection>("RampInspection", {
-        FOD: !!data.departure.rampInspectionBeforeDeparture.FOD,
-        agent: rampAgent,
-        status: data.departure.rampInspectionBeforeDeparture.status,
-      });
-      const departure = realm.create<IDeparture>("Departure", {
-        adultCount: Number(data.departure.adultCount),
-        departureDate: dayjs(data.departure.departureDate).toDate(),
-        departureTime: departureTime,
-        isLocalFlight: data.departure.isLocalFlight,
-        minorCount: Number(data.departure.minorCount),
-        rampInspectionBeforeDeparture: rampInspection,
-        to: data.departure.to,
-      });
-      const arrival = realm.create<IArrival>("Arrival", {
-        arrivalDate: data.arrival.arrivalDate,
-        arrivalTime: data.arrival.arrivalTime,
-      });
+    try {
+      realm.write(() => {
+        const departureTime = realm.create<ITime>("Time", {
+          hours: Number(data.departure.departureTime.hours),
+          minutes: Number(data.departure.departureTime.minutes),
+        });
+        const rampAgent = realm.create<IRampAgent>("RampAgent", {
+          fullname: data.departure.rampInspectionBeforeDeparture.agent.fullname,
+        });
+        const rampInspection = realm.create<IRampInspection>("RampInspection", {
+          FOD: !!data.departure.rampInspectionBeforeDeparture.FOD,
+          agent: rampAgent,
+          status: data.departure.rampInspectionBeforeDeparture.status,
+        });
+        const departure = realm.create<IDeparture>("Departure", {
+          adultCount: Number(data.departure.adultCount),
+          departureDate: dayjs(data.departure.departureDate).toDate(),
+          departureTime: departureTime,
+          isLocalFlight: data.departure.isLocalFlight,
+          minorCount: Number(data.departure.minorCount),
+          rampInspectionBeforeDeparture: rampInspection,
+          to: data.departure.to,
+        });
+        const arrival = realm.create<IArrival>("Arrival", {
+          arrivalDate: data.arrival.arrivalDate,
+          arrivalTime: data.arrival.arrivalTime,
+        });
 
-      if (_existingFlight) {
-        if (!_.isEqual(_existingFlight.toJSON(), data)) {
-          _existingFlight.providedServices &&
-            realm.delete(_existingFlight.providedServices);
+        if (_existingFlight) {
+          if (!_.isEqual(_existingFlight.toJSON(), data)) {
+            _existingFlight.providedServices &&
+              realm.delete(_existingFlight.providedServices);
+          }
+          _existingFlight.departure = departure;
+          if (_existingFlight.handlingType === "Departure") {
+            _existingFlight.arrival = arrival;
+          }
         }
-        _existingFlight.departure = departure;
-        if (_existingFlight.handlingType === "Departure") {
-          _existingFlight.arrival = arrival;
-        }
-      }
-    });
-    dispatch(
-      setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
-    );
+      });
+      dispatch(
+        setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
+      );
+      snackbar.showSnackbar("Departure information saved successfully");
 
-    router.navigate("/(createFlight)/providedServices");
+      router.navigate("/(createFlight)/providedServices");
+    } catch (e) {
+      alert("Error saving departure information");
+    }
   };
   const [departureTimerVisible, setDepartureTimerVisible] =
     React.useState(false);
@@ -269,7 +276,6 @@ const Form: React.FC = () => {
             />
           </>
         )}
-
         <Controller
           control={control}
           defaultValue={dayjs().toDate()}
@@ -495,6 +501,23 @@ const Form: React.FC = () => {
           {_existingFlight
             ? "Save departure information"
             : "Submit departure information"}
+        </Button>
+        <Button
+          mode="outlined"
+          style={{ marginVertical: 15 }}
+          onPress={() => {
+            router.push({
+              pathname: _existingFlight?.crew?.signature
+                ? "/(createFlight)/(tabs)/depArr"
+                : "/(createFlight)/signature",
+              params: {
+                fileType: "Departure",
+              },
+            });
+          }}
+          disabled={!formState.isValid || !_existingFlight?.departure?.to}
+        >
+          Generate Departure pdf
         </Button>
       </ScrollView>
     </SafeAreaView>

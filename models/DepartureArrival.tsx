@@ -42,18 +42,20 @@ class Departure extends Realm.Object<IDeparture> {
   static schema: ObjectSchema = {
     name: "Departure",
     properties: {
-      to: "string",
-      isLocalFlight: "bool",
-      departureDate: "date",
+      to: "string?",
+      isLocalFlight: "bool?",
+      departureDate: "date?",
       departureTime: {
         type: "object",
         objectType: "Time",
+        optional: true,
       },
-      adultCount: "int",
-      minorCount: "int",
+      adultCount: "int?",
+      minorCount: "int?",
       rampInspectionBeforeDeparture: {
         objectType: "RampInspection",
         type: "object",
+        optional: true,
       }, //TBD
       crewNumber: "int?",
       specialInfo: "string?",
@@ -100,10 +102,11 @@ class Arrival extends Realm.Object<IArrival> {
     properties: {
       from: "string?",
       isLocalFlight: "bool?",
-      arrivalDate: "date",
+      arrivalDate: "date?",
       arrivalTime: {
         type: "object",
         objectType: "Time",
+        optional: true,
       },
       adultCount: "int?",
       minorCount: "int?",

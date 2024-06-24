@@ -10,11 +10,11 @@ export class FeeQuota extends Realm.Object<IFeeQuota> {
   static schema: ObjectSchema = {
     name: "FeeQuota",
     properties: {
-      perTon: "float?",
-      perPax: "float?",
-      lightAircraft: "float?",
-      winterPeriodQuotaPercentage: "float?",
-      summerPeriodQuotaPercentage: "float?",
+      perTon: {type:'float', optional: false, default: 0},
+      perPax: {type:'float', optional: false, default: 0},
+      lightAircraft: {type:'float', optional: false, default: 0},
+      winterPeriodQuotaPercentage: {type:'float', optional: false, default: 0},
+      summerPeriodQuotaPercentage: {type:'float', optional: false, default: 0},
     },
   };
 }

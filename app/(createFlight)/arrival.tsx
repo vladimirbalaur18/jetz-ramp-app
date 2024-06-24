@@ -1,3 +1,4 @@
+import { useSnackbar } from "@/context/snackbarContext";
 import { IArrival } from "@/models/DepartureArrival";
 import { IFlight } from "@/models/Flight";
 import { IProvidedServices } from "@/models/ProvidedServices";
@@ -47,7 +48,7 @@ const Form: React.FC = () => {
   const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
 
   const dispatch = useDispatch();
-
+  const snackbar = useSnackbar();
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onChange",
@@ -74,72 +75,61 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: IFlight) => {
-    console.log("yeah", JSON.stringify(data, null, 4));
-    // //nullyfy services if we update new data
-    // if (_existingFlight) {
-    //   if (!_.isEqual(_existingFlight, data)) {
-    //     dispatch(
-    //       updateFlight({
-    //         ...data,
-    //         providedServices: null as unknown as IProvidedServices,
-    //       })
-    //     );
-    //   } else dispatch(updateFlight(data));
-    // } else {
-    //   alert("creating a flight");
-    //   dispatch(createFlight(data));
-    // }
+    try {
+      realm.write(() => {
+        const arrivalTime = realm.create<ITime>("Time", {
+          hours: Number(data.arrival.arrivalTime.hours),
+          minutes: Number(data.arrival.arrivalTime.minutes),
+        });
+        const rampAgent = realm.create<IRampAgent>("RampAgent", {
+          fullname: data.arrival.rampInspectionBeforeArrival.agent.fullname,
+        });
+        const rampInspection = realm.create<IRampInspection>("RampInspection", {
+          FOD: !!data.arrival.rampInspectionBeforeArrival.FOD,
+          agent: rampAgent,
+          status: data.arrival.rampInspectionBeforeArrival.status,
+        });
+        const arrival = realm.create<IArrival>("Arrival", {
+          adultCount: Number(data.arrival.adultCount),
+          arrivalDate: dayjs(data.arrival.arrivalDate).toDate(),
+          arrivalTime: arrivalTime,
+          isLocalFlight: data.arrival.isLocalFlight,
+          minorCount: Number(data.arrival.minorCount),
+          rampInspectionBeforeArrival: rampInspection,
+          from: data.arrival.from,
+        });
 
-    realm.write(() => {
-      const arrivalTime = realm.create<ITime>("Time", {
-        hours: Number(data.arrival.arrivalTime.hours),
-        minutes: Number(data.arrival.arrivalTime.minutes),
+        if (_existingFlight) {
+          if (_.isEqual(_existingFlight.toJSON(), data)) {
+            console.log("arrival data", data);
+            _existingFlight.arrival = arrival;
+          } else {
+            console.log(
+              "Nullyfying services because arrival date differs frmo previous arrival data",
+              "BEFORE",
+              JSON.stringify(_existingFlight.arrival, null, 3),
+              "AFTER",
+              JSON.stringify(arrival, null, 3)
+            );
+            _existingFlight.providedServices &&
+              realm.delete(_existingFlight.providedServices);
+            _existingFlight.arrival = arrival;
+          }
+        } else return arrival;
       });
-      const rampAgent = realm.create<IRampAgent>("RampAgent", {
-        fullname: data.arrival.rampInspectionBeforeArrival.agent.fullname,
-      });
-      const rampInspection = realm.create<IRampInspection>("RampInspection", {
-        FOD: !!data.arrival.rampInspectionBeforeArrival.FOD,
-        agent: rampAgent,
-        status: data.arrival.rampInspectionBeforeArrival.status,
-      });
-      const arrival = realm.create<IArrival>("Arrival", {
-        adultCount: Number(data.arrival.adultCount),
-        arrivalDate: dayjs(data.arrival.arrivalDate).toDate(),
-        arrivalTime: arrivalTime,
-        isLocalFlight: data.arrival.isLocalFlight,
-        minorCount: Number(data.arrival.minorCount),
-        rampInspectionBeforeArrival: rampInspection,
-        from: data.arrival.from,
-      });
+      dispatch(
+        setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
+      );
 
-      if (_existingFlight) {
-        if (_.isEqual(_existingFlight.toJSON(), data)) {
-          console.log("arrival data", data);
-          _existingFlight.arrival = arrival;
-        } else {
-          console.log(
-            "Nullyfying services because arrival date differs frmo previous arrival data",
-            "BEFORE",
-            JSON.stringify(_existingFlight.arrival, null, 3),
-            "AFTER",
-            JSON.stringify(arrival, null, 3)
-          );
-          _existingFlight.providedServices &&
-            realm.delete(_existingFlight.providedServices);
-          _existingFlight.arrival = arrival;
-        }
-      } else return arrival;
-    });
-    dispatch(
-      setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
-    );
-
-    router.navigate(
-      data?.handlingType === "Arrival"
-        ? "/(createFlight)/providedServices"
-        : "/(createFlight)/departure"
-    );
+      snackbar.showSnackbar("Arrival saved successfully");
+      router.navigate(
+        data?.handlingType === "Arrival"
+          ? "/(createFlight)/providedServices"
+          : "/(createFlight)/departure"
+      );
+    } catch (e) {
+      alert("Error saving arrival");
+    }
   };
   const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
 
@@ -415,6 +405,23 @@ const Form: React.FC = () => {
           {_existingFlight
             ? "Save arrival information"
             : "Submit arrival information"}
+        </Button>
+        <Button
+          mode="outlined"
+          style={{ marginVertical: 15 }}
+          onPress={() => {
+            router.push({
+              pathname: _existingFlight?.crew?.signature
+                ? "/(createFlight)/(tabs)/depArr"
+                : "/(createFlight)/signature",
+              params: {
+                fileType: "Arrival",
+              },
+            });
+          }}
+          disabled={!formState.isValid || !_existingFlight?.arrival?.from}
+        >
+          Generate Arr pdf
         </Button>
       </ScrollView>
     </SafeAreaView>

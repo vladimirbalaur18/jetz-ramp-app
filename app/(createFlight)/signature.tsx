@@ -12,7 +12,7 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useTheme } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -40,6 +40,7 @@ const SignaturePage = () => {
       },
     });
   const { errors, isValid } = formState;
+  const params = useLocalSearchParams();
 
   const submit = (data: Partial<IFlight>) => {
     if (realmExistingFlight)
@@ -56,6 +57,14 @@ const SignaturePage = () => {
 
         realmExistingFlight.ramp = ramp;
         realmExistingFlight.crew = crew;
+      });
+
+    if (params.fileType === "Arrival" || params.fileType === "Departure")
+      return router.push({
+        pathname: "/(createFlight)/(tabs)/depArr",
+        params: {
+          fileType: params.fileType,
+        },
       });
     router.navigate("(tabs)/chargeNote");
   };

@@ -4,7 +4,7 @@ import { realmWithoutSync } from "@/realm";
 import { useQuery } from "@realm/react";
 import dayjs from "dayjs";
 
-export default function ArrDepTemplateRenderHTML(flight: IFlight) {
+export default function ArrDepTemplateRenderHTML(flight: IFlight, handlingType: any) {
   const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
   console.log("ArrDepTemplateRenderHTML", flight);
   const arrivalDate = dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
@@ -18,7 +18,6 @@ export default function ArrDepTemplateRenderHTML(flight: IFlight) {
     mtow,
     flightNumber,
     crew,
-    handlingType,
   } = flight;
   const arrivalRoute = `${flight?.arrival?.from}-${config.defaultAirport}`;
   const departureRoute = `${config.defaultAirport}-${flight?.departure?.to}`;

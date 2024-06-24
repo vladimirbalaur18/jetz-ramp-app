@@ -1,6 +1,6 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Tabs, useGlobalSearchParams, usePathname } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -16,8 +16,15 @@ export default function TabLayout() {
     ? `(${currentFlightNumber})`
     : "";
 
+  console.log(useGlobalSearchParams());
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: {
+          display: useGlobalSearchParams()?.fileType ? "none" : "flex",
+        },
+      }}
+    >
       <Tabs.Screen
         name="chargeNote"
         options={{

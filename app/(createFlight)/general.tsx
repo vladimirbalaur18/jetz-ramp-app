@@ -38,6 +38,7 @@ import {
   onlyIntNumber,
   replaceCommaWithDot,
 } from "@/utils/numericInputFormatter";
+import { useSnackbar } from "@/context/snackbarContext";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -81,77 +82,82 @@ const Form: React.FC = () => {
   };
 
   const { errors } = formState;
-
+  const snackbar = useSnackbar();
   const realm = useRealm();
   const allFlight = useQuery<IFlight>("Flight");
   console.log("allFlight", allFlight);
   const submit = (data: IFlight) => {
-    if (!realmExistingFlight) {
-      realm.write(() => {
-        const newFlightId = uuid();
-        realm.create<IFlight>("Flight", {
-          ...data,
-          chargeNote: realm.create<IChargeNoteDetails>("ChargeNoteDetails", {
-            paymentType: data.chargeNote.paymentType,
-            billingTo: data.chargeNote.billingTo,
-            disbursementPercentage: Number(
-              data.chargeNote.disbursementPercentage
-            ),
-            currency: realm.create<ICurrencyRates>("CurrencyRates", {
-              date: data.chargeNote.currency.date,
-              usdToMDL: data.chargeNote.currency.usdToMDL,
-              euroToMDL: data.chargeNote.currency.euroToMDL,
+    try {
+      if (!realmExistingFlight) {
+        realm.write(() => {
+          const newFlightId = uuid();
+          realm.create<IFlight>("Flight", {
+            ...data,
+            chargeNote: realm.create<IChargeNoteDetails>("ChargeNoteDetails", {
+              paymentType: data.chargeNote.paymentType,
+              billingTo: data.chargeNote.billingTo,
+              disbursementPercentage: Number(
+                data.chargeNote.disbursementPercentage
+              ),
+              currency: realm.create<ICurrencyRates>("CurrencyRates", {
+                date: data.chargeNote.currency.date,
+                usdToMDL: data.chargeNote.currency.usdToMDL,
+                euroToMDL: data.chargeNote.currency.euroToMDL,
+              }),
             }),
-          }),
-          flightId: newFlightId,
+            flightId: newFlightId,
+          });
+          dispatch(setCurrentFlightById(newFlightId));
         });
-        dispatch(setCurrentFlightById(newFlightId));
-      });
-    } else {
-      if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
-        realm.write(
-          () =>
-            realmExistingFlight.providedServices &&
-            realm.delete(realmExistingFlight.providedServices)
-        );
+      } else {
+        if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
+          realm.write(
+            () =>
+              realmExistingFlight.providedServices &&
+              realm.delete(realmExistingFlight.providedServices)
+          );
+        }
+        realm.write(() => {
+          realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
+          realmExistingFlight.aircraftType = data.aircraftType;
+          realmExistingFlight.chargeNote.date = data.chargeNote.date;
+          realmExistingFlight.chargeNote.currency.euroToMDL =
+            data.chargeNote.currency.euroToMDL;
+          realmExistingFlight.chargeNote.currency.usdToMDL =
+            data.chargeNote.currency.usdToMDL;
+          realmExistingFlight.crew = data?.crew;
+          realmExistingFlight.chargeNote.paymentType =
+            data?.chargeNote.paymentType;
+          realmExistingFlight.chargeNote.billingTo = data.chargeNote.billingTo;
+          realmExistingFlight.chargeNote.disbursementPercentage = Number(
+            data.chargeNote.disbursementPercentage
+          );
+          realmExistingFlight.departure = data?.departure;
+          realmExistingFlight.flightNumber = data?.flightNumber;
+          realmExistingFlight.handlingType = data?.handlingType;
+          realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
+          realmExistingFlight.mtow = Number(data?.mtow);
+          realmExistingFlight.operatorName = data?.operatorName;
+          realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
+          realmExistingFlight.parkingPosition = data?.parkingPosition;
+          realmExistingFlight.providedServices = undefined;
+          realmExistingFlight.ramp = undefined;
+          realmExistingFlight.scheduleType = data?.scheduleType;
+          realmExistingFlight.status = data?.status;
+        });
+        dispatch(setCurrentFlightById(data.flightId as any));
       }
-      realm.write(() => {
-        realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
-        realmExistingFlight.aircraftType = data.aircraftType;
-        realmExistingFlight.chargeNote.date = data.chargeNote.date;
-        realmExistingFlight.chargeNote.currency.euroToMDL =
-          data.chargeNote.currency.euroToMDL;
-        realmExistingFlight.chargeNote.currency.usdToMDL =
-          data.chargeNote.currency.usdToMDL;
-        realmExistingFlight.crew = data?.crew;
-        realmExistingFlight.chargeNote.paymentType =
-          data?.chargeNote.paymentType;
-        realmExistingFlight.chargeNote.billingTo = data.chargeNote.billingTo;
-        realmExistingFlight.chargeNote.disbursementPercentage = Number(
-          data.chargeNote.disbursementPercentage
-        );
-        realmExistingFlight.departure = data?.departure;
-        realmExistingFlight.flightNumber = data?.flightNumber;
-        realmExistingFlight.handlingType = data?.handlingType;
-        realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
-        realmExistingFlight.mtow = Number(data?.mtow);
-        realmExistingFlight.operatorName = data?.operatorName;
-        realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
-        realmExistingFlight.parkingPosition = data?.parkingPosition;
-        realmExistingFlight.providedServices = undefined;
-        realmExistingFlight.ramp = undefined;
-        realmExistingFlight.scheduleType = data?.scheduleType;
-        realmExistingFlight.status = data?.status;
-      });
-      dispatch(setCurrentFlightById(data.flightId as any));
-    }
+      snackbar.showSnackbar("General details saved successfully");
 
-    //need to see based on flight plan type
-    router.navigate(
-      data?.handlingType === "Departure"
-        ? "/(createFlight)/departure"
-        : "/(createFlight)/arrival"
-    );
+      //need to see based on flight plan type
+      router.navigate(
+        data?.handlingType === "Departure"
+          ? "/(createFlight)/departure"
+          : "/(createFlight)/arrival"
+      );
+    } catch (e) {
+      alert("Error saving general details");
+    }
   };
 
   return (
