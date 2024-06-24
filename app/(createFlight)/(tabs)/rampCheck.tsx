@@ -35,7 +35,7 @@ export default function Page() {
         realmExistingFlight!.providedServices!.otherServices?.map((service) => {
           data.providedServices?.otherServices?.map((s) => {
             if (
-              service.service.serviceName === s.service.serviceName &&
+              service.service.serviceName == s.service.serviceName &&
               s.isUsed
             ) {
               service.notes = s.notes;
@@ -98,6 +98,14 @@ export default function Page() {
   const { errors } = formState;
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {!fields?.length && (
+        <Text
+          style={{ marginVertical: 20, textAlign: "center" }}
+          variant="bodyMedium"
+        >
+          No services selected
+        </Text>
+      )}
       {fields.map((field, serviceIndex, array) => {
         const {
           service,
@@ -186,6 +194,7 @@ export default function Page() {
           )
         );
       })}
+      <SectionTitle>Remarks:</SectionTitle>
       <Controller
         control={control}
         defaultValue=""
