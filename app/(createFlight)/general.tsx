@@ -34,6 +34,10 @@ import uuid from "react-uuid";
 import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
 import { ICurrencyRates } from "@/models/CurrencyRates";
 import { IBillingOperator } from "@/models/billingOperators";
+import {
+  onlyIntNumber,
+  replaceCommaWithDot,
+} from "@/utils/numericInputFormatter";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -261,9 +265,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Flight number"
                 style={styles.input}
-                value={value}
+                value={String(value).toUpperCase()}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
                 error={errors.flightNumber && true}
               />
               <HelperText type="error">
@@ -362,9 +366,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Aircraft type"
                 style={styles.input}
-                value={value}
+                value={String(value).toUpperCase()}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
                 error={errors.aircraftType && true}
               />
               <HelperText type="error">
@@ -412,9 +416,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Parking position"
                 style={styles.input}
-                value={String(value)}
+                value={String(value).toUpperCase()}
+                onChangeText={(value) => onChange(String(value).toUpperCase())}
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(String(value))}
                 error={errors.parkingPosition && true}
               />
               <HelperText type="error">
@@ -504,6 +508,10 @@ const Form: React.FC = () => {
           name="chargeNote.currency.euroToMDL"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "Invalid number format",
+              value: REGEX.number,
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -513,7 +521,7 @@ const Form: React.FC = () => {
                 value={value}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(value) => onChange(value.replace(/,/g, "."))}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.chargeNote?.currency?.euroToMDL && true}
               />
               <HelperText type="error">
@@ -528,6 +536,10 @@ const Form: React.FC = () => {
           name="chargeNote.currency.usdToMDL"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "Invalid number format",
+              value: REGEX.number,
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -537,7 +549,7 @@ const Form: React.FC = () => {
                 value={value}
                 keyboardType="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value.replace(/,/g, "."))}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.chargeNote?.currency?.usdToMDL && true}
               />
               <HelperText type="error">
@@ -552,6 +564,10 @@ const Form: React.FC = () => {
           name="chargeNote.disbursementPercentage"
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            pattern: {
+              message: "Invalid number format",
+              value: REGEX.number,
+            },
           }}
           render={({ field: { onBlur, onChange, value } }) => (
             <>
@@ -561,7 +577,7 @@ const Form: React.FC = () => {
                 value={String(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value.replace(/[,.]/g, ""))}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors?.chargeNote?.disbursementPercentage && true}
               />
               <HelperText type="error">

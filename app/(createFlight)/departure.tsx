@@ -31,6 +31,7 @@ import { IRampInspection } from "@/models/RampInspection";
 import { IRampAgent, RampAgent } from "@/models/RampAgentName";
 import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
 import { formatTime } from "@/utils/formatTime";
+import { onlyIntNumber } from "@/utils/numericInputFormatter";
 type FormData = IFlight;
 
 export { ErrorBoundary } from "expo-router";
@@ -361,7 +362,7 @@ const Form: React.FC = () => {
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
-              message: "Please insert correct format",
+              message: "Invalid number format",
               value: REGEX.number,
             },
           }}
@@ -373,7 +374,7 @@ const Form: React.FC = () => {
                 value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(value) => onChange(value.replace(/[,.]/g, ""))}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors.departure?.adultCount && true}
               />
               <HelperText type="error">
@@ -389,7 +390,7 @@ const Form: React.FC = () => {
           rules={{
             required: { value: true, message: ERROR_MESSAGES.REQUIRED },
             pattern: {
-              message: "Must be a valid number",
+              message: "Invalid number format",
               value: REGEX.number,
             },
           }}
@@ -401,9 +402,7 @@ const Form: React.FC = () => {
                 value={value ? String(value) : undefined}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                onChangeText={(text) => {
-                  onChange(text);
-                }}
+                onChangeText={(value) => onChange(onlyIntNumber(value))}
                 error={errors.departure?.minorCount && true}
               />
               <HelperText type="error">

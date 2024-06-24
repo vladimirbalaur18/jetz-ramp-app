@@ -46,6 +46,10 @@ import { ObjectId } from "bson";
 import { IServiceCategory } from "@/models/ServiceCategory";
 import { IProvidedService, ProvidedService } from "@/models/ProvidedService";
 import uuid from "react-uuid";
+import {
+  onlyIntNumber,
+  replaceCommaWithDot,
+} from "@/utils/numericInputFormatter";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -308,6 +312,10 @@ const Form: React.FC = () => {
             name="providedServices.basicHandling.total"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Invalid number format",
+                value: REGEX.number,
+              },
             }}
             render={({ field: { onBlur, onChange, value } }) => (
               <>
@@ -317,7 +325,7 @@ const Form: React.FC = () => {
                   value={value ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
-                  onChangeText={(text) => (text ? onChange(text) : onChange(0))}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={errors.providedServices?.basicHandling?.total && true}
                 />
                 {/* <Text>{renderBasicHandlingVATString()}</Text> */}
@@ -372,8 +380,8 @@ const Form: React.FC = () => {
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
-                message: "Please insert correct format",
-                value: REGEX.price,
+                message: "Invalid number format",
+                value: REGEX.number,
               },
             }}
             render={({ field: { onBlur, onChange, value } }) => (
@@ -384,7 +392,7 @@ const Form: React.FC = () => {
                   value={String(value)}
                   onBlur={onBlur}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={
                     errors?.providedServices?.supportServices?.airportFee
                       ?.total && true
@@ -407,7 +415,7 @@ const Form: React.FC = () => {
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
-                message: "Please insert correct format",
+                message: "Invalid number format",
                 value: REGEX.number,
               },
             }}
@@ -422,13 +430,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[,]/g, "."));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={
                     errors?.providedServices?.supportServices?.fuel
                       ?.fuelLitersQuantity && true
@@ -450,7 +452,7 @@ const Form: React.FC = () => {
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
               pattern: {
-                message: "Please insert correct format",
+                message: "Invalid number format",
                 value: REGEX.number,
               },
             }}
@@ -465,13 +467,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[,]/g, "."));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={
                     errors?.providedServices?.supportServices?.fuel
                       ?.fuelDensity && true
@@ -493,6 +489,10 @@ const Form: React.FC = () => {
             name="providedServices.supportServices.catering.total"
             rules={{
               required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+              pattern: {
+                message: "Invalid number format",
+                value: REGEX.number,
+              },
             }}
             render={({ field: { onBlur, onChange, value, name } }) => (
               <>
@@ -505,13 +505,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9.]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={
                     errors?.providedServices?.supportServices?.catering
                       ?.total && true
@@ -549,13 +543,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9.]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                   error={
                     errors?.providedServices?.supportServices?.HOTAC?.total &&
                     true
@@ -598,13 +586,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={
                     errors?.providedServices?.VIPLoungeServices
                       ?.departureAdultPax && true
@@ -641,13 +623,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={
                     errors?.providedServices?.VIPLoungeServices
                       ?.departureMinorPax && true
@@ -685,13 +661,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={
                     errors?.providedServices?.VIPLoungeServices
                       ?.arrivalAdultPax && true
@@ -728,13 +698,7 @@ const Form: React.FC = () => {
                     onBlur();
                   }}
                   keyboardType="numeric"
-                  onChangeText={(text) => {
-                    if (text) {
-                      onChange(text.replace(/[^0-9]/g, ""));
-                    } else {
-                      setValue(name, "" as any); //prevent throwing undefined errors
-                    }
-                  }}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={
                     errors?.providedServices?.VIPLoungeServices
                       ?.arrivalMinorPax && true
@@ -849,7 +813,9 @@ const Form: React.FC = () => {
                                   value={String(value)}
                                   onBlur={onBlur}
                                   keyboardType="numeric"
-                                  onChangeText={(text) => onChange(text)}
+                                  onChangeText={(value) =>
+                                    onChange(onlyIntNumber(value))
+                                  }
                                   error={
                                     //@ts-ignore
                                     errors?.providedServices?.otherServices[

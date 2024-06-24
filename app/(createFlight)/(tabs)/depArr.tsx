@@ -5,6 +5,7 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
 import ArrDepTemplateRenderHTML from "@/utils/arrDepTemplate";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import printToFile from "@/utils/printToFile";
 import REGEX from "@/utils/regexp";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
@@ -119,7 +120,7 @@ export default function Page() {
                   value={value ? String(value) : undefined}
                   onBlur={onBlur}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={errors.arrival?.crewNumber && true}
                 />
                 <HelperText type="error">
@@ -256,7 +257,7 @@ export default function Page() {
                   value={value ? String(value) : undefined}
                   onBlur={onBlur}
                   keyboardType="numeric"
-                  onChangeText={(text) => onChange(text)}
+                  onChangeText={(value) => onChange(onlyIntNumber(value))}
                   error={errors.departure?.crewNumber && true}
                 />
                 <HelperText type="error">

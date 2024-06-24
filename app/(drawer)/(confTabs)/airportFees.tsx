@@ -3,6 +3,7 @@ import { IAirportFees } from "@/models/AirportFees";
 import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
+import { replaceCommaWithDot } from "@/utils/numericInputFormatter";
 import REGEX from "@/utils/regexp";
 import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
@@ -137,7 +138,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.landingFee?.perTon && true}
               />
               <HelperText type="error">
@@ -162,7 +163,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.commercial?.landingFee?.winterPeriodQuotaPercentage &&
                   true
@@ -192,7 +193,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.commercial?.landingFee?.summerPeriodQuotaPercentage &&
                   true
@@ -225,7 +226,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.takeoffFee?.perTon && true}
               />
               <HelperText type="error">
@@ -250,7 +251,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.takeoffFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -274,7 +275,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.commercial?.takeoffFee?.winterPeriodQuotaPercentage &&
                   true
@@ -304,7 +305,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.commercial?.takeoffFee?.summerPeriodQuotaPercentage &&
                   true
@@ -338,7 +339,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.passengerFee?.perPax && true}
               />
               <HelperText type="error">
@@ -365,7 +366,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.securityFee?.perTon && true}
               />
               <HelperText type="error">
@@ -389,7 +390,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.securityFee?.perPax && true}
               />
               <HelperText type="error">
@@ -416,7 +417,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.commercial?.parkingDay?.perTon && true}
               />
               <HelperText type="error">
@@ -447,7 +448,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.landingFee?.perTon && true}
               />
               <HelperText type="error">
@@ -472,7 +473,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.landingFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -496,7 +497,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.nonCommercial?.landingFee
                     ?.winterPeriodQuotaPercentage && true
@@ -526,7 +527,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.nonCommercial?.landingFee
                     ?.summerPeriodQuotaPercentage && true
@@ -559,7 +560,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.takeoffFee?.perTon && true}
               />
               <HelperText type="error">
@@ -584,7 +585,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.takeoffFee?.lightAircraft && true}
               />
               <HelperText type="error">
@@ -608,7 +609,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.nonCommercial?.takeoffFee
                     ?.winterPeriodQuotaPercentage && true
@@ -638,7 +639,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={
                   errors?.nonCommercial?.takeoffFee
                     ?.summerPeriodQuotaPercentage && true
@@ -672,7 +673,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.passengerFee?.perPax && true}
               />
               <HelperText type="error">
@@ -699,7 +700,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.securityFee?.perTon && true}
               />
               <HelperText type="error">
@@ -723,7 +724,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.securityFee?.perPax && true}
               />
               <HelperText type="error">
@@ -750,7 +751,7 @@ const Form: React.FC = () => {
                 value={String(value?.toFixed(2) || "")}
                 inputMode="numeric"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.nonCommercial?.parkingDay?.perTon && true}
               />
               <HelperText type="error">
