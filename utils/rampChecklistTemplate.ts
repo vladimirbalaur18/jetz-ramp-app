@@ -16,6 +16,8 @@ export default function reampChecklistHTML(flight: IFlight){
     const depPaxCount =flight?.handlingType!='Arrival'? flight?.departure.adultCount + flight?.departure.minorCount:0
     const arrPaxCount =flight?.handlingType!='Departure'? flight?.arrival.adultCount + flight?.arrival.minorCount:0
 
+
+
     const renderCategoryRow = (serviceCategoryName ='') => `<tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl118" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">${serviceCategoryName}</td>
@@ -55,7 +57,10 @@ export default function reampChecklistHTML(flight: IFlight){
     })
    })
 
+   resultHTML+= renderCategoryRow('VIP');
 
+   const v = flight?.providedServices?.VIPLoungeServices 
+   resultHTML+= renderServiceRow('VIP / Express terminal',(v!.arrivalAdultPax+v!.arrivalMinorPax+v!.departureAdultPax+v!.departureMinorPax),v?.remarks)
 
 
    return resultHTML;

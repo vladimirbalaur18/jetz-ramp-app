@@ -73,7 +73,7 @@ const Form: React.FC = () => {
   const basicHandlingPricePerLegs =
     existingFlight && getBasicHandlingPrice({ ...existingFlight });
   const disbursementPercentage =
-    existingFlight.chargeNote.disbursementPercentage;
+    existingFlight?.chargeNote?.disbursementPercentage;
 
   const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
 
@@ -123,6 +123,7 @@ const Form: React.FC = () => {
           departureMinorPax: 0,
           arrivalAdultPax: 0,
           arrivalMinorPax: 0,
+          remarks: "",
         },
       },
     },
@@ -236,6 +237,7 @@ const Form: React.FC = () => {
               arrivalMinorPax: Number(
                 data.providedServices?.VIPLoungeServices.arrivalMinorPax || 0
               ),
+              remarks: data.providedServices?.VIPLoungeServices.remarks || "",
             }
           ),
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
@@ -676,6 +678,7 @@ const Form: React.FC = () => {
               </>
             )}
           />
+
           <Controller
             control={control}
             defaultValue={0}
@@ -707,6 +710,34 @@ const Form: React.FC = () => {
                 <HelperText type="error">
                   {
                     errors?.providedServices?.VIPLoungeServices?.arrivalMinorPax
+                      ?.message
+                  }
+                </HelperText>
+              </>
+            )}
+          />
+          <Text variant="bodyMedium">Remarks:</Text>
+          <Controller
+            control={control}
+            defaultValue={""}
+            name="providedServices.VIPLoungeServices.remarks"
+            rules={{
+              required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+            }}
+            render={({ field: { onBlur, onChange, value, name } }) => (
+              <>
+                <TextInput
+                  label="VIP lounge remarks:"
+                  style={formStyles.input}
+                  value={String(value)}
+                  onChangeText={(value) => onChange(value)}
+                  error={
+                    errors?.providedServices?.VIPLoungeServices?.remarks && true
+                  }
+                />
+                <HelperText type="error">
+                  {
+                    errors?.providedServices?.VIPLoungeServices?.remarks
                       ?.message
                   }
                 </HelperText>

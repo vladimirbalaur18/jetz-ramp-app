@@ -45,24 +45,26 @@ export default function Page() {
         });
 
         realmExistingFlight!.providedServices!.remarks =
-          data.providedServices?.remarks || "";
+          data.providedServices?.remarks;
       }
     });
-
-    if (realmExistingFlight) realm.write(() => {});
   };
 
-  const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
-    mode: "onChange",
-    defaultValues: {
-      providedServices: existingFlightJSON.providedServices,
-    },
-  });
+  const { control, formState, handleSubmit, getValues, watch } =
+    useForm<IFlight>({
+      mode: "onChange",
+      defaultValues: {
+        providedServices: {
+          ...existingFlightJSON.providedServices,
+          remarks: existingFlightJSON.providedServices?.remarks ?? "",
+        },
+      },
+    });
 
   const submitRampChecklist = (data: Partial<IFlight>) => {
     submit(data);
     printToFile({
-      html: rampChecklistHTML({ ...existingFlightJSON }),
+      html: rampChecklistHTML({ ...existingFlightJSON, ...data }),
       fileName: `rampChecklist_${existingFlightJSON?.flightNumber}_${existingFlightJSON?.aircraftRegistration}`,
       width: 500,
     });
@@ -96,9 +98,10 @@ export default function Page() {
   }, []);
 
   const { errors } = formState;
+  const allProvidedServices = watch("providedServices");
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {!fields?.length && (
+      {(!fields || fields?.filter((f) => f.isUsed).length == 0) && (
         <Text
           style={{ marginVertical: 20, textAlign: "center" }}
           variant="bodyMedium"

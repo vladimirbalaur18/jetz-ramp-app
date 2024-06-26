@@ -5,6 +5,8 @@ export type IVIPLoungeService = {
   departureMinorPax: number;
   arrivalAdultPax: number;
   arrivalMinorPax: number;
+    remarks?:string;
+
 };
 
 export class VIPLoungeService extends Realm.Object<IVIPLoungeService> {
@@ -12,6 +14,7 @@ export class VIPLoungeService extends Realm.Object<IVIPLoungeService> {
   departureMinorPax!: number;
   arrivalAdultPax!: number;
   arrivalMinorPax!: number;
+  remarks?:string;
 
   static schema: ObjectSchema = {
     name: "VIPLoungeService",
@@ -20,6 +23,7 @@ export class VIPLoungeService extends Realm.Object<IVIPLoungeService> {
       departureMinorPax: 'int',
       arrivalAdultPax: 'int',
       arrivalMinorPax: 'int',
+      remarks:{type:'string', optional:true, default:''}
     },
   };
 }

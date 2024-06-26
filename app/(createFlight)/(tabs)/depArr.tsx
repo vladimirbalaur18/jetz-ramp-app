@@ -42,15 +42,29 @@ export default function Page() {
 
     if (realmExistingFlight)
       realm.write(() => {
-        if (realmExistingFlight.handlingType !== "Departure") {
-          if (!realmExistingFlight?.arrival?.from) {
-            realm.create<IArrival>("Arrival", {
-              crewNumber: Number(data.arrival?.crewNumber),
-              cargoInfo: data.arrival?.cargoInfo,
-              mailInfo: data.arrival?.mailInfo,
-              specialInfo: data.arrival?.specialInfo,
-              remarksInfo: data.arrival?.remarksInfo,
-            });
+        if (realmExistingFlight.handlingType != "Departure") {
+          if (fileType == "Arrival" || !realmExistingFlight?.arrival?.from) {
+            console.warn(
+              "filetype",
+              fileType == "Arrival",
+              "arrival",
+              !realmExistingFlight?.arrival?.from
+            );
+            // realmExistingFlight.arrival = realm.create<IArrival>("Arrival", {
+            //   crewNumber: Number(data.arrival?.crewNumber),
+            //   cargoInfo: data.arrival?.cargoInfo,
+            //   mailInfo: data.arrival?.mailInfo,
+            //   specialInfo: data.arrival?.specialInfo,
+            //   remarksInfo: data.arrival?.remarksInfo,
+            // });
+            realmExistingFlight.arrival.crewNumber = Number(
+              data.arrival?.crewNumber
+            );
+            realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
+            realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
+            realmExistingFlight.arrival.specialInfo = data.arrival?.specialInfo;
+            realmExistingFlight.arrival.remarksInfo = data.arrival?.remarksInfo;
+            return;
           } else {
             realmExistingFlight.arrival.crewNumber = Number(
               data.arrival?.crewNumber
@@ -62,15 +76,33 @@ export default function Page() {
           }
         }
 
-        if (realmExistingFlight.handlingType !== "Arrival") {
-          if (!realmExistingFlight?.departure?.to) {
-            realm.create<IDeparture>("Departure", {
-              crewNumber: Number(data.departure?.crewNumber),
-              cargoInfo: data.departure?.cargoInfo,
-              mailInfo: data.departure?.mailInfo,
-              specialInfo: data.departure?.specialInfo,
-              remarksInfo: data.departure?.remarksInfo,
-            });
+        if (realmExistingFlight.handlingType != "Arrival") {
+          if (fileType == "Departure" || !realmExistingFlight?.departure?.to) {
+            alert("departure flow");
+            console.warn(
+              "filetype",
+              fileType == "Departure",
+              "departure",
+              !realmExistingFlight?.departure?.to
+            );
+            // realm.create<IDeparture>("Departure", {
+            //   crewNumber: Number(data.departure?.crewNumber),
+            //   cargoInfo: data.departure?.cargoInfo,
+            //   mailInfo: data.departure?.mailInfo,
+            //   specialInfo: data.departure?.specialInfo,
+            //   remarksInfo: data.departure?.remarksInfo,
+            // });
+
+            realmExistingFlight.departure.crewNumber = Number(
+              data.departure?.crewNumber
+            );
+            realmExistingFlight.departure.cargoInfo = data.departure?.cargoInfo;
+            realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
+            realmExistingFlight.departure.specialInfo =
+              data.departure?.specialInfo;
+            realmExistingFlight.departure.remarksInfo =
+              data.departure?.remarksInfo;
+            return;
           } else {
             realmExistingFlight.departure.crewNumber = Number(
               data.departure?.crewNumber

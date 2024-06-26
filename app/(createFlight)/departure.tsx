@@ -502,23 +502,25 @@ const Form: React.FC = () => {
             ? "Save departure information"
             : "Submit departure information"}
         </Button>
-        <Button
-          mode="outlined"
-          style={{ marginVertical: 15 }}
-          onPress={() => {
-            router.push({
-              pathname: _existingFlight?.crew?.signature
-                ? "/(createFlight)/(tabs)/depArr"
-                : "/(createFlight)/signature",
-              params: {
-                fileType: "Departure",
-              },
-            });
-          }}
-          disabled={!formState.isValid || !_existingFlight?.departure?.to}
-        >
-          Generate Departure pdf
-        </Button>
+        {_existingFlight?.handlingType === "FULL" && (
+          <Button
+            mode="outlined"
+            style={{ marginVertical: 15 }}
+            onPress={() => {
+              router.push({
+                pathname: _existingFlight?.crew?.signature
+                  ? "/(createFlight)/(tabs)/depArr"
+                  : "/(createFlight)/signature",
+                params: {
+                  fileType: "Departure",
+                },
+              });
+            }}
+            disabled={!formState.isValid || !_existingFlight?.departure?.to}
+          >
+            Generate Departure pdf
+          </Button>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
