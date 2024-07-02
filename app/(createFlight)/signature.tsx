@@ -16,7 +16,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Button, HelperText, TextInput } from "react-native-paper";
+import { Button, HelperText, IconButton, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 const SignaturePage = () => {
@@ -83,7 +83,17 @@ const SignaturePage = () => {
   return (
     <ScrollView contentContainerStyle={{ ...formStyles.container }}>
       <Stack.Screen
-        options={{ headerRight: () => <_GenerateInvoiceButton /> }}
+        options={{
+          headerRight: () => <_GenerateInvoiceButton />,
+          headerLeft: () => (
+            <IconButton
+              onLongPress={() => router.replace("/(drawer)")}
+              onPress={() => router.back()}
+              icon={"arrow-left"}
+              style={{ marginLeft: -5 }}
+            />
+          ),
+        }}
       />
       <View style={{ alignSelf: "center" }}>
         <JetzSvg width={110} height={100} color={iconColor} />

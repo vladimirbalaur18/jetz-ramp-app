@@ -54,90 +54,91 @@ export default function App() {
   const { errors } = formState;
 
   return (
-    <ScrollView contentContainerStyle={{ ...styles.container }}>
-      <View style={{ alignSelf: "center" }}>
-        <JetzSvg width={110} height={100} color={iconColor} />
-      </View>
-      <SectionTitle>Charge note details:</SectionTitle>
-      <Controller
-        control={control}
-        defaultValue=""
-        name="chargeNote.paymentType"
-        rules={{
-          required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-        }}
-        render={({ field: { onBlur, onChange, value } }) => (
-          <>
-            <TextInput
-              label="Payment type:"
-              style={formStyles.input}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              error={errors?.arrival?.from && true}
-            />
-            <HelperText type="error">
-              {errors.arrival?.from?.message}
-            </HelperText>
-          </>
-        )}
-      />
-      <Controller
-        control={control}
-        defaultValue=""
-        name="chargeNote.billingTo"
-        rules={{
-          required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-        }}
-        render={({ field: { onBlur, onChange, value } }) => (
-          <>
-            <TextInput
-              label="Billing to:"
-              style={{ ...formStyles.input }}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              error={errors?.chargeNote?.billingTo && true}
-              multiline={true}
-              maxLength={250}
-              numberOfLines={5} // Optional: Set the number of lines to display
-            />
-            <HelperText type="error">
-              {errors?.chargeNote?.billingTo?.message}
-            </HelperText>
-          </>
-        )}
-      />
-      <Controller
-        control={control}
-        defaultValue=""
-        name="chargeNote.remarks"
-        render={({ field: { onBlur, onChange, value } }) => (
-          <>
-            <TextInput
-              label="Remarks:"
-              style={formStyles.input}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              error={errors?.chargeNote?.remarks && true}
-              maxLength={100}
-            />
-            <HelperText type="error">
-              {errors?.chargeNote?.remarks?.message}
-            </HelperText>
-          </>
-        )}
-      />
-      <Button
-        mode="contained"
-        disabled={!formState.isValid}
-        onPress={handleSubmit(submit)}
-      >
-        Generate charge note
-      </Button>
+    <>
+      <ScrollView contentContainerStyle={{ ...styles.container }}>
+        <View style={{ alignSelf: "center" }}>
+          <JetzSvg width={110} height={100} color={iconColor} />
+        </View>
+        <SectionTitle>Charge note details:</SectionTitle>
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.paymentType"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Payment type:"
+                style={formStyles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.arrival?.from && true}
+              />
+              <HelperText type="error">
+                {errors.arrival?.from?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.billingTo"
+          rules={{
+            required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+          }}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Billing to:"
+                style={{ ...formStyles.input }}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.billingTo && true}
+                multiline={true}
+                maxLength={250}
+                numberOfLines={5} // Optional: Set the number of lines to display
+              />
+              <HelperText type="error">
+                {errors?.chargeNote?.billingTo?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          defaultValue=""
+          name="chargeNote.remarks"
+          render={({ field: { onBlur, onChange, value } }) => (
+            <>
+              <TextInput
+                label="Remarks:"
+                style={formStyles.input}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                error={errors?.chargeNote?.remarks && true}
+                maxLength={100}
+              />
+              <HelperText type="error">
+                {errors?.chargeNote?.remarks?.message}
+              </HelperText>
+            </>
+          )}
+        />
+        <Button
+          mode="contained"
+          disabled={!formState.isValid}
+          onPress={handleSubmit(submit)}
+        >
+          Generate charge note
+        </Button>
 
-      {/* {Platform.OS === "ios" && (<>
+        {/* {Platform.OS === "ios" && (<>
           
           <View>
             <View style={styles.spacer} />
@@ -150,7 +151,8 @@ export default function App() {
             ) : undefined}
           </>
         )} */}
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 

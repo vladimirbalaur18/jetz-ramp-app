@@ -1183,7 +1183,7 @@ td
   <td colspan="3" class="xl80" width="192" style="border-right:.5pt solid black;
   border-left:none;width:144pt">ARR PAX (ADT/INF):</td>
   <td colspan="2" class="xl83" width="128" style="border-right:1.0pt solid black;
-  width:96pt">2</td>
+  width:96pt">${arrPaxCount}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td colspan="2" height="20" class="xl85" width="134" style="border-right:1.0pt solid black;
@@ -1192,7 +1192,7 @@ td
   border-left:none;width:100pt">${parsedRoute}</td>
   <td colspan="3" class="xl80" width="192" style="border-right:.5pt solid black;
   border-left:none;width:144pt">DEP PAX (ADT/INF):</td>
-  <td colspan="${arrPaxCount}" class="xl83" width="128" style="border-right:1.0pt solid black;
+  <td colspan="2" class="xl83" width="128" style="border-right:1.0pt solid black;
   width:96pt">${depPaxCount}</td>
  </tr>
  <tr height="40" style="height:30.0pt">
@@ -1221,7 +1221,7 @@ td
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="2" rowspan="2" height="38" class="xl69" width="134" style="border-right:
-  1.0pt solid black;height:28.8pt;width:100pt">PARKING POSITION NO.:</td>
+  1.0pt solid black;height:28.8pt;width:100pt">PARKING POSITION NO. :</td>
   <td colspan="5" class="xl67" width="326" style="border-right:1.0pt solid black;
   border-left:none;width:244pt">RAMP FOD INSPECTION BEFORE ARRIVAL PERFORMED</td>
   <td colspan="2" class="xl67" width="128" style="border-right:1.0pt solid black;

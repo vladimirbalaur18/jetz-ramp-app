@@ -14,6 +14,7 @@ import {
   MD3DarkTheme,
   adaptNavigationTheme,
   Button,
+  IconButton,
 } from "react-native-paper";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import merge from "deepmerge";
@@ -223,6 +224,7 @@ function RootLayoutNav() {
               name="(createFlight)/general"
               options={{
                 headerShown: true,
+
                 title: "General flight information",
               }}
             />
@@ -231,6 +233,15 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: `Arrival information ${FlightNumberIndicator}`,
+                headerLeft: () => (
+                  <IconButton
+                    onLongPress={() => {
+                      router.navigate("/");
+                    }}
+                    onPress={() => router.back()}
+                    icon={"arrow-left"}
+                  />
+                ),
               }}
             />
             <Stack.Screen
@@ -238,6 +249,15 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: `Departure information ${FlightNumberIndicator}`,
+                headerLeft: () => (
+                  <IconButton
+                    onLongPress={() => {
+                      router.navigate("/");
+                    }}
+                    onPress={() => router.back()}
+                    icon={"arrow-left"}
+                  />
+                ),
               }}
             />
             <Stack.Screen
@@ -245,6 +265,15 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: `Provided services ${FlightNumberIndicator}`,
+                headerLeft: () => (
+                  <IconButton
+                    onLongPress={() => {
+                      router.navigate("/");
+                    }}
+                    onPress={() => router.back()}
+                    icon={"arrow-left"}
+                  />
+                ),
               }}
             />
             <Stack.Screen
@@ -252,6 +281,15 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: `Signature ${FlightNumberIndicator}`,
+                headerLeft: () => (
+                  <IconButton
+                    onLongPress={() => {
+                      router.navigate("/");
+                    }}
+                    onPress={() => router.back()}
+                    icon={"arrow-left"}
+                  />
+                ),
               }}
             />
             <Stack.Screen
@@ -259,6 +297,15 @@ function RootLayoutNav() {
               options={{
                 headerShown: true,
                 title: `Generate PDF files ${FlightNumberIndicator}`,
+                headerLeft: () => (
+                  <IconButton
+                    onLongPress={() => {
+                      router.navigate("/");
+                    }}
+                    onPress={() => router.back()}
+                    icon={"arrow-left"}
+                  />
+                ),
               }}
             />
             <Stack.Screen

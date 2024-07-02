@@ -14,7 +14,11 @@ export default function Layout() {
   const [config] = useQuery<GeneralConfigState>("General");
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer screenOptions={!config ? { headerLeft: () => null } : undefined}>
+      <Drawer
+        screenOptions={
+          !config?.defaultAirport ? { headerLeft: () => null } : undefined
+        }
+      >
         <Drawer.Screen
           name="index" // This is the name of the page and must match the url from root
           options={{

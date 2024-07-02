@@ -66,17 +66,20 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     0
   );
 
+  console.log('checking VAT applying condition',  basicHandlingWithVAT &&
+    !flight?.providedServices!.basicHandling?.isPriceOverriden, basicHandlingWithVAT, !flight?.providedServices?.basicHandling.isPriceOverriden)
   if (
     basicHandlingWithVAT &&
     !flight?.providedServices!.basicHandling?.isPriceOverriden
   ) {
+	alert('applying VAT on basic handling')
     VATServicesList.push({
       serviceName: "Basic handling",
       basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),
       totalPrice: Number(basicHandlingWithVAT),
       quantity: 1,
     });
-  }
+  } else console.warn('VAT NOT APPLIED')
 
   if (basicHandlingWithoutVAT) {
     servicesListNoVAT.push({
@@ -89,7 +92,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 
   flight?.providedServices?.otherServices?.forEach((s) => {
     if (s?.isUsed) {
-      const quantity = Number(s?.quantity) || 0;
+      const quantity = Number(s?.quantity) || 1;
       const basePrice = s?.service.price;
       const amount = s?.isPriceOverriden
         ? s.totalPriceOverride || 0
@@ -155,7 +158,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">${
     s?.serviceName
   }</td>
-  <td class="xl121" style=";border-left:none">${s?.quantity}</td>
+  <td class="xl121" style=";border-left:none">${s?.quantity || ''}</td>
   <td colspan="2" class="xl114" style="border-right:.5pt solid black">${
     s?.isPriceOverriden
       ? Number(s?.totalPrice).toFixed(2)
@@ -2903,7 +2906,8 @@ ${VATApplicableServicesRenderHTML()}
   <td height="19" class="xl184" colspan="4" style="height:14.4pt;mso-ignore:colspan">Name
   and signature of handling agent</td>
   <td class="xl226" style="border-top:none">&nbsp;</td>
-  <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black">Name
+  <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black;	white-space:nowrap;
+">Name
   and signature of Crew/Carrier representative</td>
  </tr>
  <tr>

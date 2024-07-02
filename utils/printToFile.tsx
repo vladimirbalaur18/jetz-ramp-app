@@ -48,7 +48,7 @@ const printToFile = async ({
           alert("File saved successfully");
         })
         .catch((e) => alert("ERROR saving file"));
-    }
+    } else alert("Cannot save due to lack of permissions");
   } else alert("File cannot be generated. Invalid platform");
   // if (await isAvailableAsync()) {
   //   console.log("Sharing is available");

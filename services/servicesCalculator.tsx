@@ -96,15 +96,18 @@ export const getBasicHandlingPrice = (flight: IFlight) => {
 
 export const getTotalAirportFeesPrice = (flight: IFlight) => {
   const result = {
-    landing: getLandingFees(flight),
-    takeOff: getTakeOffFees(flight),
-    passengers: getPassengersFee(flight),
-    security: getSecurityFee(flight),
-    parking: getParkingFee(flight),
+    landing: getLandingFees(flight)?.toFixed(2),
+    takeOff: getTakeOffFees(flight)?.toFixed(2),
+    passengers: getPassengersFee(flight)?.toFixed(2),
+    security: getSecurityFee(flight)?.toFixed(2),
+    parking: getParkingFee(flight)?.toFixed(2),
   };
 
   return {
-    total: Object.values(result).reduce((sum, value) => sum + value, 0),
+    total: Object.values(result).reduce(
+      (sum, value) => sum + parseFloat(value),
+      0
+    ),
     fees: { ...result },
   };
 };

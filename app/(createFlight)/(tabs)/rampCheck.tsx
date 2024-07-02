@@ -66,7 +66,8 @@ export default function Page() {
     printToFile({
       html: rampChecklistHTML({ ...existingFlightJSON, ...data }),
       fileName: `rampChecklist_${existingFlightJSON?.flightNumber}_${existingFlightJSON?.aircraftRegistration}`,
-      width: 500,
+      width: 485,
+      height: 942,
     });
   };
 
@@ -89,7 +90,7 @@ export default function Page() {
             service: s.service,
             isUsed: s.isUsed,
             isPriceOverriden: s.isPriceOverriden,
-            quantity: s.quantity,
+            quantity: s.isPriceOverriden ? 1 : s.quantity,
             notes: s.notes || "",
           });
       });
@@ -135,7 +136,6 @@ export default function Page() {
                     <Text variant="bodyMedium">{service.serviceName}</Text>
                     <Controller
                       control={control}
-                      defaultValue={1}
                       name={`providedServices.otherServices.${serviceIndex}.quantity`}
                       rules={{
                         required: {

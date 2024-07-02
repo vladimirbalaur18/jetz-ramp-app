@@ -120,19 +120,19 @@ export default function Page() {
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
     mode: "onChange",
     defaultValues: {
-      arrival: existingFlightJSON.arrival || {
-        crewNumber: 1,
-        cargoInfo: "NIL",
-        mailInfo: "NIL",
-        specialInfo: "NIL",
-        remarksInfo: "NIL",
+      arrival: {
+        crewNumber: existingFlightJSON.arrival.crewNumber ?? 1,
+        cargoInfo: existingFlightJSON.arrival.cargoInfo ?? "NIL",
+        mailInfo: existingFlightJSON.arrival.mailInfo ?? "NIL",
+        specialInfo: existingFlightJSON.arrival.specialInfo ?? "NIL",
+        remarksInfo: existingFlightJSON.arrival.remarksInfo ?? "NIL",
       },
-      departure: existingFlightJSON.departure || {
-        crewNumber: 1,
-        cargoInfo: "NIL",
-        mailInfo: "NIL",
-        specialInfo: "NIL",
-        remarksInfo: "NIL",
+      departure: {
+        crewNumber: existingFlightJSON.departure.crewNumber ?? 1,
+        cargoInfo: existingFlightJSON.departure.cargoInfo ?? "NIL",
+        mailInfo: existingFlightJSON.departure.mailInfo ?? "NIL",
+        specialInfo: existingFlightJSON.departure.specialInfo ?? "NIL",
+        remarksInfo: existingFlightJSON.departure.remarksInfo ?? "NIL",
       },
     },
   });
