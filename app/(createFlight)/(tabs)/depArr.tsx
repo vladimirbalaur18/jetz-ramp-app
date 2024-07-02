@@ -121,6 +121,7 @@ export default function Page() {
     mode: "onChange",
     defaultValues: {
       arrival: {
+        ...existingFlightJSON.arrival,
         crewNumber: existingFlightJSON.arrival.crewNumber ?? 1,
         cargoInfo: existingFlightJSON.arrival.cargoInfo ?? "NIL",
         mailInfo: existingFlightJSON.arrival.mailInfo ?? "NIL",
@@ -128,6 +129,7 @@ export default function Page() {
         remarksInfo: existingFlightJSON.arrival.remarksInfo ?? "NIL",
       },
       departure: {
+        ...existingFlightJSON.departure,
         crewNumber: existingFlightJSON.departure.crewNumber ?? 1,
         cargoInfo: existingFlightJSON.departure.cargoInfo ?? "NIL",
         mailInfo: existingFlightJSON.departure.mailInfo ?? "NIL",

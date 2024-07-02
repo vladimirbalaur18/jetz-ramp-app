@@ -76,7 +76,7 @@ const SignaturePage = () => {
         icon={"clipboard-list"}
         onPress={handleSubmit(submit)}
       >
-        Generate invoice
+        Invoice
       </Button>
     </View>
   );
