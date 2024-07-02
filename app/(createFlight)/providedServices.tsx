@@ -27,6 +27,7 @@ import {
   Divider,
   HelperText,
   Icon,
+  IconButton,
   Modal,
   Portal,
   Switch,
@@ -88,6 +89,7 @@ const Form: React.FC = () => {
     getValues,
     resetField,
     watch,
+    reset,
     setValue,
   } = useForm<FormData>({
     mode: "all",
@@ -145,7 +147,7 @@ const Form: React.FC = () => {
   const { errors } = formState;
   const [priceOverrideModalVisible, setPriceOverrideModalVisible] =
     useState(false);
-  const { fields, append, update } = useFieldArray({
+  const { fields, append, update, remove } = useFieldArray({
     control,
     name: "providedServices.otherServices",
   });
@@ -174,6 +176,8 @@ const Form: React.FC = () => {
         });
       });
     }
+
+    return () => remove();
   }, []);
   //disbursement calculation
   useEffect(() => {
@@ -329,9 +333,7 @@ const Form: React.FC = () => {
             onDismiss={() => setAirportFeeModalVisible(false)}
           >
             <View>
-              <Text style={{ marginVertical: 10 }} variant="headlineSmall">
-                Airport fee details
-              </Text>
+              <Text variant="headlineSmall">Airport fee details</Text>
               <Controller
                 control={airportFeeOverrideForm.control}
                 name="landing"
@@ -633,9 +635,18 @@ const Form: React.FC = () => {
 
           <SectionTitle>Support services</SectionTitle>
           <View>
-            <Text style={{ alignItems: "center" }}>
-              Airport fee{" "}
-              <Pressable
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "space-bewteen",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ alignItems: "center" }}>Airport fee </Text>
+              <IconButton
+                icon="information"
+                size={16}
                 onPress={() =>
                   // Alert.alert(
                   //   "Airport fee details:",
@@ -657,10 +668,8 @@ const Form: React.FC = () => {
                   // )
                   setAirportFeeModalVisible(true)
                 }
-              >
-                <Icon source="information" size={16} color="white" />
-              </Pressable>
-            </Text>
+              />
+            </View>
 
             <Controller
               control={control}
@@ -1099,7 +1108,7 @@ const Form: React.FC = () => {
                                 service,
                                 isPriceOverriden,
                                 notes: notes || "",
-                                quantity,
+                                quantity: 1,
                                 totalPriceOverride,
                                 isUsed: value,
                               });
