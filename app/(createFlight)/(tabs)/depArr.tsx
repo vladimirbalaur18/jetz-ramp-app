@@ -190,7 +190,7 @@ export default function Page() {
                   <TextInput
                     label="Crew members count"
                     style={styles.input}
-                    value={value ? String(value) : undefined}
+                    value={String(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) => onChange(onlyIntNumber(value))}
@@ -329,7 +329,7 @@ export default function Page() {
                   <TextInput
                     label="Crew members count"
                     style={styles.input}
-                    value={value ? String(value) : undefined}
+                    value={String(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) => onChange(onlyIntNumber(value))}
