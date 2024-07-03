@@ -1248,7 +1248,7 @@ td
   <td colspan="5" rowspan="2" height="39" class="xl98" width="326" style="border-right:
   1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname?'&nbsp;':flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname}</td>
   <td colspan="2" rowspan="2" class="xl100" width="128" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:96pt">${flight?.departure.rampInspectionBeforeDeparture.FOD === undefined? '&nbsp;':flight?.departure.rampInspectionBeforeDeparture.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
+  border-bottom:1.0pt solid black;width:96pt">${flight?.departure?.rampInspectionBeforeDeparture?.FOD === undefined? '&nbsp;':flight?.departure?.rampInspectionBeforeDeparture?.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>

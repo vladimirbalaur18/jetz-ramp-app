@@ -1267,6 +1267,7 @@ const Form: React.FC = () => {
                                         label="Manual price override:"
                                         style={formStyles.input}
                                         onBlur={onBlur}
+                                        keyboardType="numeric"
                                         onChangeText={(text) => onChange(text)}
                                       />
 
