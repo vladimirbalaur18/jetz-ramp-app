@@ -40,7 +40,7 @@ const Form: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues, reset, watch } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         serviceName: currentService?.serviceName,
         amount: currentService?.price,

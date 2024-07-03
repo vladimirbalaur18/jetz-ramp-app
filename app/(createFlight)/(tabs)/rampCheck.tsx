@@ -52,7 +52,7 @@ export default function Page() {
 
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IFlight>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         providedServices: {
           ...existingFlightJSON.providedServices,
@@ -96,7 +96,7 @@ export default function Page() {
       });
 
     return () => remove();
-  }, []);
+  }, [JSON.stringify(existingFlightJSON, null, 5)]);
 
   const { errors } = formState;
   const allProvidedServices = watch("providedServices");
@@ -133,7 +133,10 @@ export default function Page() {
                   )}
 
                   <View style={{ marginVertical: 10 }}>
-                    <Text variant="bodyMedium">{service.serviceName}</Text>
+                    <Text variant="bodyMedium">
+                      {service.serviceName}{" "}
+                      {isPriceOverriden && "(price overriden)"}
+                    </Text>
                     <Controller
                       control={control}
                       name={`providedServices.otherServices.${serviceIndex}.quantity`}
@@ -152,6 +155,7 @@ export default function Page() {
                           <TextInput
                             label="Quantity:"
                             style={formStyles.input}
+                            disabled={isPriceOverriden}
                             value={String(value)}
                             onBlur={onBlur}
                             keyboardType="numeric"

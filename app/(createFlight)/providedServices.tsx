@@ -52,6 +52,7 @@ import {
   replaceCommaWithDot,
 } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";
+import _ from "lodash";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -92,7 +93,7 @@ const Form: React.FC = () => {
     reset,
     setValue,
   } = useForm<FormData>({
-    mode: "all",
+    mode: "onBlur",
     defaultValues: {
       providedServices: {
         basicHandling: {
@@ -145,8 +146,9 @@ const Form: React.FC = () => {
     },
   });
   const { errors } = formState;
-  const [priceOverrideModalVisible, setPriceOverrideModalVisible] =
-    useState(false);
+  const [priceOverrideModalVisible, setPriceOverrideModalVisible] = useState<
+    number | null
+  >(null);
   const { fields, append, update, remove } = useFieldArray({
     control,
     name: "providedServices.otherServices",
@@ -250,18 +252,18 @@ const Form: React.FC = () => {
             "VIPLoungeService",
             {
               departureAdultPax: Number(
-                data.providedServices?.VIPLoungeServices.departureAdultPax || 0
+                data.providedServices?.VIPLoungeServices?.departureAdultPax || 0
               ),
               departureMinorPax: Number(
-                data.providedServices?.VIPLoungeServices.departureMinorPax || 0
+                data.providedServices?.VIPLoungeServices?.departureMinorPax || 0
               ),
               arrivalAdultPax: Number(
-                data.providedServices?.VIPLoungeServices.arrivalAdultPax || 0
+                data.providedServices?.VIPLoungeServices?.arrivalAdultPax || 0
               ),
               arrivalMinorPax: Number(
-                data.providedServices?.VIPLoungeServices.arrivalMinorPax || 0
+                data.providedServices?.VIPLoungeServices?.arrivalMinorPax || 0
               ),
-              remarks: data.providedServices?.VIPLoungeServices.remarks || "",
+              remarks: data.providedServices?.VIPLoungeServices?.remarks || "",
             }
           ),
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
@@ -273,25 +275,25 @@ const Form: React.FC = () => {
           supportServices: realm.create<ISupportServices>("SupportServices", {
             HOTAC: {
               total: Number(
-                data?.providedServices?.supportServices.HOTAC.total
+                data?.providedServices?.supportServices.HOTAC?.total
               ),
             },
             airportFee: {
               total: Number(
-                data?.providedServices?.supportServices.airportFee.total
+                data?.providedServices?.supportServices?.airportFee?.total
               ),
             },
             catering: {
               total: Number(
-                data?.providedServices?.supportServices.catering.total
+                data?.providedServices?.supportServices?.catering?.total
               ),
             },
             fuel: {
               fuelDensity: Number(
-                data.providedServices?.supportServices.fuel.fuelDensity
+                data.providedServices?.supportServices?.fuel?.fuelDensity
               ),
               fuelLitersQuantity: Number(
-                data.providedServices?.supportServices.fuel.fuelLitersQuantity
+                data.providedServices?.supportServices?.fuel?.fuelLitersQuantity
               ),
             },
           }),
@@ -639,7 +641,7 @@ const Form: React.FC = () => {
               style={{
                 flex: 1,
                 flexDirection: "row",
-                justifyContent: "space-bewteen",
+                justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
@@ -874,7 +876,6 @@ const Form: React.FC = () => {
             <Text variant="bodyMedium">Departure</Text>
             <Controller
               control={control}
-              defaultValue={0}
               name="providedServices.VIPLoungeServices.departureAdultPax"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
@@ -889,12 +890,14 @@ const Form: React.FC = () => {
                     label="Departure adult passengers:"
                     style={formStyles.input}
                     value={String(value)}
+                    onChangeText={(value) =>
+                      _.isString(value) && onChange(onlyIntNumber(value))
+                    }
                     onBlur={(e) => {
                       if (!value) onChange(0);
                       onBlur();
                     }}
                     keyboardType="numeric"
-                    onChangeText={(value) => onChange(onlyIntNumber(value))}
                     error={
                       errors?.providedServices?.VIPLoungeServices
                         ?.departureAdultPax && true
@@ -1204,7 +1207,7 @@ const Form: React.FC = () => {
                               </Text>
                               <Button
                                 onPress={() =>
-                                  setPriceOverrideModalVisible(true)
+                                  setPriceOverrideModalVisible(serviceIndex)
                                 }
                               >
                                 <MaterialCommunityIcons
@@ -1220,9 +1223,11 @@ const Form: React.FC = () => {
                               }}
                             >
                               <PriceOverrideModal
-                                visible={priceOverrideModalVisible}
+                                visible={
+                                  priceOverrideModalVisible === serviceIndex
+                                }
                                 onDismiss={() =>
-                                  setPriceOverrideModalVisible(false)
+                                  setPriceOverrideModalVisible(null)
                                 }
                               >
                                 <Text variant="bodyMedium">{serviceName}</Text>
@@ -1259,7 +1264,7 @@ const Form: React.FC = () => {
                                               totalPriceOverride,
                                               isUsed,
                                             });
-                                            setPriceOverrideModalVisible(false);
+                                            setPriceOverrideModalVisible(null);
                                           }}
                                         >
                                           Reset
@@ -1276,7 +1281,7 @@ const Form: React.FC = () => {
                                               totalPriceOverride: value,
                                               isUsed,
                                             });
-                                            setPriceOverrideModalVisible(false);
+                                            setPriceOverrideModalVisible(null);
                                           }}
                                         >
                                           Submit

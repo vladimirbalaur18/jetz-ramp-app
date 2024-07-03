@@ -59,7 +59,7 @@ const Form: React.FC = () => {
     useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm<FormData>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: existingFlightJSON || {
       chargeNote: {
         currency: {

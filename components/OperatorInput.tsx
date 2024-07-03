@@ -32,7 +32,7 @@ export const OperatorInput: React.FC<IOperatorInput> = ({
 }) => {
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IBillingOperator>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         operatorName,
         billingInfo,

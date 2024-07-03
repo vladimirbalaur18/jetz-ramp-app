@@ -46,7 +46,7 @@ export default function App() {
   };
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: { ...existingFlightJSON },
   });
   const iconColor = useTheme().colors.text;

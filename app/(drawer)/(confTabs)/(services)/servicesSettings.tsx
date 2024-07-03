@@ -21,7 +21,7 @@ const Form: React.FC = () => {
   let [fuelFee] = useQuery<FuelFeesState>("FuelFees");
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {},
   });
   const { errors } = formState;

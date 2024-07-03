@@ -49,7 +49,7 @@ const Form: React.FC = () => {
 
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: _existingFlight?.toJSON().departure
         ? _existingFlight?.toJSON()
         : {

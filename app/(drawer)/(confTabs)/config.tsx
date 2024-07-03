@@ -35,7 +35,7 @@ const Form: React.FC = () => {
 
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       VAT: configs?.VAT,
       defaultAirport: configs?.defaultAirport,

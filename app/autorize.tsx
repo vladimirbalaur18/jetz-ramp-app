@@ -15,7 +15,7 @@ type FormData = {
 const Page = () => {
   const { control, formState, handleSubmit, getValues, watch, setError } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
     });
   const { login } = useAuthContext();
   const iconColor = useTheme().colors.text;

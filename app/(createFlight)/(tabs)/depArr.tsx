@@ -118,23 +118,23 @@ export default function Page() {
       });
   };
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       arrival: {
         ...existingFlightJSON.arrival,
-        crewNumber: existingFlightJSON.arrival.crewNumber ?? 1,
-        cargoInfo: existingFlightJSON.arrival.cargoInfo ?? "NIL",
-        mailInfo: existingFlightJSON.arrival.mailInfo ?? "NIL",
-        specialInfo: existingFlightJSON.arrival.specialInfo ?? "NIL",
-        remarksInfo: existingFlightJSON.arrival.remarksInfo ?? "NIL",
+        crewNumber: existingFlightJSON?.arrival?.crewNumber ?? 1,
+        cargoInfo: existingFlightJSON?.arrival?.cargoInfo ?? "NIL",
+        mailInfo: existingFlightJSON?.arrival?.mailInfo ?? "NIL",
+        specialInfo: existingFlightJSON?.arrival?.specialInfo ?? "NIL",
+        remarksInfo: existingFlightJSON?.arrival?.remarksInfo ?? "NIL",
       },
       departure: {
         ...existingFlightJSON.departure,
-        crewNumber: existingFlightJSON.departure.crewNumber ?? 1,
-        cargoInfo: existingFlightJSON.departure.cargoInfo ?? "NIL",
-        mailInfo: existingFlightJSON.departure.mailInfo ?? "NIL",
-        specialInfo: existingFlightJSON.departure.specialInfo ?? "NIL",
-        remarksInfo: existingFlightJSON.departure.remarksInfo ?? "NIL",
+        crewNumber: existingFlightJSON?.departure?.crewNumber ?? 1,
+        cargoInfo: existingFlightJSON?.departure?.cargoInfo ?? "NIL",
+        mailInfo: existingFlightJSON?.departure?.mailInfo ?? "NIL",
+        specialInfo: existingFlightJSON?.departure?.specialInfo ?? "NIL",
+        remarksInfo: existingFlightJSON?.departure?.remarksInfo ?? "NIL",
       },
     },
   });

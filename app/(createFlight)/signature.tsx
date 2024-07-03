@@ -33,7 +33,7 @@ const SignaturePage = () => {
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<IFlight>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         crew: existingFlightJSON.crew || { name: "", signature: "" },
         ramp: existingFlightJSON.ramp || { name: "", signature: "" },

@@ -29,7 +29,7 @@ const Form: React.FC = () => {
   let basicHandlingFees =
     useQuery<IBasicHandlingRule>("BasicHandlingRule").sorted("minMTOW");
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
-    mode: "onChange",
+    mode: "onBlur",
   });
   const [isSnackbarVisible, setSnackbarVisible] = useState(false);
   const fieldArray = useFieldArray<FormData>({
@@ -150,7 +150,7 @@ function BasicHandlingInput({
   const theme = useTheme();
   const { control, formState, handleSubmit, getValues, watch, getFieldState } =
     useForm<IBasicHandlingRule>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         minMTOW,
         maxMTOW,

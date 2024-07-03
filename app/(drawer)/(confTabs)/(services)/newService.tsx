@@ -41,7 +41,7 @@ const NewService: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues, reset, watch } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         serviceName: "",
         amount: 0,
@@ -278,7 +278,7 @@ const AddCategoryModal = ({
     useForm<{
       serviceCategoryName: string;
     }>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
         serviceCategoryName: "",
       },

@@ -51,7 +51,7 @@ const Form: React.FC = () => {
   const snackbar = useSnackbar();
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: _existingFlight?.toJSON().arrival
         ? _existingFlight?.toJSON()
         : {

@@ -29,7 +29,7 @@ const Page = () => {
   const realm = useRealm();
   const { control, formState, handleSubmit, getValues, watch, setError } =
     useForm<FormData>({
-      mode: "onChange",
+      mode: "onBlur",
     });
   const { errors } = formState;
   const password = watch("password");
