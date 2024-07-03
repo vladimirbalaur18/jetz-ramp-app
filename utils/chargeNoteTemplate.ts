@@ -24,6 +24,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
+  console.log("FLIGHT INFO", JSON.stringify(flight,null, 10))
   const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
   console.log("confa", config);
   const basicHandling = getBasicHandlingPrice(flight);
@@ -72,7 +73,6 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     basicHandlingWithVAT &&
     !flight?.providedServices!.basicHandling?.isPriceOverriden
   ) {
-	alert('applying VAT on basic handling')
     VATServicesList.push({
       serviceName: "Basic handling",
       basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),

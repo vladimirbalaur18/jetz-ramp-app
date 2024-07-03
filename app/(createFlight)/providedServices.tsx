@@ -112,23 +112,47 @@ const Form: React.FC = () => {
         supportServices: {
           airportFee: {
             total: Number(
-              existingFlight
-                ? getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
-                : 0
+              existingFlight?.providedServices?.supportServices?.airportFee
+                ?.total
+                ? existingFlight?.providedServices?.supportServices?.airportFee
+                    ?.total
+                : getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
             ),
           },
           fuel: {
-            fuelLitersQuantity: 0,
+            fuelLitersQuantity:
+              existingFlight?.providedServices?.supportServices?.fuel
+                ?.fuelLitersQuantity || 0,
+            fuelDensity:
+              existingFlight?.providedServices?.supportServices?.fuel
+                ?.fuelDensity || 0,
           },
-          catering: { total: 0 },
-          HOTAC: { total: 0 },
+          catering: {
+            total:
+              existingFlight?.providedServices?.supportServices?.catering
+                ?.total || 0,
+          },
+          HOTAC: {
+            total:
+              existingFlight?.providedServices?.supportServices?.HOTAC?.total ||
+              0,
+          },
         },
         VIPLoungeServices: {
-          departureAdultPax: 0,
-          departureMinorPax: 0,
-          arrivalAdultPax: 0,
-          arrivalMinorPax: 0,
-          remarks: "",
+          departureAdultPax:
+            existingFlight?.providedServices?.VIPLoungeServices
+              ?.departureAdultPax || 0,
+          departureMinorPax:
+            existingFlight?.providedServices?.VIPLoungeServices
+              ?.departureMinorPax || 0,
+          arrivalAdultPax:
+            existingFlight?.providedServices?.VIPLoungeServices
+              ?.arrivalAdultPax || 0,
+          arrivalMinorPax:
+            existingFlight?.providedServices?.VIPLoungeServices
+              ?.arrivalMinorPax || 0,
+          remarks:
+            existingFlight?.providedServices?.VIPLoungeServices?.remarks || "",
         },
       },
     },
@@ -351,7 +375,7 @@ const Form: React.FC = () => {
                     <TextInput
                       label="Landing fee:"
                       style={formStyles.input}
-                      value={value ? String(value) : ""}
+                      value={String(value)}
                       onBlur={onBlur}
                       keyboardType="numeric"
                       onChangeText={(value) =>
@@ -394,7 +418,7 @@ const Form: React.FC = () => {
                     <TextInput
                       label="Takeoff fee:"
                       style={formStyles.input}
-                      value={value ? String(value) : ""}
+                      value={String(value)}
                       onBlur={onBlur}
                       keyboardType="numeric"
                       onChangeText={(value) =>
@@ -436,7 +460,7 @@ const Form: React.FC = () => {
                     <TextInput
                       label="Passenger fee:"
                       style={formStyles.input}
-                      value={value ? String(value) : ""}
+                      value={String(value)}
                       onBlur={onBlur}
                       keyboardType="numeric"
                       onChangeText={(value) =>
@@ -479,7 +503,7 @@ const Form: React.FC = () => {
                     <TextInput
                       label="Security fee:"
                       style={formStyles.input}
-                      value={value ? String(value) : ""}
+                      value={String(value)}
                       onBlur={onBlur}
                       keyboardType="numeric"
                       onChangeText={(value) =>
@@ -521,7 +545,7 @@ const Form: React.FC = () => {
                     <TextInput
                       label="Parking fee:"
                       style={formStyles.input}
-                      value={value ? String(value) : ""}
+                      value={String(value)}
                       onBlur={onBlur}
                       keyboardType="numeric"
                       onChangeText={(value) =>
@@ -575,7 +599,7 @@ const Form: React.FC = () => {
                     );
                     setValue(
                       "providedServices.supportServices.airportFee.total",
-                      sum as number
+                      parseFloat(sum as string).toFixed(2) as unknown as number
                     );
 
                     setAirportFeeModalVisible(false);
@@ -607,7 +631,7 @@ const Form: React.FC = () => {
                   <TextInput
                     label="Basic handling fee:"
                     style={formStyles.input}
-                    value={value ? String(value) : ""}
+                    value={String(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) => {

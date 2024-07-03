@@ -11,6 +11,7 @@ import printToFile from "@/utils/printToFile";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useTheme } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
+import _ from "lodash";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -50,6 +51,7 @@ export default function App() {
     defaultValues: { ...existingFlightJSON },
   });
   const iconColor = useTheme().colors.text;
+  const isFlightNotConsistent = _.isNull(existingFlightJSON?.providedServices);
 
   const { errors } = formState;
 
@@ -132,11 +134,16 @@ export default function App() {
         />
         <Button
           mode="contained"
-          disabled={!formState.isValid}
+          disabled={!formState.isValid || isFlightNotConsistent}
           onPress={handleSubmit(submit)}
         >
           Generate charge note
         </Button>
+        {isFlightNotConsistent && (
+          <HelperText type="info">
+            *Please submit the service page first
+          </HelperText>
+        )}
 
         {/* {Platform.OS === "ios" && (<>
           

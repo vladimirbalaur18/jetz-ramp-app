@@ -94,9 +94,14 @@ export default function Page() {
             notes: s.notes || "",
           });
       });
+    console.log("render ramp check");
 
-    return () => remove();
-  }, [JSON.stringify(existingFlightJSON, null, 5)]);
+    return () => {
+      console.log("unmount ramp check");
+
+      remove();
+    };
+  }, []);
 
   const { errors } = formState;
   const allProvidedServices = watch("providedServices");
