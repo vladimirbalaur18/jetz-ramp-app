@@ -118,8 +118,10 @@ const Form: React.FC = () => {
           );
         }
         realm.write(() => {
-          realmExistingFlight.aircraftRegistration = data.aircraftRegistration;
-          realmExistingFlight.aircraftType = data.aircraftType;
+          realmExistingFlight.aircraftRegistration =
+            data.aircraftRegistration?.toLocaleUpperCase();
+          realmExistingFlight.aircraftType =
+            data.aircraftType?.toLocaleUpperCase();
           realmExistingFlight.chargeNote.date = data.chargeNote.date;
           realmExistingFlight.chargeNote.currency.euroToMDL =
             data.chargeNote.currency.euroToMDL;
@@ -127,19 +129,21 @@ const Form: React.FC = () => {
             data.chargeNote.currency.usdToMDL;
           realmExistingFlight.crew = data?.crew;
           realmExistingFlight.chargeNote.paymentType =
-            data?.chargeNote.paymentType;
+            data?.chargeNote.paymentType?.toLocaleUpperCase();
           realmExistingFlight.chargeNote.billingTo = data.chargeNote.billingTo;
           realmExistingFlight.chargeNote.disbursementPercentage = Number(
             data.chargeNote.disbursementPercentage
           );
           realmExistingFlight.departure = data?.departure;
-          realmExistingFlight.flightNumber = data?.flightNumber;
+          realmExistingFlight.flightNumber =
+            data?.flightNumber?.toLocaleUpperCase();
           realmExistingFlight.handlingType = data?.handlingType;
           realmExistingFlight.isCommercialFlight = data?.isCommercialFlight;
           realmExistingFlight.mtow = Number(data?.mtow);
           realmExistingFlight.operatorName = data?.operatorName;
           realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
-          realmExistingFlight.parkingPosition = data?.parkingPosition;
+          realmExistingFlight.parkingPosition =
+            data?.parkingPosition?.toLocaleUpperCase();
           realmExistingFlight.providedServices = undefined;
           realmExistingFlight.ramp = undefined;
           realmExistingFlight.scheduleType = data?.scheduleType;
@@ -271,8 +275,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Flight number"
                 style={styles.input}
-                value={String(value).toUpperCase()}
-                onChangeText={(value) => onChange(String(value).toUpperCase())}
+                autoCapitalize="characters"
+                value={String(value)}
+                onChangeText={(value) => onChange(String(value))}
                 onBlur={onBlur}
                 error={errors.flightNumber && true}
               />
@@ -372,8 +377,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Aircraft type"
                 style={styles.input}
-                value={String(value).toUpperCase()}
-                onChangeText={(value) => onChange(String(value).toUpperCase())}
+                autoCapitalize="characters"
+                value={String(value)}
+                onChangeText={(value) => onChange(String(value))}
                 onBlur={onBlur}
                 error={errors.aircraftType && true}
               />
@@ -396,9 +402,12 @@ const Form: React.FC = () => {
               <TextInput
                 label="Aircraft registration"
                 style={styles.input}
-                value={String(value?.toUpperCase())}
+                value={value}
+                autoCapitalize="characters"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(String(value).toUpperCase())}
+                onChangeText={(value) => {
+                  onChange(value);
+                }}
                 error={errors.aircraftRegistration && true}
               />
               <HelperText type="error">
@@ -422,8 +431,9 @@ const Form: React.FC = () => {
               <TextInput
                 label="Parking position"
                 style={styles.input}
-                value={String(value).toUpperCase()}
-                onChangeText={(value) => onChange(String(value).toUpperCase())}
+                autoCapitalize="characters"
+                value={String(value)}
+                onChangeText={(value) => onChange(String(value))}
                 onBlur={onBlur}
                 error={errors.parkingPosition && true}
               />
@@ -472,6 +482,7 @@ const Form: React.FC = () => {
                 label="Payment type:"
                 style={formStyles.input}
                 value={value}
+                autoCapitalize="characters"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
                 error={errors?.arrival?.from && true}

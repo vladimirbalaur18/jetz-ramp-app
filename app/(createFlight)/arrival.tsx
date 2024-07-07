@@ -96,7 +96,7 @@ const Form: React.FC = () => {
           isLocalFlight: data.arrival.isLocalFlight,
           minorCount: Number(data.arrival.minorCount),
           rampInspectionBeforeArrival: rampInspection,
-          from: data.arrival.from,
+          from: data.arrival.from?.toLocaleUpperCase(),
         });
 
         if (_existingFlight) {
@@ -160,10 +160,9 @@ const Form: React.FC = () => {
                   label="From (ICAO):"
                   style={styles.input}
                   value={value}
+                  autoCapitalize="characters"
                   onBlur={onBlur}
-                  onChangeText={(value) =>
-                    onChange(String(value).toUpperCase())
-                  }
+                  onChangeText={(value) => onChange(String(value))}
                   error={errors?.arrival?.from && true}
                 />
                 <HelperText type="error">
@@ -345,6 +344,7 @@ const Form: React.FC = () => {
                   style={styles.input}
                   value={value ? String(value) : ""}
                   onBlur={onBlur}
+                  autoCapitalize="characters"
                   keyboardType="default"
                   onChangeText={(text) => onChange(text)}
                   error={

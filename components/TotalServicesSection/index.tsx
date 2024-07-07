@@ -67,7 +67,7 @@ const TotalServicesSection: React.FC<{
     }
 
     return categoryServicesMap;
-  }, [JSON.stringify(providedServices, null, 3)]);
+  }, [JSON.stringify(providedServices, null, 5)]);
 
   const [generalConfig] = useQuery<GeneralConfigState>("General");
   console.log("genCOnfig", generalConfig);
@@ -232,37 +232,43 @@ const TotalServicesSection: React.FC<{
       )}
       <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
-        Airport fees: {airportFee?.total || 0}&euro;
+        Airport fees: {Number(airportFee?.total)?.toFixed(2) || 0}&euro;
       </Text>
       <Text style={styles.serviceListItem} variant="titleMedium">
-        HOTAC fees: {HOTAC?.total || 0}&euro;
+        HOTAC fees: {Number(HOTAC?.total)?.toFixed(2) || 0}&euro;
       </Text>
       <Text style={styles.serviceListItem} variant="titleMedium">
-        Catering fees: {catering?.total || 0}&euro;
+        Catering fees: {Number(catering?.total)?.toFixed(2) || 0}&euro;
       </Text>
       <Text style={styles.serviceListItem} variant="titleMedium">
-        Fuel fee: {totalFuelPrice || 0}&euro;
+        Fuel fee: {Number(totalFuelPrice)?.toFixed(2) || 0}&euro;
       </Text>
       <Divider />
       <Text style={styles.serviceListItem} variant="titleMedium">
         Disbursement fees:
       </Text>
       <Text>
-        Airport fees: {disbursementFees.airportFee.toFixed(2) || 0}
+        Airport fees: {Number(disbursementFees.airportFee).toFixed(2) || 0}
         &euro;
       </Text>
-      <Text>HOTAC fees: {disbursementFees.HOTACFee.toFixed(2) || 0}&euro;</Text>
       <Text>
-        Catering fees: {disbursementFees.cateringFee.toFixed(2) || 0}
+        HOTAC fees: {Number(disbursementFees.HOTACFee).toFixed(2) || 0}&euro;
+      </Text>
+      <Text>
+        Catering fees: {Number(disbursementFees.cateringFee).toFixed(2) || 0}
         &euro;
       </Text>
-      <Text>Fuel fee: {disbursementFees.fuelFee.toFixed(2) || 0}&euro;</Text>
       <Text>
-        Express/VIP Lounge fee: {disbursementFees.VIPLoungeFee.toFixed(2)}&euro;
+        Fuel fee: {Number(disbursementFees.fuelFee).toFixed(2) || 0}&euro;
+      </Text>
+      <Text>
+        Express/VIP Lounge fee:{" "}
+        {Number(disbursementFees.VIPLoungeFee).toFixed(2)}&euro;
       </Text>
       <Divider style={{ marginVertical: 10 }} />
       <Text variant="titleLarge">
-        Total: {totalAmountOfServices.toFixed(2)}&euro;
+        Total: {Number(totalAmountOfServices).toFixed(2)}&euro;{" "}
+        {totalAmountOfServices}
       </Text>
     </View>
   );

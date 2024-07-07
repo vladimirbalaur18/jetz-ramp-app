@@ -113,6 +113,7 @@ const SignaturePage = () => {
                 label="Ramp agent name"
                 style={formStyles.input}
                 value={String(value)}
+                autoCapitalize="characters"
                 onBlur={onBlur}
                 keyboardType="default"
                 onChangeText={(text) => onChange(text)}
@@ -158,6 +159,7 @@ const SignaturePage = () => {
                 label="PIC name"
                 style={formStyles.input}
                 value={String(value)}
+                autoCapitalize="characters"
                 onBlur={onBlur}
                 keyboardType="default"
                 onChangeText={(text) => onChange(text)}

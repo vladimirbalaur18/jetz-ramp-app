@@ -57,11 +57,13 @@ const Form: React.FC = () => {
       realm.write(() => {
         if (configs) {
           configs.VAT = Number(data.VAT);
-          configs.defaultAirport = String(data.defaultAirport);
+          configs.defaultAirport = String(
+            data.defaultAirport
+          ).toLocaleUpperCase();
         } else {
           realm.create("General", {
             VAT: Number(data.VAT),
-            defaultAirport: String(data.defaultAirport),
+            defaultAirport: String(data.defaultAirport).toLocaleUpperCase(),
           });
         }
 
@@ -176,8 +178,9 @@ const Form: React.FC = () => {
                 label="Default airfield"
                 style={styles.input}
                 value={value}
+                autoCapitalize="characters"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(String(value).toUpperCase())}
+                onChangeText={(value) => onChange(String(value))}
                 error={errors?.defaultAirport && true}
               />
               <HelperText type="error">

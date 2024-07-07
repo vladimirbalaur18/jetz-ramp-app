@@ -106,7 +106,7 @@ const Form: React.FC = () => {
           isLocalFlight: data.departure.isLocalFlight,
           minorCount: Number(data.departure.minorCount),
           rampInspectionBeforeDeparture: rampInspection,
-          to: data.departure.to,
+          to: data.departure.to?.toLocaleUpperCase(),
         });
         const arrival = realm.create<IArrival>("Arrival", {
           arrivalDate: data.arrival.arrivalDate,
@@ -165,10 +165,9 @@ const Form: React.FC = () => {
                   label="To: (ICAO):"
                   style={styles.input}
                   value={value}
+                  autoCapitalize="characters"
                   onBlur={onBlur}
-                  onChangeText={(value) =>
-                    onChange(String(value).toUpperCase())
-                  }
+                  onChangeText={(value) => onChange(String(value))}
                   error={errors?.departure?.to && true}
                 />
                 <HelperText type="error">
@@ -439,6 +438,7 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Ramp agent name"
                   style={styles.input}
+                  autoCapitalize="characters"
                   value={value ? String(value) : undefined}
                   onBlur={onBlur}
                   keyboardType="default"
