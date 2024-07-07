@@ -268,7 +268,6 @@ const TotalServicesSection: React.FC<{
       <Divider style={{ marginVertical: 10 }} />
       <Text variant="titleLarge">
         Total: {Number(totalAmountOfServices).toFixed(2)}&euro;{" "}
-        {totalAmountOfServices}
       </Text>
     </View>
   );
