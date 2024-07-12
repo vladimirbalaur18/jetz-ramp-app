@@ -33,6 +33,7 @@ export const getDifferenceBetweenArrivalDeparture = (
   const arrivalTime = getParsedDateTime(
     flight.arrival.arrivalDate,
     flight.arrival.arrivalTime
+  ).add(FREE_PARKING_HOURS, "hours");
 
   const departureTime = getParsedDateTime(
     flight.departure.departureDate,
