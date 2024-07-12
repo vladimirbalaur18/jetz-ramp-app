@@ -14,7 +14,7 @@ import { useRealm } from "@realm/react";
 import _ from "lodash";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 type FormData = IFlight;
@@ -28,22 +28,28 @@ export default function App() {
 
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    if (realmExistingFlight)
-      realm.write(() => {
-        realmExistingFlight.chargeNote.billingTo =
-          data.chargeNote?.billingTo || "";
-        realmExistingFlight.chargeNote.date = new Date();
-        realmExistingFlight.chargeNote.paymentType =
-          data.chargeNote?.paymentType || "";
-        realmExistingFlight.chargeNote.remarks = data.chargeNote?.remarks || "";
+    try {
+      if (realmExistingFlight)
+        realm.write(() => {
+          realmExistingFlight.chargeNote.billingTo =
+            data.chargeNote?.billingTo || "";
+          realmExistingFlight.chargeNote.date = new Date();
+          realmExistingFlight.chargeNote.paymentType =
+            data.chargeNote?.paymentType || "";
+          realmExistingFlight.chargeNote.remarks =
+            data.chargeNote?.remarks || "";
+        });
+      const pdfName = `${existingFlightJSON?.flightNumber}_${existingFlightJSON.aircraftRegistration}`;
+
+      printToFile({
+        html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
+        fileName: pdfName,
+        width: 485,
+        height: 742,
       });
-    const pdfName = `${existingFlightJSON?.flightNumber}_${existingFlightJSON.aircraftRegistration}`;
-    printToFile({
-      html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
-      fileName: pdfName,
-      width: 485,
-      height: 742,
-    });
+    } catch (e) {
+      Alert.alert("Error saving charge note", JSON.stringify(e, null, 5));
+    }
   };
 
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({

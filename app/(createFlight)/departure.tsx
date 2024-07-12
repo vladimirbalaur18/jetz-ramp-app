@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import {
   TextInput,
   Button,
@@ -70,20 +76,11 @@ const Form: React.FC = () => {
   const adultPassengersCount = watch("departure.adultCount");
   const minorPassengersCount = watch("departure.minorCount");
   const snackbar = useSnackbar();
+  const [departureTimerVisible, setDepartureTimerVisible] =
+    React.useState(false);
+  const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
+
   const submit = (data: IFlight) => {
-    // alert(JSON.stringify(data));
-    //nullyfy services if we update new data
-
-    // if (!_.isEqual(existingFlight, data)) {
-    //   alert("Nullyfind services");
-    //   dispatch(
-    //     updateFlight({
-    //       ...data,
-    //       providedServices: null as unknown as IProvidedServices,
-    //     })
-    //   );
-    // } else dispatch(updateFlight(data));
-
     try {
       realm.write(() => {
         const departureTime = realm.create<ITime>("Time", {
@@ -130,14 +127,12 @@ const Form: React.FC = () => {
 
       router.navigate("/(createFlight)/providedServices");
     } catch (e) {
-      alert(
-        `Error saving departure information: ${JSON.stringify(e, null, 5)}`
+      Alert.alert(
+        "Error saving departure information",
+        JSON.stringify(e, null, 2)
       );
     }
   };
-  const [departureTimerVisible, setDepartureTimerVisible] =
-    React.useState(false);
-  const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
 
   return (
     <>

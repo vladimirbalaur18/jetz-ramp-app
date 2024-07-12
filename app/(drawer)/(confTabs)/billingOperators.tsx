@@ -1,4 +1,4 @@
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, Alert } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Divider, Searchbar } from "react-native-paper";
 import { IBillingOperator } from "@/models/billingOperators";
@@ -21,49 +21,70 @@ const BillingOperators = () => {
   const [isPendingItemCreate, setIsPendingItemCreate] = useState(false);
 
   const onFieldCreatePress = (data: IBillingOperator) => {
-    realm.write(() => {
-      realm.create<IBillingOperator>("BillingOperator", {
-        _id: new ObjectId(),
-        billingInfo: data.billingInfo,
-        operatorName: data.operatorName,
+    try {
+      realm.write(() => {
+        realm.create<IBillingOperator>("BillingOperator", {
+          _id: new ObjectId(),
+          billingInfo: data.billingInfo,
+          operatorName: data.operatorName,
+        });
       });
-    });
 
-    setIsPendingItemCreate(false);
+      setIsPendingItemCreate(false);
+    } catch (e) {
+      Alert.alert(
+        "Error creating billing operator",
+        JSON.stringify(e, null, 5)
+      );
+    }
   };
   const onFieldUpdatePress = ({
     _id,
     billingInfo,
     operatorName,
   }: IBillingOperator) => {
-    realm.write(() => {
-      const updatedField = realm
-        .objects<IBillingOperator>("BillingOperator")
-        .find((o) => o._id.equals(_id));
+    try {
+      realm.write(() => {
+        const updatedField = realm
+          .objects<IBillingOperator>("BillingOperator")
+          .find((o) => o._id.equals(_id));
 
-      if (updatedField) {
-        for (let flight of allFlightsData) {
-          if (flight.operatorName === updatedField.operatorName) {
-            flight.operatorName = operatorName;
-            flight.chargeNote.billingTo = billingInfo;
-          }
+        if (updatedField) {
+          for (let flight of allFlightsData) {
+            if (flight.operatorName === updatedField.operatorName) {
+              flight.operatorName = operatorName;
+              flight.chargeNote.billingTo = billingInfo;
+            }
 
-          if (flight.orderingCompanyName === updatedField.operatorName) {
-            flight.orderingCompanyName = operatorName;
+            if (flight.orderingCompanyName === updatedField.operatorName) {
+              flight.orderingCompanyName = operatorName;
+            }
           }
+          updatedField.billingInfo = billingInfo;
+          updatedField.operatorName = operatorName;
         }
-        updatedField.billingInfo = billingInfo;
-        updatedField.operatorName = operatorName;
-      }
-    });
+      });
+    } catch (e) {
+      Alert.alert(
+        "Error updating billing operator",
+        JSON.stringify(e, null, 5)
+      );
+    }
   };
   const onFieldRemovePress = (id: Realm.BSON.ObjectId) => {
-    realm.write(() => {
-      const removedField = realm
-        .objects<IBillingOperator>("BillingOperator")
-        .find((o) => o._id.equals(id));
-      realm.delete(removedField);
-    });
+    try {
+      realm.write(() => {
+        const removedField = realm
+          .objects<IBillingOperator>("BillingOperator")
+          .find((o) => o._id.equals(id));
+        realm.delete(removedField);
+      });
+    } catch (e) {
+      Alert.alert(
+        "Error removing billing operator",
+        JSON.stringify(e, null, 5)
+      );
+    }
   };
   const onFieldDismissPress = (id: Realm.BSON.ObjectId) => {
     setData((prev) => prev.filter((item) => !item.id.equals(id)));

@@ -157,7 +157,14 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
                       }).start(() => {
                         // setOpacity(new Animated.Value(1));
                         setIsVisible(false);
-                        realm.write(() => realm.delete(realmCurrentFlight));
+                        try {
+                          realm.write(() => realm.delete(realmCurrentFlight));
+                        } catch (e) {
+                          Alert.alert(
+                            "Error removing flight",
+                            JSON.stringify(e, null, 5)
+                          );
+                        }
                       }),
                     style: "destructive",
                   },
@@ -272,12 +279,16 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
                   {flight?.status !== "Completed" && (
                     <Menu.Item
                       onPress={() => {
-                        realm.write(() => {
-                          realmCurrentFlight.status = "Completed";
-                        });
-                        // // dispatch(removeFlight(flight?.flightId as string));   dispatch(setCurrentFlightById(flight?.flightId as string));
-                        // router.navigate("/(createFlight)/(tabs)/chargeNote");
-                        // closeMenu();
+                        try {
+                          realm.write(() => {
+                            realmCurrentFlight.status = "Completed";
+                          });
+                        } catch (e) {
+                          Alert.alert(
+                            "Error changing flight status",
+                            JSON.stringify(e, null, 5)
+                          );
+                        }
                       }}
                       leadingIcon={() => (
                         <MaterialCommunityIcons

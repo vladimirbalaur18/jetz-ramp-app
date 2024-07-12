@@ -112,7 +112,7 @@ const Form: React.FC = () => {
       });
       showSnackbar("Airport fees saved successfully");
     } catch (err) {
-      Alert.alert("Error saving Airport fees", JSON.stringify(err, null, 2));
+      Alert.alert("Error saving Airport fees", JSON.stringify(err, null, 5));
     }
   };
 

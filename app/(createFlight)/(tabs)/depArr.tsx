@@ -20,7 +20,7 @@ import {
 } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet } from "react-native";
+import { Alert, ScrollView, StyleSheet } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 export default function Page() {
@@ -33,54 +33,67 @@ export default function Page() {
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    if (realmExistingFlight)
-      realm.write(() => {
-        if (realmExistingFlight.handlingType != "Departure") {
-          if (fileType == "Arrival" || !realmExistingFlight?.arrival?.from) {
-            realmExistingFlight.arrival.crewNumber = Number(
-              data.arrival?.crewNumber
-            );
-            realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
-            realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
-            realmExistingFlight.arrival.specialInfo = data.arrival?.specialInfo;
-            realmExistingFlight.arrival.remarksInfo = data.arrival?.remarksInfo;
-            return;
-          } else {
-            realmExistingFlight.arrival.crewNumber = Number(
-              data.arrival?.crewNumber
-            );
-            realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
-            realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
-            realmExistingFlight.arrival.specialInfo = data.arrival?.specialInfo;
-            realmExistingFlight.arrival.remarksInfo = data.arrival?.remarksInfo;
+    try {
+      if (realmExistingFlight)
+        realm.write(() => {
+          if (realmExistingFlight.handlingType != "Departure") {
+            if (fileType == "Arrival" || !realmExistingFlight?.arrival?.from) {
+              realmExistingFlight.arrival.crewNumber = Number(
+                data.arrival?.crewNumber
+              );
+              realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
+              realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
+              realmExistingFlight.arrival.specialInfo =
+                data.arrival?.specialInfo;
+              realmExistingFlight.arrival.remarksInfo =
+                data.arrival?.remarksInfo;
+              return;
+            } else {
+              realmExistingFlight.arrival.crewNumber = Number(
+                data.arrival?.crewNumber
+              );
+              realmExistingFlight.arrival.cargoInfo = data.arrival?.cargoInfo;
+              realmExistingFlight.arrival.mailInfo = data.arrival?.mailInfo;
+              realmExistingFlight.arrival.specialInfo =
+                data.arrival?.specialInfo;
+              realmExistingFlight.arrival.remarksInfo =
+                data.arrival?.remarksInfo;
+            }
           }
-        }
 
-        if (realmExistingFlight.handlingType != "Arrival") {
-          if (fileType == "Departure" || !realmExistingFlight?.departure?.to) {
-            realmExistingFlight.departure.crewNumber = Number(
-              data.departure?.crewNumber
-            );
-            realmExistingFlight.departure.cargoInfo = data.departure?.cargoInfo;
-            realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
-            realmExistingFlight.departure.specialInfo =
-              data.departure?.specialInfo;
-            realmExistingFlight.departure.remarksInfo =
-              data.departure?.remarksInfo;
-            return;
-          } else {
-            realmExistingFlight.departure.crewNumber = Number(
-              data.departure?.crewNumber
-            );
-            realmExistingFlight.departure.cargoInfo = data.departure?.cargoInfo;
-            realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
-            realmExistingFlight.departure.specialInfo =
-              data.departure?.specialInfo;
-            realmExistingFlight.departure.remarksInfo =
-              data.departure?.remarksInfo;
+          if (realmExistingFlight.handlingType != "Arrival") {
+            if (
+              fileType == "Departure" ||
+              !realmExistingFlight?.departure?.to
+            ) {
+              realmExistingFlight.departure.crewNumber = Number(
+                data.departure?.crewNumber
+              );
+              realmExistingFlight.departure.cargoInfo =
+                data.departure?.cargoInfo;
+              realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
+              realmExistingFlight.departure.specialInfo =
+                data.departure?.specialInfo;
+              realmExistingFlight.departure.remarksInfo =
+                data.departure?.remarksInfo;
+              return;
+            } else {
+              realmExistingFlight.departure.crewNumber = Number(
+                data.departure?.crewNumber
+              );
+              realmExistingFlight.departure.cargoInfo =
+                data.departure?.cargoInfo;
+              realmExistingFlight.departure.mailInfo = data.departure?.mailInfo;
+              realmExistingFlight.departure.specialInfo =
+                data.departure?.specialInfo;
+              realmExistingFlight.departure.remarksInfo =
+                data.departure?.remarksInfo;
+            }
           }
-        }
-      });
+        });
+    } catch (e) {
+      Alert.alert("Error saving data to DepArr", JSON.stringify(e, null, 5));
+    }
   };
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
     mode: "onBlur",

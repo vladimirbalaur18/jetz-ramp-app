@@ -275,79 +275,86 @@ const Form: React.FC = () => {
 
   // HELPERS
   const submit = (data: IFlight) => {
-    realm.write(() => {
-      const providedServices = realm.create<IProvidedServices>(
-        "ProvidedServices",
-        {
-          VIPLoungeServices: realm.create<IVIPLoungeService>(
-            "VIPLoungeService",
-            {
-              departureAdultPax: Number(
-                data.providedServices?.VIPLoungeServices?.departureAdultPax || 0
-              ),
-              departureMinorPax: Number(
-                data.providedServices?.VIPLoungeServices?.departureMinorPax || 0
-              ),
-              arrivalAdultPax: Number(
-                data.providedServices?.VIPLoungeServices?.arrivalAdultPax || 0
-              ),
-              arrivalMinorPax: Number(
-                data.providedServices?.VIPLoungeServices?.arrivalMinorPax || 0
-              ),
-              remarks: data.providedServices?.VIPLoungeServices?.remarks || "",
-            }
-          ),
-          basicHandling: realm.create<IBasicHandling>("BasicHandling", {
-            total: Number(data?.providedServices?.basicHandling?.total),
-            isPriceOverriden:
-              data.providedServices?.basicHandling.isPriceOverriden,
-          }),
-          disbursementFees: data.providedServices?.disbursementFees,
-          supportServices: realm.create<ISupportServices>("SupportServices", {
-            HOTAC: {
-              total: Number(
-                data?.providedServices?.supportServices.HOTAC?.total
-              ),
-            },
-            airportFee: {
-              total: Number(
-                data?.providedServices?.supportServices?.airportFee?.total
-              ),
-            },
-            catering: {
-              total: Number(
-                data?.providedServices?.supportServices?.catering?.total
-              ),
-            },
-            fuel: {
-              fuelDensity: Number(
-                data.providedServices?.supportServices?.fuel?.fuelDensity
-              ),
-              fuelLitersQuantity: Number(
-                data.providedServices?.supportServices?.fuel?.fuelLitersQuantity
-              ),
-            },
-          }),
-          otherServices: data?.providedServices?.otherServices?.map((s) => {
-            return new ProvidedService(realm, {
-              isPriceOverriden: s.isPriceOverriden,
-              isUsed: s.isUsed,
-              notes: s.notes,
-              quantity: s.isPriceOverriden ? 1 : Number(s.quantity),
-              service: new Service(realm, {
-                ...s.service,
-                _id: new ObjectId(),
-              }),
-              totalPriceOverride: Number(s.totalPriceOverride),
-            });
-          }),
-        }
-      );
-      if (realmExistingFlight)
-        realmExistingFlight.providedServices = providedServices;
-    });
-
-    router.navigate("/signature");
+    try {
+      realm.write(() => {
+        const providedServices = realm.create<IProvidedServices>(
+          "ProvidedServices",
+          {
+            VIPLoungeServices: realm.create<IVIPLoungeService>(
+              "VIPLoungeService",
+              {
+                departureAdultPax: Number(
+                  data.providedServices?.VIPLoungeServices?.departureAdultPax ||
+                    0
+                ),
+                departureMinorPax: Number(
+                  data.providedServices?.VIPLoungeServices?.departureMinorPax ||
+                    0
+                ),
+                arrivalAdultPax: Number(
+                  data.providedServices?.VIPLoungeServices?.arrivalAdultPax || 0
+                ),
+                arrivalMinorPax: Number(
+                  data.providedServices?.VIPLoungeServices?.arrivalMinorPax || 0
+                ),
+                remarks:
+                  data.providedServices?.VIPLoungeServices?.remarks || "",
+              }
+            ),
+            basicHandling: realm.create<IBasicHandling>("BasicHandling", {
+              total: Number(data?.providedServices?.basicHandling?.total),
+              isPriceOverriden:
+                data.providedServices?.basicHandling.isPriceOverriden,
+            }),
+            disbursementFees: data.providedServices?.disbursementFees,
+            supportServices: realm.create<ISupportServices>("SupportServices", {
+              HOTAC: {
+                total: Number(
+                  data?.providedServices?.supportServices.HOTAC?.total
+                ),
+              },
+              airportFee: {
+                total: Number(
+                  data?.providedServices?.supportServices?.airportFee?.total
+                ),
+              },
+              catering: {
+                total: Number(
+                  data?.providedServices?.supportServices?.catering?.total
+                ),
+              },
+              fuel: {
+                fuelDensity: Number(
+                  data.providedServices?.supportServices?.fuel?.fuelDensity
+                ),
+                fuelLitersQuantity: Number(
+                  data.providedServices?.supportServices?.fuel
+                    ?.fuelLitersQuantity
+                ),
+              },
+            }),
+            otherServices: data?.providedServices?.otherServices?.map((s) => {
+              return new ProvidedService(realm, {
+                isPriceOverriden: s.isPriceOverriden,
+                isUsed: s.isUsed,
+                notes: s.notes,
+                quantity: s.isPriceOverriden ? 1 : Number(s.quantity),
+                service: new Service(realm, {
+                  ...s.service,
+                  _id: new ObjectId(),
+                }),
+                totalPriceOverride: Number(s.totalPriceOverride),
+              });
+            }),
+          }
+        );
+        if (realmExistingFlight)
+          realmExistingFlight.providedServices = providedServices;
+      });
+      router.navigate("/signature");
+    } catch (e) {
+      Alert.alert("Error saving provided services", JSON.stringify(e, null, 5));
+    }
   };
 
   return (

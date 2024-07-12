@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import {
   TextInput,
   Button,
@@ -52,18 +58,22 @@ const NewService: React.FC = () => {
   const handleServiceSubmit = () => {
     for (let serviceCategory of serviceCategories) {
       if (formValues.serviceCategoryName === serviceCategory.categoryName) {
-        realm.write(() => {
-          serviceCategory.services.push(
-            realm.create<IService>("Service", {
-              _id: new ObjectId(),
-              hasVAT: formValues.hasVAT,
-              isDisbursed: formValues.isDisbursed,
-              price: Number(formValues.amount),
-              serviceName: formValues.serviceName,
-              categoryName: serviceCategory.categoryName,
-            })
-          );
-        });
+        try {
+          realm.write(() => {
+            serviceCategory.services.push(
+              realm.create<IService>("Service", {
+                _id: new ObjectId(),
+                hasVAT: formValues.hasVAT,
+                isDisbursed: formValues.isDisbursed,
+                price: Number(formValues.amount),
+                serviceName: formValues.serviceName,
+                categoryName: serviceCategory.categoryName,
+              })
+            );
+          });
+        } catch (e) {
+          Alert.alert("Error creating service", JSON.stringify(e, null, 5));
+        }
       }
     }
     reset();
@@ -180,13 +190,20 @@ const NewService: React.FC = () => {
               }
             }
 
-            realm.write(() => {
-              realm.create<IServiceCategory>("ServiceCategory", {
-                _id: new ObjectId(),
-                categoryName: values.serviceCategoryName,
+            try {
+              realm.write(() => {
+                realm.create<IServiceCategory>("ServiceCategory", {
+                  _id: new ObjectId(),
+                  categoryName: values.serviceCategoryName,
+                });
               });
-            });
-            setShowAddCategoryModal(false);
+              setShowAddCategoryModal(false);
+            } catch (e) {
+              Alert.alert(
+                "Error creating new service category",
+                JSON.stringify(e, null, 5)
+              );
+            }
           }}
         />
         <Controller

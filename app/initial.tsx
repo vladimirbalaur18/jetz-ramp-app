@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   SafeAreaView,
@@ -36,14 +37,17 @@ const Page = () => {
   const confirmPassword = watch("confirmPassword");
   const iconColor = useTheme().colors.text;
   const submit = (data: FormData) => {
-    realm.write(() => {
-      realm.create<IAppData>("AppData", {
-        masterPassword: data.password,
-        schemaCreationDate: new Date(),
+    try {
+      realm.write(() => {
+        realm.create<IAppData>("AppData", {
+          masterPassword: data.password,
+          schemaCreationDate: new Date(),
+        });
       });
-    });
-
-    router.navigate("/(drawer)/config");
+      router.navigate("/(drawer)/config");
+    } catch (e) {
+      Alert.alert("Error saving master password", JSON.stringify(e, null, 5));
+    }
   };
   return (
     <SafeAreaView>

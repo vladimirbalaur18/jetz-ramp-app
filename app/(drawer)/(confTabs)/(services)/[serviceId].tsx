@@ -5,7 +5,13 @@ import { useObject, useQuery, useRealm } from "@realm/react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { ObjectId } from "bson";
 import {
   Button,
@@ -51,29 +57,37 @@ const Form: React.FC = () => {
   const formValues = watch();
   const handleServiceEdit = () => {};
   const handleServiceRemove = () => {
-    realm.write(() => {
-      showSnackbar(`${currentService?.serviceName} has been removed`);
-      realm.delete(currentService);
+    try {
+      realm.write(() => {
+        showSnackbar(`${currentService?.serviceName} has been removed`);
+        realm.delete(currentService);
 
-      for (const category of allServiceCategories) {
-        if (!category.services.length) {
-          realm.delete(category);
+        for (const category of allServiceCategories) {
+          if (!category.services.length) {
+            realm.delete(category);
+          }
         }
-      }
-      router.back();
-    });
+        router.back();
+      });
+    } catch (e) {
+      Alert.alert("Error trying to remove service", JSON.stringify(e, null, 5));
+    }
   };
   const handleServiceSubmit = () => {
-    realm.write(() => {
-      if (currentService) {
-        currentService.serviceName = formValues.serviceName;
-        currentService.price = Number(formValues.amount);
-        currentService.hasVAT = formValues.hasVAT;
-        currentService.isDisbursed = formValues.isDisbursed;
-        showSnackbar(`Services has been updated successfully`);
-        setScope("view");
-      }
-    });
+    try {
+      realm.write(() => {
+        if (currentService) {
+          currentService.serviceName = formValues.serviceName;
+          currentService.price = Number(formValues.amount);
+          currentService.hasVAT = formValues.hasVAT;
+          currentService.isDisbursed = formValues.isDisbursed;
+          showSnackbar(`Services has been updated successfully`);
+          setScope("view");
+        }
+      });
+    } catch (e) {
+      Alert.alert("Error trying to update service", JSON.stringify(e, null, 5));
+    }
   };
   const disableField = scope === "view";
 

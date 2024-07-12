@@ -17,7 +17,7 @@ import { useRealm } from "@realm/react";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 export default function Page() {
@@ -29,24 +29,33 @@ export default function Page() {
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    realm.write(() => {
-      if (realmExistingFlight) {
-        realmExistingFlight!.providedServices!.otherServices?.map((service) => {
-          data.providedServices?.otherServices?.map((s) => {
-            if (
-              service.service.serviceName == s.service.serviceName &&
-              s.isUsed
-            ) {
-              service.notes = s.notes;
-              service.quantity = Number(s.quantity);
+    try {
+      realm.write(() => {
+        if (realmExistingFlight) {
+          realmExistingFlight!.providedServices!.otherServices?.map(
+            (service) => {
+              data.providedServices?.otherServices?.map((s) => {
+                if (
+                  service.service.serviceName == s.service.serviceName &&
+                  s.isUsed
+                ) {
+                  service.notes = s.notes;
+                  service.quantity = Number(s.quantity);
+                }
+              });
             }
-          });
-        });
+          );
 
-        realmExistingFlight!.providedServices!.remarks =
-          data.providedServices?.remarks;
-      }
-    });
+          realmExistingFlight!.providedServices!.remarks =
+            data.providedServices?.remarks;
+        }
+      });
+    } catch (e) {
+      Alert.alert(
+        "Error saving data to ramp checklist",
+        JSON.stringify(e, null, 5)
+      );
+    }
   };
 
   const { control, formState, handleSubmit, getValues, watch } =

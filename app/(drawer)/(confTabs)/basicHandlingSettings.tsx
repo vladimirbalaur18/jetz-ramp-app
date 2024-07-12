@@ -88,15 +88,22 @@ const Form: React.FC = () => {
                       {
                         text: "Confirm",
                         onPress: () => {
-                          realm.write(() => {
-                            if (feeToRemove) {
-                              realm.delete(feeToRemove);
-                              showSnackbar(
-                                "Rule has been removed successfully"
-                              );
-                              setSnackbarVisible(true);
-                            }
-                          });
+                          try {
+                            realm.write(() => {
+                              if (feeToRemove) {
+                                realm.delete(feeToRemove);
+                                showSnackbar(
+                                  "Rule has been removed successfully"
+                                );
+                                setSnackbarVisible(true);
+                              }
+                            });
+                          } catch (e) {
+                            Alert.alert(
+                              "Error trying to remove fee",
+                              JSON.stringify(e, null, 5)
+                            );
+                          }
                         },
                         style: "destructive",
                       },
@@ -176,39 +183,53 @@ function BasicHandlingInput({
       );
 
       return;
-    } else
-      realm.write(() => {
-        if (isFeeMTOWRangeOverlapping(formValues, [...fees])) {
-          alert(
-            "This rule is conflicting with already existing rules. Please check."
-          );
+    } else {
+      try {
+        realm.write(() => {
+          if (isFeeMTOWRangeOverlapping(formValues, [...fees])) {
+            alert(
+              "This rule is conflicting with already existing rules. Please check."
+            );
 
-          return;
-        }
+            return;
+          }
 
-        onFieldCreatePress && onFieldCreatePress();
-        realm.create("BasicHandlingRule", {
-          minMTOW: Number(formValues.minMTOW),
-          maxMTOW: Number(formValues.maxMTOW),
-          pricePerLeg: Number(formValues.pricePerLeg),
-          notes: formValues.notes,
+          onFieldCreatePress && onFieldCreatePress();
+          realm.create("BasicHandlingRule", {
+            minMTOW: Number(formValues.minMTOW),
+            maxMTOW: Number(formValues.maxMTOW),
+            pricePerLeg: Number(formValues.pricePerLeg),
+            notes: formValues.notes,
+          });
+          setScope("view");
         });
-        setScope("view");
-      });
+      } catch (e) {
+        Alert.alert(
+          "Error creating basic handling rule",
+          JSON.stringify(e, null, 5)
+        );
+      }
+    }
   };
 
   const handleRuleEdit = () => {
-    realm.write(() => {
-      for (let fee of fees) {
-        if (compareBasicHandlingFees(fee, formValues)) {
-          fee.pricePerLeg = Number(formValues.pricePerLeg);
-          fee.notes = formValues.notes;
-          return;
+    try {
+      realm.write(() => {
+        for (let fee of fees) {
+          if (compareBasicHandlingFees(fee, formValues)) {
+            fee.pricePerLeg = Number(formValues.pricePerLeg);
+            fee.notes = formValues.notes;
+            return;
+          }
         }
-      }
-    });
-
-    onFieldUpdatePress && onFieldUpdatePress();
+      });
+      onFieldUpdatePress && onFieldUpdatePress();
+    } catch (e) {
+      Alert.alert(
+        "Error trying to update basic handling fee",
+        JSON.stringify(e, null, 5)
+      );
+    }
   };
 
   const EditButton = ({ onPress }: any) => {

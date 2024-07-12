@@ -22,7 +22,13 @@ import { useRouter } from "expo-router";
 import _ from "lodash";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import {
   Button,
   HelperText,
@@ -120,7 +126,7 @@ const Form: React.FC = () => {
           : "/(createFlight)/departure"
       );
     } catch (e) {
-      alert("Error saving arrival");
+      Alert.alert("Error saving arrival data", JSON.stringify(e, null, 5));
     }
   };
   const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);

@@ -15,7 +15,7 @@ import { useRealm } from "@realm/react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, IconButton, TextInput } from "react-native-paper";
 import { useSelector } from "react-redux";
 
@@ -43,30 +43,34 @@ const SignaturePage = () => {
   const params = useLocalSearchParams();
 
   const submit = (data: Partial<IFlight>) => {
-    if (realmExistingFlight)
-      realm.write(() => {
-        const ramp = new PersonNameSignature(realm, {
-          name: data.ramp?.name,
-          signature: data.ramp?.signature,
+    try {
+      if (realmExistingFlight)
+        realm.write(() => {
+          const ramp = new PersonNameSignature(realm, {
+            name: data.ramp?.name,
+            signature: data.ramp?.signature,
+          });
+
+          const crew = new PersonNameSignature(realm, {
+            name: data.crew?.name,
+            signature: data.crew?.signature,
+          });
+
+          realmExistingFlight.ramp = ramp;
+          realmExistingFlight.crew = crew;
         });
 
-        const crew = new PersonNameSignature(realm, {
-          name: data.crew?.name,
-          signature: data.crew?.signature,
+      if (params.fileType === "Arrival" || params.fileType === "Departure")
+        return router.push({
+          pathname: "/(createFlight)/(tabs)/depArr",
+          params: {
+            fileType: params.fileType,
+          },
         });
-
-        realmExistingFlight.ramp = ramp;
-        realmExistingFlight.crew = crew;
-      });
-
-    if (params.fileType === "Arrival" || params.fileType === "Departure")
-      return router.push({
-        pathname: "/(createFlight)/(tabs)/depArr",
-        params: {
-          fileType: params.fileType,
-        },
-      });
-    router.navigate("(tabs)/chargeNote");
+      router.navigate("(tabs)/chargeNote");
+    } catch (e) {
+      Alert.alert("Error saving signature", JSON.stringify(e, null, 5));
+    }
   };
 
   const _GenerateInvoiceButton: React.FC = () => (

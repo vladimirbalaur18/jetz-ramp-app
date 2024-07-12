@@ -15,42 +15,48 @@ const printToFile = async ({
   width?: number;
   height?: number;
 }) => {
-  const { uri } = await Print.printToFileAsync({ html, height, width });
+  try {
+    const { uri } = await Print.printToFileAsync({ html, height, width });
+    if (!uri) {
+      alert("There was an error generating the file");
+    }
 
-  if (!uri) {
-    alert("There was an error generating the file");
+    const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${fileName}.pdf`;
+
+    await FileSystem.moveAsync({
+      from: uri,
+      to: pdfName,
+    });
+    console.log("File has been saved to:", uri);
+
+    if (Platform.OS === "android") {
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(pdfName, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        await FileSystem.StorageAccessFramework.createFileAsync(
+          permissions.directoryUri,
+          fileName,
+          "application/pdf"
+        )
+          .then(async (uri) => {
+            await FileSystem.writeAsStringAsync(uri, base64, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+            alert("File saved successfully");
+          })
+          .catch((e) =>
+            Alert.alert("Error saving file", JSON.stringify(e, null, 2))
+          );
+      } else alert("Cannot save due to lack of permissions");
+    } else alert("File cannot be generated. Invalid platform");
+  } catch (e) {
+    Alert.alert(
+      "Unexpected error occured during file generation",
+      JSON.stringify(e, null, 2)
+    );
   }
-
-  const pdfName = `${uri.slice(0, uri.lastIndexOf("/") + 1)}${fileName}.pdf`;
-
-  await FileSystem.moveAsync({
-    from: uri,
-    to: pdfName,
-  });
-  console.log("File has been saved to:", uri);
-
-  if (Platform.OS === "android") {
-    const permissions =
-      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-    if (permissions.granted) {
-      const base64 = await FileSystem.readAsStringAsync(pdfName, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      await FileSystem.StorageAccessFramework.createFileAsync(
-        permissions.directoryUri,
-        fileName,
-        "application/pdf"
-      )
-        .then(async (uri) => {
-          await FileSystem.writeAsStringAsync(uri, base64, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          alert("File saved successfully");
-        })
-        .catch((e) =>
-          Alert.alert("Error saving file", JSON.stringify(e, null, 2))
-        );
-    } else alert("Cannot save due to lack of permissions");
-  } else alert("File cannot be generated. Invalid platform");
 };
 export default printToFile;

@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import {
   TextInput,
   Button,
@@ -158,7 +164,10 @@ const Form: React.FC = () => {
           : "/(createFlight)/arrival"
       );
     } catch (e) {
-      alert("Error saving general details");
+      Alert.alert(
+        "Error saving general flight details",
+        JSON.stringify(e, null, 2)
+      );
     }
   };
 
