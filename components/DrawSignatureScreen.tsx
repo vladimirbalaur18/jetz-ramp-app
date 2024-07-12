@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Image, ImageBackground, View } from "react-native";
+import { Alert, Image, ImageBackground, View } from "react-native";
 import { Button } from "react-native-paper";
 //@ts-expect-error
 import ExpoDraw from "expo-draw";
@@ -35,9 +35,8 @@ export const DrawSignatureScreen: React.FC<IDrawSignatureScreenProps> = ({
       });
       // Here you can handle the captured signature image, e.g., upload it to a server
       handleSignatureSave(signatureResult);
-      console.log("signature file", signatureResult);
     } catch (error) {
-      console.log(error);
+      Alert.alert("Error saving signature", JSON.stringify(error, null, 2));
     }
   }
 

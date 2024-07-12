@@ -42,8 +42,6 @@ const BillingOperators = () => {
         .find((o) => o._id.equals(_id));
 
       if (updatedField) {
-        console.log("updating field");
-
         for (let flight of allFlightsData) {
           if (flight.operatorName === updatedField.operatorName) {
             flight.operatorName = operatorName;
@@ -56,8 +54,6 @@ const BillingOperators = () => {
         }
         updatedField.billingInfo = billingInfo;
         updatedField.operatorName = operatorName;
-      } else {
-        console.log("vai", updatedField);
       }
     });
   };

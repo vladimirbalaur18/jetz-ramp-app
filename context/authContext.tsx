@@ -31,8 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (masterPassword: string) =>
     new Promise<{ loginStatus: "success" | "error" }>((resolve, reject) => {
-      console.log("Master password", AppData.masterPassword);
-
       if (masterPassword === AppData.masterPassword) {
         setIsAuthenticated(true);
         resolve({ loginStatus: "success" });
@@ -41,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
   const logout = () => {
-    console.log("Logging out user");
     setIsAuthenticated(false);
   };
 

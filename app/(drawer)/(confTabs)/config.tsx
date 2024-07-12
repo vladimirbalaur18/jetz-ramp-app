@@ -17,7 +17,13 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 
 type FormData = GeneralConfigState & FuelFeesState & ILoungeFee;
@@ -30,8 +36,6 @@ const Form: React.FC = () => {
   let [loungeFee] = useQuery<ILoungeFee>("LoungeFees");
 
   const loungeFeeJSON = loungeFee?.toJSON() as ILoungeFee;
-
-  console.log("loungeFee JSON", loungeFeeJSON);
 
   const { showSnackbar } = useSnackbar();
   const { control, formState, handleSubmit, getValues } = useForm<FormData>({
@@ -68,8 +72,6 @@ const Form: React.FC = () => {
         }
 
         if (loungeFee) {
-          console.log(JSON.stringify(data, null, 4));
-
           loungeFee.arrival.pricePerAdult.amount = Number(
             data.arrival.pricePerAdult.amount
           );
@@ -84,7 +86,6 @@ const Form: React.FC = () => {
             data.departure.pricePerMinor.amount
           );
         } else {
-          console.log(JSON.stringify(data, null, 4));
           realm.create<ILoungeFee>("LoungeFees", {
             arrival: new DepartureArrival(realm, {
               pricePerAdult: {
@@ -125,7 +126,10 @@ const Form: React.FC = () => {
       });
       showSnackbar("General settings saved successfully");
     } catch (err) {
-      console.warn(err);
+      Alert.alert(
+        "Error saving general settings",
+        JSON.stringify(err, null, 2)
+      );
     }
   };
 

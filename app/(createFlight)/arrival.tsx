@@ -101,16 +101,8 @@ const Form: React.FC = () => {
 
         if (_existingFlight) {
           if (_.isEqual(_existingFlight.toJSON(), data)) {
-            console.log("arrival data", data);
             _existingFlight.arrival = arrival;
           } else {
-            console.log(
-              "Nullyfying services because arrival date differs frmo previous arrival data",
-              "BEFORE",
-              JSON.stringify(_existingFlight.arrival, null, 3),
-              "AFTER",
-              JSON.stringify(arrival, null, 3)
-            );
             _existingFlight.providedServices &&
               realm.delete(_existingFlight.providedServices);
             _existingFlight.arrival = arrival;

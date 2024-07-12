@@ -27,36 +27,16 @@ export default function Page() {
   const realm = useRealm();
 
   const currentFlightId = useSelector(
-    (state: RootState) => state.flights.currentFlightId
+    (state: RootState) => state?.flights.currentFlightId
   );
   const { fileType } = useGlobalSearchParams();
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    // dispatch(
-    //   // updateFlight({
-    //   //   ...existingFlightJSON,
-    //   //   ...data,
-    //   // })
-    // );
-
     if (realmExistingFlight)
       realm.write(() => {
         if (realmExistingFlight.handlingType != "Departure") {
           if (fileType == "Arrival" || !realmExistingFlight?.arrival?.from) {
-            console.warn(
-              "filetype",
-              fileType == "Arrival",
-              "arrival",
-              !realmExistingFlight?.arrival?.from
-            );
-            // realmExistingFlight.arrival = realm.create<IArrival>("Arrival", {
-            //   crewNumber: Number(data.arrival?.crewNumber),
-            //   cargoInfo: data.arrival?.cargoInfo,
-            //   mailInfo: data.arrival?.mailInfo,
-            //   specialInfo: data.arrival?.specialInfo,
-            //   remarksInfo: data.arrival?.remarksInfo,
-            // });
             realmExistingFlight.arrival.crewNumber = Number(
               data.arrival?.crewNumber
             );
@@ -78,21 +58,6 @@ export default function Page() {
 
         if (realmExistingFlight.handlingType != "Arrival") {
           if (fileType == "Departure" || !realmExistingFlight?.departure?.to) {
-            alert("departure flow");
-            console.warn(
-              "filetype",
-              fileType == "Departure",
-              "departure",
-              !realmExistingFlight?.departure?.to
-            );
-            // realm.create<IDeparture>("Departure", {
-            //   crewNumber: Number(data.departure?.crewNumber),
-            //   cargoInfo: data.departure?.cargoInfo,
-            //   mailInfo: data.departure?.mailInfo,
-            //   specialInfo: data.departure?.specialInfo,
-            //   remarksInfo: data.departure?.remarksInfo,
-            // });
-
             realmExistingFlight.departure.crewNumber = Number(
               data.departure?.crewNumber
             );

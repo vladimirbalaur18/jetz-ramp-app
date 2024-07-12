@@ -1,8 +1,9 @@
 import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
 const isWinterEurDST = (dayjsDate: Dayjs) => {
   const year = dayjsDate.year();
-
-  // Function to find the last Sunday of a given month and year
   const findLastSunday = (year: number, month: number) => {
     const date = dayjs(new Date(year, month + 1, 0)); // Last day of the month
     return date.subtract(date.day(), "day");
@@ -24,11 +25,15 @@ const isWinterEurDST = (dayjsDate: Dayjs) => {
 };
 
 export const isSummerNightTime = (dayjsDate: Dayjs) => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   const hour = dayjsDate.hour();
-  return !isWinterEurDST(dayjsDate) && (hour >= 18 || hour < 7);
+
+  return !isWinterEurDST(dayjsDate) && (hour >= 17 || hour < 3); //utc time converted to local
 };
 
 export const isWinterNightTime = (dayjsDate: Dayjs) => {
   const hour = dayjsDate.hour();
-  return isWinterEurDST(dayjsDate) && (hour >= 20 || hour < 6);
+
+  return isWinterEurDST(dayjsDate) && (hour >= 16 || hour < 5);
 };

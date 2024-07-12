@@ -187,7 +187,6 @@ function BasicHandlingInput({
         }
 
         onFieldCreatePress && onFieldCreatePress();
-        console.log(formValues.notes);
         realm.create("BasicHandlingRule", {
           minMTOW: Number(formValues.minMTOW),
           maxMTOW: Number(formValues.maxMTOW),
@@ -204,7 +203,6 @@ function BasicHandlingInput({
         if (compareBasicHandlingFees(fee, formValues)) {
           fee.pricePerLeg = Number(formValues.pricePerLeg);
           fee.notes = formValues.notes;
-          console.log("editing fee", formValues);
           return;
         }
       }

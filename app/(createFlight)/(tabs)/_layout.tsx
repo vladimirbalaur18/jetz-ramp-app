@@ -16,7 +16,6 @@ export default function TabLayout() {
     ? `(${currentFlightNumber})`
     : "";
 
-  console.log(useGlobalSearchParams());
   return (
     <Tabs
       screenOptions={{

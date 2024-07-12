@@ -70,7 +70,6 @@ const TotalServicesSection: React.FC<{
   }, [JSON.stringify(providedServices, null, 5)]);
 
   const [generalConfig] = useQuery<GeneralConfigState>("General");
-  console.log("genCOnfig", generalConfig);
 
   const { amount: loungeFeeAmount, currency: loungeFeeCurrency } =
     getLoungeFeePrice({ ...VIPLoungeServices });

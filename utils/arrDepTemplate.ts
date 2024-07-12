@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 
 export default function ArrDepTemplateRenderHTML(flight: IFlight, handlingType: any) {
   const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
-  console.log("ArrDepTemplateRenderHTML", flight);
   const arrivalDate = dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
   const departureDate = dayjs(flight?.departure.departureDate).format(
     "DD-MMM-YY"

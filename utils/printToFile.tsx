@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as Print from "expo-print";
@@ -47,30 +47,10 @@ const printToFile = async ({
           });
           alert("File saved successfully");
         })
-        .catch((e) => alert("ERROR saving file"));
+        .catch((e) =>
+          Alert.alert("Error saving file", JSON.stringify(e, null, 2))
+        );
     } else alert("Cannot save due to lack of permissions");
   } else alert("File cannot be generated. Invalid platform");
-  // if (await isAvailableAsync()) {
-  //   console.log("Sharing is available");
-  //   await shareAsync(pdfName, {
-  //     dialogTitle: "Share file",
-  //     mimeType: "application/pdf",
-  //   });
-  // } else return alert("Sharing is not supported");
-
-  // try {
-  // const contentUri = await FileSystem.getContentUriAsync(pdfName);
-  //   if (Platform.OS === "ios") {
-  //     await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-  //   } else {
-  //     await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-  //       data: contentUri,
-  //       flags: 1,
-  //       type: "application/pdf",
-  //     });
-  //   }
-  // } catch (e) {
-  //   console.error(e);
-  // }
 };
 export default printToFile;

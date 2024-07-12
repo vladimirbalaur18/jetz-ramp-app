@@ -168,6 +168,7 @@ export const getSecurityFee = (flight: IFlight): number => {
     : securityFeePerTon * mtowTons;
 };
 export const getParkingFee = (flight: IFlight): number => {
+  const FREE_PARKING_HOURS = 3;
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
@@ -181,7 +182,7 @@ export const getParkingFee = (flight: IFlight): number => {
 
   if (!feePerTon) throw new Error("Parking fee per ton is undefined");
 
-  return hours <= 4 //first 4 hours of parking are free
+  return hours <= FREE_PARKING_HOURS //first 3 hours of parking are free
     ? 0
     : days * mtowTons * feePerTon;
 };

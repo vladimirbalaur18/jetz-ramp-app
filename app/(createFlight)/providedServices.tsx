@@ -53,6 +53,9 @@ import {
 } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";
 import _ from "lodash";
+import { getDifferenceBetweenArrivalDeparture } from "@/services/AirportFeesManager/utils";
+import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
+import getParsedDateTime from "@/utils/getParsedDateTime";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -60,13 +63,28 @@ const Form: React.FC = () => {
   const defaultServicesPerCategories = allServices.flatMap((sc) => [
     ...sc.services,
   ]);
-  console.log(defaultServicesPerCategories);
   const currentFlightId = useSelector(
-    (state: RootState) => state.flights.currentFlightId
+    (state: RootState) => state?.flights.currentFlightId
   );
   const [general] = useQuery<GeneralConfigState>("General");
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlight = realmExistingFlight?.toJSON() as IFlight;
+  const fullDepartureDateTime = getParsedDateTime(
+    existingFlight?.departure?.departureDate,
+    existingFlight?.departure?.departureTime
+  );
+  const fullArrivalDateTime = getParsedDateTime(
+    existingFlight?.arrival?.arrivalDate,
+    existingFlight?.arrival?.arrivalTime
+  );
+
+  const flightHasDeparture =
+    existingFlight?.handlingType === "FULL" ||
+    existingFlight?.handlingType === "Departure";
+
+  const flightHasArrival =
+    existingFlight?.handlingType === "FULL" ||
+    existingFlight?.handlingType === "Arrival";
 
   console.log(
     "Existing flight on render providedServices",
@@ -80,7 +98,6 @@ const Form: React.FC = () => {
     existingFlight?.chargeNote?.disbursementPercentage;
 
   const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
-  console.warn("fee detail", JSON.stringify(airportFeesDetails, null, 2));
   const [airportFeeModalVisible, setAirportFeeModalVisible] = useState(false);
   const {
     control,
@@ -258,16 +275,6 @@ const Form: React.FC = () => {
 
   // HELPERS
   const submit = (data: IFlight) => {
-    console.log("providedServicesSubmit", data);
-    console.log("services", data.providedServices?.otherServices);
-
-    console.log(
-      "Check is price overriden condition",
-      data?.providedServices?.basicHandling?.total !==
-        existingFlight?.providedServices?.basicHandling?.total,
-      data.providedServices?.basicHandling.total,
-      existingFlight.providedServices?.basicHandling.total
-    );
     realm.write(() => {
       const providedServices = realm.create<IProvidedServices>(
         "ProvidedServices",
@@ -336,13 +343,10 @@ const Form: React.FC = () => {
           }),
         }
       );
-      console.log("pushind provided services", providedServices);
       if (realmExistingFlight)
         realmExistingFlight.providedServices = providedServices;
     });
 
-    //   console.log("providedServicesRealm: ", providedServices.toJSON());
-    // });
     router.navigate("/signature");
   };
 
@@ -400,6 +404,22 @@ const Form: React.FC = () => {
                         *Price has been manually overriden
                       </HelperText>
                     )}
+                    {flightHasArrival &&
+                      !airportFeeOverrideForm.getFieldState("landing")
+                        .isDirty &&
+                      isWinterNightTime(fullArrivalDateTime) && (
+                        <HelperText type="info">
+                          *Winter night Quota has been applied
+                        </HelperText>
+                      )}
+                    {flightHasArrival &&
+                      !airportFeeOverrideForm.getFieldState("landing")
+                        .isDirty &&
+                      isSummerNightTime(fullArrivalDateTime) && (
+                        <HelperText type="info">
+                          *Summer night Quota has been applied
+                        </HelperText>
+                      )}
                   </>
                 )}
               />
@@ -442,6 +462,22 @@ const Form: React.FC = () => {
                         *Price has been manually overriden
                       </HelperText>
                     )}
+                    {flightHasDeparture &&
+                      !airportFeeOverrideForm.getFieldState("takeOff")
+                        .isDirty &&
+                      isWinterNightTime(fullDepartureDateTime) && (
+                        <HelperText type="info">
+                          *Winter night Quota has been applied
+                        </HelperText>
+                      )}
+                    {flightHasDeparture &&
+                      !airportFeeOverrideForm.getFieldState("takeOff")
+                        .isDirty &&
+                      isSummerNightTime(fullDepartureDateTime) && (
+                        <HelperText type="info">
+                          *Summer night Quota has been applied
+                        </HelperText>
+                      )}
                   </>
                 )}
               />
@@ -640,7 +676,6 @@ const Form: React.FC = () => {
                         "providedServices.basicHandling.isPriceOverriden",
                         true
                       );
-                      console.warn("Overriden basic handling fee");
                     }}
                     error={errors?.providedServices?.basicHandling && true}
                   />

@@ -24,9 +24,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   let VATServicesList: Array<ChargeListService> = [];
   let servicesListNoVAT: Array<ChargeListService> = [];
 
-  console.log("FLIGHT INFO", JSON.stringify(flight, null, 10));
   const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
-  console.log("confa", config);
   const basicHandling = getBasicHandlingPrice(flight);
 
   const basicHandlingWithoutVAT = (() => {
@@ -67,13 +65,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     0
   );
 
-  console.log(
-    "checking VAT applying condition",
-    basicHandlingWithVAT &&
-      !flight?.providedServices!.basicHandling?.isPriceOverriden,
-    basicHandlingWithVAT,
-    !flight?.providedServices?.basicHandling.isPriceOverriden
-  );
+  
   if (
     basicHandlingWithVAT &&
     !flight?.providedServices!.basicHandling?.isPriceOverriden
@@ -84,7 +76,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
       totalPrice: Number(basicHandlingWithVAT),
       quantity: 1,
     });
-  } else console.warn("VAT NOT APPLIED");
+  } 
 
   if (basicHandlingWithoutVAT) {
     servicesListNoVAT.push({

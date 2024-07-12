@@ -84,7 +84,6 @@ const Form: React.FC = () => {
     //   );
     // } else dispatch(updateFlight(data));
 
-    console.log("from db, existing flight");
     try {
       realm.write(() => {
         const departureTime = realm.create<ITime>("Time", {
@@ -131,7 +130,9 @@ const Form: React.FC = () => {
 
       router.navigate("/(createFlight)/providedServices");
     } catch (e) {
-      alert("Error saving departure information");
+      alert(
+        `Error saving departure information: ${JSON.stringify(e, null, 5)}`
+      );
     }
   };
   const [departureTimerVisible, setDepartureTimerVisible] =
@@ -348,7 +349,6 @@ const Form: React.FC = () => {
                     onDismiss={() => setDepartureTimerVisible(false)}
                     onConfirm={(value) => {
                       setDepartureTimerVisible(false);
-                      console.warn(value.minutes);
                       onChange({
                         hours: Number(value.hours),
                         minutes: Number(value.minutes),

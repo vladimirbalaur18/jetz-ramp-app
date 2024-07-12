@@ -54,7 +54,6 @@ const Form: React.FC = () => {
   );
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
-  console.log("existingFlightJSON", existingFlightJSON);
   const [handleTypeDropdownVisible, setHandleTypeDropdownVisible] =
     useState(false);
 
@@ -85,7 +84,6 @@ const Form: React.FC = () => {
   const snackbar = useSnackbar();
   const realm = useRealm();
   const allFlight = useQuery<IFlight>("Flight");
-  console.log("allFlight", allFlight);
   const submit = (data: IFlight) => {
     try {
       if (!realmExistingFlight) {

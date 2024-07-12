@@ -24,12 +24,11 @@ export default function Page() {
   const realm = useRealm();
 
   const currentFlightId = useSelector(
-    (state: RootState) => state.flights.currentFlightId
+    (state: RootState) => state?.flights.currentFlightId
   );
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
-    console.warn(JSON.stringify(data, null, 5));
     realm.write(() => {
       if (realmExistingFlight) {
         realmExistingFlight!.providedServices!.otherServices?.map((service) => {
@@ -94,11 +93,8 @@ export default function Page() {
             notes: s.notes || "",
           });
       });
-    console.log("render ramp check");
 
     return () => {
-      console.log("unmount ramp check");
-
       remove();
     };
   }, []);

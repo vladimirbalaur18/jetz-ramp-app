@@ -32,13 +32,6 @@ export const flightsSlice = createSlice({
         ...payload,
         flightId: id,
       });
-      console.log(
-        "new flight created",
-        "payload:",
-        payload,
-        "redux state:",
-        state.flightsArray
-      );
     },
 
     updateFlight: (state, { payload }: PayloadAction<IFlight>) => {

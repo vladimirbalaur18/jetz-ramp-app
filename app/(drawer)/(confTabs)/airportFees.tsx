@@ -9,7 +9,13 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 
 type FormData = IAirportFees;
@@ -106,7 +112,7 @@ const Form: React.FC = () => {
       });
       showSnackbar("Airport fees saved successfully");
     } catch (err) {
-      console.warn(err);
+      Alert.alert("Error saving Airport fees", JSON.stringify(err, null, 2));
     }
   };
 
