@@ -15,12 +15,14 @@ import REGEX from "@/utils/regexp";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useRealm } from "@realm/react";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 export default function Page() {
+  const [loading, setIsLoading] = useState(false);
+
   const realm = useRealm();
 
   const currentFlightId = useSelector(
@@ -70,13 +72,15 @@ export default function Page() {
     });
 
   const submitRampChecklist = (data: Partial<IFlight>) => {
+    setIsLoading(true);
+
     submit(data);
     printToFile({
       html: rampChecklistHTML({ ...existingFlightJSON, ...data }),
       fileName: `rampChecklist_${existingFlightJSON?.flightNumber}_${existingFlightJSON?.aircraftRegistration}`,
       width: 485,
       height: 942,
-    });
+    }).finally(() => setIsLoading(false));
   };
 
   const { fields, append, update, remove } = useFieldArray({
@@ -236,7 +240,8 @@ export default function Page() {
       <Button
         mode="contained"
         onPress={handleSubmit(submitRampChecklist)}
-        disabled={!formState.isValid}
+        disabled={!formState.isValid || loading}
+        loading={loading}
       >
         Generate ramp checklist
       </Button>

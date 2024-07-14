@@ -131,6 +131,9 @@ export const getTakeOffFees = (flight: IFlight): number => {
           );
 };
 
+// Daca e light isLightAircraft, se returneaza mtowTons*feeLightAicraft
+// Altfel, se ia takeoff fee per ton, si se aplica winterSummerQuota (la voi matinca e de 20 procente)
+
 export const getPassengersFee = (flight: IFlight): number => {
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
@@ -186,3 +189,5 @@ export const getParkingFee = (flight: IFlight): number => {
     ? 0
     : days * mtowTons * feePerTon;
 };
+// daca e mai mic sau egal cu 4 ore - 0
+//alfel, se ia days (differenta in zile dintre arrival - departure) * mtowTons * feePerTon

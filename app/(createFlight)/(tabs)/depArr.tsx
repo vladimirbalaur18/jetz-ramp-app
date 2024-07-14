@@ -18,12 +18,14 @@ import {
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 export default function Page() {
+  const [loading, setIsLoading] = useState(false);
+
   const realm = useRealm();
 
   const currentFlightId = useSelector(
@@ -118,6 +120,8 @@ export default function Page() {
   });
 
   const submitArrDeparture = (data: Partial<IFlight>) => {
+    setIsLoading(true);
+
     submit(data);
     printToFile({
       html: ArrDepTemplateRenderHTML(
@@ -140,7 +144,7 @@ export default function Page() {
           ? 800
           : 400,
       height: 596,
-    });
+    }).finally(() => setIsLoading(false));
   };
 
   const { errors } = formState;
@@ -420,7 +424,8 @@ export default function Page() {
         <Button
           mode="contained"
           onPress={handleSubmit(submitArrDeparture)}
-          disabled={!formState.isValid}
+          disabled={!formState.isValid || loading}
+          loading={loading}
         >
           Generate{" "}
           {existingFlightJSON?.handlingType === "Arrival"

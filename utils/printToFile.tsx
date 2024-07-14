@@ -29,6 +29,21 @@ const printToFile = async ({
     });
     console.log("File has been saved to:", uri);
 
+    //    try {
+    //   const contentUri = await FileSystem.getContentUriAsync(pdfName);
+    //   if (Platform.OS === "ios") {
+    //     await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
+    //   } else {
+    //     await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+    //       data: contentUri,
+    //       flags: 1,
+    //       type: "application/pdf",
+    //   });
+    //   }
+    // } catch (e) {
+    //   console.error(e);
+    // }
+
     if (Platform.OS === "android") {
       const permissions =
         await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();

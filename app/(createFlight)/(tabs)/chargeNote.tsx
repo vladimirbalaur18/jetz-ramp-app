@@ -11,8 +11,10 @@ import printToFile from "@/utils/printToFile";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useTheme } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
+import { isLoading } from "expo-font";
 import _ from "lodash";
 import * as React from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
@@ -20,6 +22,8 @@ import { useSelector } from "react-redux";
 type FormData = IFlight;
 
 export default function App() {
+  const [loading, setIsLoading] = useState(false);
+
   const realm = useRealm();
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
@@ -28,6 +32,7 @@ export default function App() {
 
   const existingFlightJSON = realmExistingFlight?.toJSON() as IFlight;
   const submit = (data: Partial<IFlight>) => {
+    setIsLoading(true);
     try {
       if (realmExistingFlight)
         realm.write(() => {
@@ -46,7 +51,7 @@ export default function App() {
         fileName: pdfName,
         width: 485,
         height: 742,
-      });
+      }).then(() => setIsLoading(false));
     } catch (e) {
       Alert.alert("Error saving charge note", JSON.stringify(e, null, 5));
     }
@@ -140,8 +145,9 @@ export default function App() {
         />
         <Button
           mode="contained"
-          disabled={!formState.isValid || isFlightNotConsistent}
+          disabled={!formState.isValid || isFlightNotConsistent || loading}
           onPress={handleSubmit(submit)}
+          loading={loading}
         >
           Generate charge note
         </Button>

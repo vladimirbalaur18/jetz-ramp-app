@@ -259,7 +259,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td class="xl161" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">${basePrice.toFixed(2)}</td>
   <td class="xl181" style="border-top:none">${config.VAT}%</td>
-  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice}</td>
+  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice?.toFixed(2)}</td>
  </tr>`;
       }
     );

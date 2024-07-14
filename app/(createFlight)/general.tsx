@@ -614,6 +614,7 @@ const Form: React.FC = () => {
           mode="contained"
           onPress={handleSubmit(submit)}
           disabled={!formState.isValid}
+          loading={formState.isSubmitting}
         >
           {realmExistingFlight?.toJSON()
             ? "Save information"
