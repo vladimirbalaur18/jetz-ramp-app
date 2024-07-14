@@ -226,8 +226,9 @@ const Form: React.FC = () => {
         });
       });
     } else {
+      let pushedServices: Record<string, boolean> = {};
       existingFlight.providedServices.otherServices?.forEach((s) => {
-        if (s.service)
+        if (s.service) {
           append({
             service: s.service,
             isUsed: s.isUsed,
@@ -236,6 +237,19 @@ const Form: React.FC = () => {
             notes: s.notes || "",
             totalPriceOverride: s.totalPriceOverride,
           });
+          pushedServices[s?.service?.serviceName] = true;
+        }
+      });
+      //loops through root services and see if there are some new services that didn't exist previously
+      defaultServicesPerCategories.map((s) => {
+        if (!pushedServices[s?.serviceName]) {
+          append({
+            service: s,
+            isUsed: false,
+            isPriceOverriden: false,
+            quantity: 0,
+          });
+        }
       });
     }
 
