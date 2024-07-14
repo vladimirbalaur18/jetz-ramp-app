@@ -16,6 +16,11 @@ import { IProvidedServices } from "@/models/ProvidedServices";
 import { IService } from "@/models/Services";
 import { IProvidedService } from "@/models/ProvidedService";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SafeNumber } from "@/utils/SafeNumber";
+import {
+  getDisbursedServices,
+  getTotalDisbursementFees,
+} from "@/services/totalsCalculator";
 
 function getCircularReplacer() {
   const ancestors: any[] = []; //@ts-expect-error
@@ -113,12 +118,6 @@ const TotalServicesSection: React.FC<{
 
       return Number(total);
     };
-    const calculateDisbursementsTotal = () => {
-      return Object.values(disbursementFees).reduce(
-        (accumulator, currentValue) => accumulator + currentValue,
-        0
-      );
-    };
 
     return Number(
       Number(totalFuelPrice) +
@@ -130,7 +129,7 @@ const TotalServicesSection: React.FC<{
         Number(airportFee.total) +
         Number(basicHandling.total) +
         calculateOtherServicesTotal() +
-        calculateDisbursementsTotal()
+        getTotalDisbursementFees(providedServices, existingFlight)
     );
   }, [JSON.stringify(providedServices, getCircularReplacer())]);
 
@@ -140,7 +139,7 @@ const TotalServicesSection: React.FC<{
       <SectionTitle>Total services provided:</SectionTitle>
       <Text style={styles.serviceListItem} variant="titleMedium">
         Basic handling (MTOW: {existingFlight?.mtow}kg):{" "}
-        {renderBasicHandlingVAT}
+        {SafeNumber(renderBasicHandlingVAT)}
         &euro;
       </Text>
       <Divider />
@@ -264,6 +263,13 @@ const TotalServicesSection: React.FC<{
         Express/VIP Lounge fee:{" "}
         {Number(disbursementFees.VIPLoungeFee).toFixed(2)}&euro;
       </Text>
+      {getDisbursedServices(providedServices, existingFlight).map(
+        ({ serviceName, total }) => (
+          <Text>
+            {serviceName}: {Number(total).toFixed(2) || 0}&euro;
+          </Text>
+        )
+      )}
       <Divider style={{ marginVertical: 10 }} />
       <Text variant="titleLarge">
         Total: {Number(totalAmountOfServices).toFixed(2)}&euro;{" "}

@@ -56,6 +56,7 @@ import _ from "lodash";
 import { getDifferenceBetweenArrivalDeparture } from "@/services/AirportFeesManager/utils";
 import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
+import { SafeNumber } from "@/utils/SafeNumber";
 type FormData = IFlight;
 
 const Form: React.FC = () => {
@@ -63,6 +64,7 @@ const Form: React.FC = () => {
   const defaultServicesPerCategories = allServices.flatMap((sc) => [
     ...sc.services,
   ]);
+
   const currentFlightId = useSelector(
     (state: RootState) => state?.flights.currentFlightId
   );
@@ -674,7 +676,7 @@ const Form: React.FC = () => {
                   <TextInput
                     label="Basic handling fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) => {
@@ -755,7 +757,7 @@ const Form: React.FC = () => {
                   <TextInput
                     label="Total airport fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>

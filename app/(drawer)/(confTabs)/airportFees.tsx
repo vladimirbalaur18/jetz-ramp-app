@@ -4,6 +4,7 @@ import { GeneralConfigState } from "@/models/Config";
 import { FuelFeesState } from "@/models/Fuelfees";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
+import { SafeNumber } from "@/utils/SafeNumber";
 import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -144,7 +145,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -173,7 +174,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -207,7 +208,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -244,7 +245,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -273,7 +274,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -301,7 +302,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -335,7 +336,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -373,7 +374,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -404,7 +405,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -432,7 +433,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -463,7 +464,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -498,7 +499,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -527,7 +528,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -555,7 +556,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -589,7 +590,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Summer night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -626,7 +627,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -655,7 +656,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price for light aicraft:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -683,7 +684,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Winter night period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -717,7 +718,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Summer period quota percentage:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -755,7 +756,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -786,7 +787,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -814,7 +815,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per pax:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
@@ -845,7 +846,7 @@ const Form: React.FC = () => {
               <TextInput
                 label="Price per ton:"
                 style={styles.input}
-                value={String(value)}
+                value={SafeNumber(value)}
                 inputMode="numeric"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}

@@ -93,7 +93,6 @@ export const getBasicHandlingPrice = (flight: IFlight) => {
     }
   }
 };
-
 export const getTotalAirportFeesPrice = (flight: IFlight) => {
   const result = {
     landing: getLandingFees(flight)?.toFixed(2),
@@ -111,7 +110,6 @@ export const getTotalAirportFeesPrice = (flight: IFlight) => {
     fees: { ...result },
   };
 };
-
 export const getLoungeFeePrice = ({
   departureMinorPax = 0,
   departureAdultPax = 0,

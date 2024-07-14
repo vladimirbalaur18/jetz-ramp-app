@@ -210,7 +210,23 @@ const Form: React.FC = () => {
             )}
           />
         </View>
-
+        <View style={styles.row}>
+          <Text variant="bodyLarge">Is disbursed </Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="isDisbursed"
+            render={({ field: { value, onChange } }) => (
+              <>
+                <Switch
+                  value={value}
+                  disabled={disableField}
+                  onValueChange={(value) => onChange(value)}
+                />
+              </>
+            )}
+          />
+        </View>
         <View
           style={{
             justifyContent: "space-between",

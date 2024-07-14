@@ -6,6 +6,7 @@ export type IDisbursementFees = {
   cateringFee: number;
   HOTACFee: number;
   VIPLoungeFee: number;
+  // otherServicesFee:  Array<{serviceName:string; amount:0}>
 };
 
 export class DisbursementFees extends Realm.Object<IDisbursementFees> {
@@ -14,6 +15,7 @@ export class DisbursementFees extends Realm.Object<IDisbursementFees> {
   cateringFee!: number;
   HOTACFee!: number;
   VIPLoungeFee!: number;
+  
 
   static schema: ObjectSchema = {
     name: "DisbursementFees",

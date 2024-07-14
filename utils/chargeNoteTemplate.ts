@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import convertCurrency from "./convertCurrency";
 import getParsedDateTime from "./getParsedDateTime";
 import { IFlight } from "@/models/Flight";
+import { getDisbursedServices, getTotalDisbursementFees } from "@/services/totalsCalculator";
 
 type ChargeListService = {
   serviceName: string;
@@ -58,14 +59,13 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 
     return result;
   })();
-  const totalDisbursementFeesAmount = Object.values(
-    flight?.providedServices!.disbursementFees
-  ).reduce(
-    (accumulator, current) => Number(accumulator) + Number(current || 0),
-    0
-  );
 
-  
+const disbursedServices = getDisbursedServices(flight?.providedServices, flight)
+const totalDisbursementFeesAmount = getTotalDisbursementFees(flight?.providedServices, flight)
+
+  console.warn("Disbursed services", JSON.stringify(disbursedServices, null));
+
+console.log(totalDisbursementFeesAmount)
   if (
     basicHandlingWithVAT &&
     !flight?.providedServices!.basicHandling?.isPriceOverriden
@@ -76,7 +76,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
       totalPrice: Number(basicHandlingWithVAT),
       quantity: 1,
     });
-  } 
+  }
 
   if (basicHandlingWithoutVAT) {
     servicesListNoVAT.push({
@@ -112,7 +112,6 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     }
   });
 
-  const disbursementPercentage = flight.chargeNote.disbursementPercentage;
 
   const VIPTerminalPrice = getLoungeFeePrice({
     ...flight?.providedServices?.VIPLoungeServices,
@@ -180,8 +179,9 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     return resultHTML;
   };
   const thirdPartyServiceProvidersRenderHTML = () => {
-
-	const VIPString  =  VIPPriceToEur >0? `<tr height="19" style="height:16.4pt">
+    const VIPString =
+      VIPPriceToEur > 0
+        ? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl139" style="height:16.4pt">&nbsp;</td>
   <td class="xl140" colspan="2" style="mso-ignore:colspan">Express/VIP Terminal</td>
   <td class="xl140" style="border-top:none">&nbsp;</td>
@@ -192,9 +192,12 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${
     VIPPriceToEur.toFixed(2) || 0
   }</td>
- </tr>`:''
+ </tr>`
+        : "";
 
- const AirportFeesString =  airportFeeTotal > 0 ? `<tr height="19" style="height:16.4pt">
+    const AirportFeesString =
+      airportFeeTotal > 0
+        ? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt">&nbsp;</td>
   <td class="xl134" colspan="2" style="mso-ignore:colspan">Airport fees</td>
   <td class="xl134">&nbsp;</td>
@@ -205,9 +208,12 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
     airportFeeTotal.toFixed(2) || 0
   }</td>
- </tr>`:''
+ </tr>`
+        : "";
 
- const CateringString = cateringFeeTotal>0 ? ` <tr height="19" style="height:16.4pt">
+    const CateringString =
+      cateringFeeTotal > 0
+        ? ` <tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">Catering</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
@@ -219,9 +225,12 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
     cateringFeeTotal.toFixed(2) || 0
   }</td>
- </tr>`:''
+ </tr>`
+        : "";
 
- const FuelString = fuelFeeTotal > 0 ?`<tr height="19" style="height:16.4pt">
+    const FuelString =
+      fuelFeeTotal > 0
+        ? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">Fuel</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
@@ -245,8 +254,9 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
     hotacFeeTotal.toFixed(2) || 0
   }</td>
- </tr>`:''
-    return AirportFeesString+CateringString+FuelString+VIPString
+ </tr>`
+        : "";
+    return AirportFeesString + CateringString + FuelString + VIPString;
   };
   const VATApplicableServicesRenderHTML = () => {
     return VATServicesList.map(
@@ -259,51 +269,69 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td class="xl161" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">${basePrice.toFixed(2)}</td>
   <td class="xl181" style="border-top:none">${config.VAT}%</td>
-  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice?.toFixed(2)}</td>
+  <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice?.toFixed(
+    2
+  )}</td>
  </tr>`;
       }
     );
   };
 
-  const renderDisbursementHTML = () =>{
+  const renderDisbursementHTML = () => {
+	  const disbursementPercentage = flight.chargeNote.disbursementPercentage;
 
-	const mapKeyByName:Record<string, string> = {
-		airportFee:'Airport fees',
-		fuelFee:'Fuel',
-		cateringFee:'Catering',
-		HOTACFee:'HOTAC',
-		VIPLoungeFee:'Express/VIP Terminal'
-	}
+    const mapKeyByName: Record<string, string> = {
+      airportFee: "Airport fees",
+      fuelFee: "Fuel",
+      cateringFee: "Catering",
+      HOTACFee: "HOTAC",
+      VIPLoungeFee: "Express/VIP Terminal",
+    };
 
-	let resultHTML = ``;
+    let resultHTML = ``;
 
-	if(flight?.providedServices?.disbursementFees){
-
-		Object.entries(flight?.providedServices.disbursementFees).map(([key, value])=>{
-
-
-			if(value > 0)
-				{
-					resultHTML+=` <tr height="19" style="height:16.4pt">
+    if (flight?.providedServices?.disbursementFees) {
+      Object.entries(flight?.providedServices.disbursementFees).map(
+        ([key, value]) => {
+          if (value > 0) {
+            resultHTML += ` <tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
-  <td class="xl134" colspan="2" style="mso-ignore:colspan">${mapKeyByName[key]}</td>
+  <td class="xl134" colspan="2" style="mso-ignore:colspan">${
+    mapKeyByName[key]
+  }</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">${
-    disbursementPercentage
-  }%</td>
+  <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
     value
   ).toFixed(2)}</td>
+ </tr>`;
+          }
+        }
+      );
+    } else
+      return alert("Something wrong occured while loading disbursement fees. They're not initialized from provided services");
+
+	  disbursedServices.map(disbursedService => {
+		resultHTML+=`<tr height="19" style="height:16.4pt">
+  <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
+  <td class="xl134" colspan="2" style="mso-ignore:colspan">${
+    disbursedService?.serviceName
+  }</td>
+  <td class="xl134" style="border-top:none">&nbsp;</td>
+  <td class="xl128" style="border-top:none">&nbsp;</td>
+  <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
+  <td class="xl114" style="border-top:none">&nbsp;</td>
+  <td class="xl115" style="border-top:none">&nbsp;</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
+    disbursedService?.total
+  ).toFixed(2)}</td>
  </tr>`
-				}
-		})
-	} else return alert('Something wrong occured while loading disbursement fees')
-	
-	return resultHTML
-  }
+	  })
+    return resultHTML;
+  };
   const servicesTotalAmountNoVAT =
     servicesListNoVAT.reduce(
       (accumulator, current) => accumulator + (current?.totalPrice || 0),
@@ -312,7 +340,6 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
     getTotalAirportFeesPrice(flight).total +
     totalDisbursementFeesAmount +
     totalSupportServicesAmount;
-
 
   const servicesTotalAmountWithVAT = VATServicesList.reduce(
     (accumulator, current) => accumulator + (current?.totalPrice || 0),
@@ -2604,7 +2631,7 @@ height="90" width="180" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAA
   <td colspan="2" height="20" class="xl68" style="height:15.0pt">CHARGE NOTE No.</td>
   <td class="xl72">${dayjs().format("DD/MMM/YY")} //</td>
   <td class="xl65" >${flight?.aircraftRegistration || ""}</td>
-  <td class="xl74">// ${dayjs().format('HHmmss')}</td>
+  <td class="xl74">// ${dayjs().format("HHmmss")}</td>
   <td class="xl65"></td>
   <td class="xl65"></td>
   <td class="xl65"></td>
