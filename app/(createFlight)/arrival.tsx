@@ -84,8 +84,8 @@ const Form: React.FC = () => {
     try {
       realm.write(() => {
         const arrivalTime = realm.create<ITime>("Time", {
-          hours: Number(data.arrival.arrivalTime.hours),
-          minutes: Number(data.arrival.arrivalTime.minutes),
+          hours: Number(data.arrival?.arrivalTime?.hours || 0),
+          minutes: Number(data.arrival?.arrivalTime?.minutes || 0),
         });
         const rampAgent = realm.create<IRampAgent>("RampAgent", {
           fullname: data.arrival.rampInspectionBeforeArrival.agent.fullname,
