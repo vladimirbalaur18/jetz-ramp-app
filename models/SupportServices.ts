@@ -3,7 +3,7 @@ import { IFeeTotal } from "./FeeTotal";
 import { IFuel } from "./Fuel";
 
 export type ISupportServices = {
-  airportFee: IFeeTotal;
+  airportFee?: IFeeTotal;
   fuel: IFuel;
   catering: IFeeTotal;
   HOTAC: IFeeTotal;

@@ -20,7 +20,7 @@ import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import REGEX from "@/utils/regexp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery, useRealm } from "@realm/react";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
   Button,
@@ -131,12 +131,14 @@ const Form: React.FC = () => {
     mode: "onBlur",
     defaultValues: {
       providedServices: {
-        basicHandling: {
-          total:
-            (basicHandlingPricePerLegs?.arrival || 0) +
-            (basicHandlingPricePerLegs?.departure || 0),
-          isPriceOverriden: false,
-        },
+        basicHandling: existingFlight?.providedServices?.basicHandling
+          ? { ...existingFlight.providedServices.basicHandling }
+          : {
+              total:
+                (basicHandlingPricePerLegs?.arrival || 0) +
+                (basicHandlingPricePerLegs?.departure || 0),
+              isPriceOverriden: false,
+            },
         disbursementFees: {
           airportFee: 0,
           cateringFee: 0,
@@ -260,7 +262,7 @@ const Form: React.FC = () => {
     const disbursementFeeMultplier = disbursementPercentage / 100;
     const disbursementFees = {
       airportFee:
-        (providedServicesObj?.supportServices.airportFee.total || 0) *
+        (providedServicesObj?.supportServices.airportFee?.total || 0) *
         disbursementFeeMultplier,
       fuelFee:
         getFuelFeeAmount({
@@ -288,7 +290,7 @@ const Form: React.FC = () => {
     providedServicesObj?.supportServices.HOTAC.total,
     providedServicesObj?.supportServices.catering.total,
     JSON.stringify(providedServicesObj?.supportServices.fuel),
-    providedServicesObj?.supportServices.airportFee.total,
+    providedServicesObj?.supportServices.airportFee?.total,
     JSON.stringify(providedServicesObj?.VIPLoungeServices),
   ]);
   const theme = useTheme();
@@ -333,7 +335,7 @@ const Form: React.FC = () => {
           basicHandling: realm.create<IBasicHandling>("BasicHandling", {
             total: Number(data?.providedServices?.basicHandling?.total),
             isPriceOverriden:
-              data.providedServices?.basicHandling.isPriceOverriden,
+              data.providedServices?.basicHandling?.isPriceOverriden,
           }),
           disbursementFees: data.providedServices?.disbursementFees,
           supportServices: realm.create<ISupportServices>("SupportServices", {
@@ -386,6 +388,29 @@ const Form: React.FC = () => {
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <>
+              <Button
+                disabled={!realmExistingFlight?.providedServices}
+                onPress={() => {
+                  realm.write(() => {
+                    if (realmExistingFlight?.providedServices) {
+                      realm.delete(realmExistingFlight?.providedServices);
+                      router.replace("/(createFlight)/providedServices");
+                      snackbar.showSnackbar("Services have been reset");
+                    }
+                  });
+                }}
+                mode="text"
+              >
+                Reset services
+              </Button>
+            </>
+          ),
+        }}
+      />
       <SafeAreaView>
         <ScrollView
           contentContainerStyle={formStyles.container}

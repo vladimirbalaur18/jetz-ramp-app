@@ -18,7 +18,7 @@ import REGEX from "@/utils/regexp";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useRealm } from "@realm/react";
 import dayjs from "dayjs";
-import { useRouter } from "expo-router";
+import { ErrorBoundaryProps, useRouter } from "expo-router";
 import _ from "lodash";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -45,6 +45,14 @@ const ERROR_MESSAGES = {
   TERMS: "Terms Must Be Accepted To Continue",
   EMAIL_INVALID: "Not a Valid Email",
 };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "red" }}>
+      <Text>{error.message} SUKAAAA</Text>
+      <Text onPress={retry}>Try Again?</Text>
+    </View>
+  );
+}
 const Form: React.FC = () => {
   const router = useRouter();
   const currentFlightId = useSelector(
@@ -105,15 +113,49 @@ const Form: React.FC = () => {
           from: data.arrival.from?.toLocaleUpperCase(),
         });
 
-        if (_existingFlight) {
+        if (_existingFlight?.arrival) {
           if (_.isEqual(_existingFlight.toJSON(), data)) {
             _existingFlight.arrival = arrival;
           } else {
-            _existingFlight.providedServices &&
-              realm.delete(_existingFlight.providedServices);
-            _existingFlight.arrival = arrival;
+            if (
+              (!_.isEqual(
+                (_existingFlight.toJSON() as IFlight).arrival.arrivalDate,
+                data.arrival.arrivalDate
+              ) ||
+                !_.isEqual(
+                  (_existingFlight.toJSON() as IFlight).arrival.arrivalTime,
+                  data.arrival.arrivalTime
+                )) &&
+              _existingFlight.providedServices
+            ) {
+              alert(
+                "Airport fees were reset due to arrival date / time updated"
+              );
+              if (
+                _existingFlight.providedServices?.supportServices?.airportFee
+              ) {
+                _existingFlight.providedServices.supportServices.airportFee =
+                  undefined;
+              }
+            }
+
+            if (
+              !_.isEqual(
+                (_existingFlight.toJSON() as IFlight).arrival.isLocalFlight,
+                data.arrival.isLocalFlight
+              ) &&
+              _existingFlight.providedServices
+            ) {
+              alert(
+                "Basic handling fees were recalculated due to local flight param being changed"
+              );
+              if (_existingFlight?.providedServices)
+                _existingFlight.providedServices.basicHandling = undefined;
+            }
           }
-        } else return arrival;
+        } else if (_existingFlight) {
+          _existingFlight.arrival = arrival;
+        }
       });
       dispatch(
         setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
@@ -127,6 +169,7 @@ const Form: React.FC = () => {
       );
     } catch (e) {
       Alert.alert("Error saving arrival data", JSON.stringify(e, null, 5));
+      throw e;
     }
   };
   const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);
@@ -281,7 +324,7 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Adult passenger count"
                   style={styles.input}
-                  value={value ? String(value) : undefined}
+                  value={typeof value !== "undefined" ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(value) => onChange(onlyIntNumber(value))}
@@ -309,7 +352,7 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Minor passenger count"
                   style={styles.input}
-                  value={value ? String(value) : undefined}
+                  value={typeof value !== "undefined" ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(value) => onChange(onlyIntNumber(value))}

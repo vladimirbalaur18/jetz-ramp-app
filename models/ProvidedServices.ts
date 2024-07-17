@@ -6,8 +6,8 @@ import { ISupportServices } from "./SupportServices";
 import { IProvidedService, ProvidedService } from "./ProvidedService";
 
 export type IProvidedServices = {
-  basicHandling: IBasicHandling;
-  disbursementFees: IDisbursementFees;
+  basicHandling?: IBasicHandling;
+  disbursementFees?: IDisbursementFees;
   supportServices: ISupportServices;
   VIPLoungeServices: IVIPLoungeService;
   remarks?: string;

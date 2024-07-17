@@ -61,6 +61,7 @@ const Form: React.FC = () => {
         : {
             ..._existingFlight?.toJSON(),
             departure: {
+              isLocalFlight: false,
               departureTime: { hours: 0, minutes: 0 },
               departureDate: new Date(),
               adultCount: 0,
@@ -99,7 +100,7 @@ const Form: React.FC = () => {
           adultCount: Number(data.departure.adultCount),
           departureDate: dayjs(data.departure.departureDate).toDate(),
           departureTime: departureTime,
-          isLocalFlight: data.departure.isLocalFlight,
+          isLocalFlight: Boolean(data.departure.isLocalFlight),
           minorCount: Number(data.departure.minorCount),
           rampInspectionBeforeDeparture: rampInspection,
           to: data.departure.to?.toLocaleUpperCase(),
@@ -109,12 +110,55 @@ const Form: React.FC = () => {
           arrivalTime: data.arrival.arrivalTime,
         });
 
-        if (_existingFlight) {
-          if (!_.isEqual(_existingFlight.toJSON(), data)) {
-            _existingFlight.providedServices &&
-              realm.delete(_existingFlight.providedServices);
+        if (_existingFlight?.departure) {
+          if (
+            !_.isEqual(
+              (_existingFlight.toJSON() as IFlight).departure.isLocalFlight,
+              data.departure.isLocalFlight
+            ) &&
+            _existingFlight.providedServices
+          ) {
+            // _existingFlight.providedServices &&
+            //   realm.delete(_existingFlight.providedServices);
+            alert(
+              "Basic handling fees were reset due to local flight param being changed"
+            );
+            if (_existingFlight?.providedServices)
+              _existingFlight.providedServices.basicHandling = undefined;
           }
+
+          if (
+            !_.isEqual(
+              (_existingFlight.toJSON() as IFlight).departure.departureDate,
+              data.departure.departureDate
+            ) ||
+            !_.isEqual(
+              (_existingFlight.toJSON() as IFlight).departure.departureTime,
+              data.departure.departureTime
+            ) ||
+            !_.isEqual(
+              (_existingFlight.toJSON() as IFlight).arrival.arrivalDate,
+              data.arrival.arrivalDate
+            ) ||
+            (!_.isEqual(
+              (_existingFlight.toJSON() as IFlight).arrival.arrivalTime,
+              data.arrival.arrivalTime
+            ) &&
+              _existingFlight.providedServices)
+          ) {
+            alert(
+              "Airport fees were reset due to date time changed for either arrival or departure"
+            );
+            if (_existingFlight.providedServices?.supportServices?.airportFee) {
+              _existingFlight.providedServices.supportServices.airportFee =
+                undefined;
+            }
+          }
+        }
+
+        if (_existingFlight) {
           _existingFlight.departure = departure;
+
           if (_existingFlight.handlingType === "Departure") {
             _existingFlight.arrival = arrival;
           }
@@ -131,6 +175,7 @@ const Form: React.FC = () => {
         "Error saving departure information",
         JSON.stringify(e, null, 2)
       );
+      throw e;
     }
   };
 
@@ -374,7 +419,7 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Adult passenger count"
                   style={styles.input}
-                  value={value ? String(value) : undefined}
+                  value={typeof value !== "undefined" ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(value) => onChange(onlyIntNumber(value))}
@@ -402,7 +447,7 @@ const Form: React.FC = () => {
                 <TextInput
                   label="Minor passenger count"
                   style={styles.input}
-                  value={value ? String(value) : undefined}
+                  value={typeof value !== "undefined" ? String(value) : ""}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   onChangeText={(value) => onChange(onlyIntNumber(value))}

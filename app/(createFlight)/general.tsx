@@ -114,11 +114,52 @@ const Form: React.FC = () => {
           dispatch(setCurrentFlightById(newFlightId));
         });
       } else {
-        if (!_.isEqual(realmExistingFlight.toJSON(), data)) {
+        if (
+          !_.isEqual(
+            (realmExistingFlight.toJSON() as IFlight)?.mtow,
+            data?.mtow
+          ) &&
+          realmExistingFlight.toJSON()?.providedServices
+        ) {
+          alert(
+            "Disbursement fees, airport fees and basic handling will be reset due to MTOW change"
+          );
+          realm.write(() => {
+            if (realmExistingFlight?.providedServices) {
+              if (realmExistingFlight?.providedServices?.basicHandling)
+                realmExistingFlight.providedServices.basicHandling = undefined;
+
+              if (realmExistingFlight?.providedServices?.disbursementFees)
+                realmExistingFlight.providedServices.disbursementFees =
+                  undefined;
+
+              if (
+                realmExistingFlight?.providedServices?.supportServices
+                  .airportFee
+              )
+                realmExistingFlight.providedServices.supportServices.airportFee =
+                  undefined;
+            }
+          });
+        }
+
+        if (
+          !_.isEqual(
+            (realmExistingFlight.toJSON() as IFlight)?.chargeNote
+              ?.disbursementPercentage,
+            data?.chargeNote?.disbursementPercentage
+          ) &&
+          realmExistingFlight.toJSON()?.providedServices
+        ) {
+          console.warn(
+            "Resetting disbursement fees due to change of percentage"
+          );
           realm.write(
             () =>
               realmExistingFlight.providedServices &&
-              realm.delete(realmExistingFlight.providedServices)
+              realm.delete(
+                realmExistingFlight.providedServices?.disbursementFees
+              )
           );
         }
         realm.write(() => {
@@ -148,7 +189,7 @@ const Form: React.FC = () => {
           realmExistingFlight.orderingCompanyName = data?.orderingCompanyName;
           realmExistingFlight.parkingPosition =
             data?.parkingPosition?.toLocaleUpperCase();
-          realmExistingFlight.providedServices = undefined;
+          // realmExistingFlight.providedServices = undefined;
           realmExistingFlight.ramp = undefined;
           realmExistingFlight.scheduleType = data?.scheduleType;
           realmExistingFlight.status = data?.status;
@@ -469,7 +510,7 @@ const Form: React.FC = () => {
                 value={value ? String(value) : ""}
                 keyboardType="number-pad"
                 onBlur={onBlur}
-                onChangeText={(value) => onChange(Number(value))}
+                onChangeText={(value) => onChange(Number(onlyIntNumber(value)))}
                 error={errors.mtow && true}
               />
               <HelperText type="error">{errors.mtow?.message}</HelperText>
