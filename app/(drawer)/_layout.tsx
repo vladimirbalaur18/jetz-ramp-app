@@ -23,6 +23,7 @@ export default function Layout() {
           name="index" // This is the name of the page and must match the url from root
           options={{
             // drawerLabel: "Home",
+            unmountOnBlur: true,
             title: "Active flights",
             drawerIcon: () => (
               <MaterialCommunityIcons

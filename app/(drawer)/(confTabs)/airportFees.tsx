@@ -12,6 +12,7 @@ import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
+  InteractionManager,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -34,87 +35,89 @@ const Form: React.FC = () => {
   const { errors } = formState;
 
   const submit = (data: FormData) => {
-    try {
-      realm.write(() => {
-        if (AirportFees) {
-          AirportFees.commercial.landingFee.perTon = Number(
-            data.commercial.landingFee.perTon
-          );
-          AirportFees.commercial.landingFee.winterPeriodQuotaPercentage =
-            Number(data.commercial.landingFee.winterPeriodQuotaPercentage);
-          AirportFees.commercial.landingFee.summerPeriodQuotaPercentage =
-            Number(data.commercial.landingFee.summerPeriodQuotaPercentage);
+    InteractionManager.runAfterInteractions(() => {
+      try {
+        realm.write(() => {
+          if (AirportFees) {
+            AirportFees.commercial.landingFee.perTon = Number(
+              data.commercial.landingFee.perTon
+            );
+            AirportFees.commercial.landingFee.winterPeriodQuotaPercentage =
+              Number(data.commercial.landingFee.winterPeriodQuotaPercentage);
+            AirportFees.commercial.landingFee.summerPeriodQuotaPercentage =
+              Number(data.commercial.landingFee.summerPeriodQuotaPercentage);
 
-          AirportFees.commercial.takeoffFee.lightAircraft = Number(
-            data.commercial.takeoffFee.lightAircraft
-          );
+            AirportFees.commercial.takeoffFee.lightAircraft = Number(
+              data.commercial.takeoffFee.lightAircraft
+            );
 
-          AirportFees.commercial.takeoffFee.perTon = Number(
-            data.commercial.takeoffFee.perTon
-          );
-          AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage =
-            Number(data.commercial.takeoffFee.winterPeriodQuotaPercentage);
-          AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage =
-            Number(data.commercial.takeoffFee.summerPeriodQuotaPercentage);
+            AirportFees.commercial.takeoffFee.perTon = Number(
+              data.commercial.takeoffFee.perTon
+            );
+            AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage =
+              Number(data.commercial.takeoffFee.winterPeriodQuotaPercentage);
+            AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage =
+              Number(data.commercial.takeoffFee.summerPeriodQuotaPercentage);
 
-          AirportFees.commercial.passengerFee.perPax = Number(
-            data.commercial.passengerFee.perPax
-          );
+            AirportFees.commercial.passengerFee.perPax = Number(
+              data.commercial.passengerFee.perPax
+            );
 
-          AirportFees.commercial.securityFee.perPax = Number(
-            data.commercial.securityFee.perPax
-          );
-          AirportFees.commercial.securityFee.perTon = Number(
-            data.commercial.securityFee.perTon
-          );
+            AirportFees.commercial.securityFee.perPax = Number(
+              data.commercial.securityFee.perPax
+            );
+            AirportFees.commercial.securityFee.perTon = Number(
+              data.commercial.securityFee.perTon
+            );
 
-          AirportFees.commercial.parkingDay.perTon = Number(
-            data.commercial.parkingDay.perTon
-          );
+            AirportFees.commercial.parkingDay.perTon = Number(
+              data.commercial.parkingDay.perTon
+            );
 
-          AirportFees.nonCommercial.landingFee.lightAircraft = Number(
-            data.nonCommercial.landingFee.lightAircraft
-          );
+            AirportFees.nonCommercial.landingFee.lightAircraft = Number(
+              data.nonCommercial.landingFee.lightAircraft
+            );
 
-          AirportFees.nonCommercial.landingFee.perTon = Number(
-            data.nonCommercial.landingFee.perTon
-          );
-          AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage =
-            Number(data.nonCommercial.landingFee.winterPeriodQuotaPercentage);
-          AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage =
-            Number(data.nonCommercial.landingFee.summerPeriodQuotaPercentage);
+            AirportFees.nonCommercial.landingFee.perTon = Number(
+              data.nonCommercial.landingFee.perTon
+            );
+            AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage =
+              Number(data.nonCommercial.landingFee.winterPeriodQuotaPercentage);
+            AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage =
+              Number(data.nonCommercial.landingFee.summerPeriodQuotaPercentage);
 
-          AirportFees.nonCommercial.takeoffFee.lightAircraft = Number(
-            data.nonCommercial.takeoffFee.lightAircraft
-          );
+            AirportFees.nonCommercial.takeoffFee.lightAircraft = Number(
+              data.nonCommercial.takeoffFee.lightAircraft
+            );
 
-          AirportFees.nonCommercial.takeoffFee.perTon = Number(
-            data.nonCommercial.takeoffFee.perTon
-          );
-          AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage =
-            Number(data.nonCommercial.takeoffFee.winterPeriodQuotaPercentage);
-          AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage =
-            Number(data.nonCommercial.takeoffFee.summerPeriodQuotaPercentage);
+            AirportFees.nonCommercial.takeoffFee.perTon = Number(
+              data.nonCommercial.takeoffFee.perTon
+            );
+            AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage =
+              Number(data.nonCommercial.takeoffFee.winterPeriodQuotaPercentage);
+            AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage =
+              Number(data.nonCommercial.takeoffFee.summerPeriodQuotaPercentage);
 
-          AirportFees.nonCommercial.passengerFee.perPax = Number(
-            data.nonCommercial.passengerFee.perPax
-          );
+            AirportFees.nonCommercial.passengerFee.perPax = Number(
+              data.nonCommercial.passengerFee.perPax
+            );
 
-          AirportFees.nonCommercial.securityFee.perPax = Number(
-            data.nonCommercial.securityFee.perPax
-          );
-          AirportFees.nonCommercial.securityFee.perTon = Number(
-            data.nonCommercial.securityFee.perTon
-          );
-          AirportFees.nonCommercial.parkingDay.perTon = Number(
-            data.nonCommercial.parkingDay.perTon
-          );
-        }
-      });
-      showSnackbar("Airport fees saved successfully");
-    } catch (err) {
-      Alert.alert("Error saving Airport fees", JSON.stringify(err, null, 5));
-    }
+            AirportFees.nonCommercial.securityFee.perPax = Number(
+              data.nonCommercial.securityFee.perPax
+            );
+            AirportFees.nonCommercial.securityFee.perTon = Number(
+              data.nonCommercial.securityFee.perTon
+            );
+            AirportFees.nonCommercial.parkingDay.perTon = Number(
+              data.nonCommercial.parkingDay.perTon
+            );
+          }
+        });
+        showSnackbar("Airport fees saved successfully");
+      } catch (err) {
+        Alert.alert("Error saving Airport fees", JSON.stringify(err, null, 5));
+      }
+    });
   };
 
   return (

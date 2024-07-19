@@ -1,4 +1,10 @@
-import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  InteractionManager,
+} from "react-native";
 import { ReactNode, useState } from "react";
 import { useTheme, Text, Menu } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -107,10 +113,13 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
                 borderRadius: 25,
               }}
               onPress={() => {
-                if (flight?.status !== "Completed") {
-                  dispatch(setCurrentFlightById(flight?.flightId as string));
-                  router.navigate("/(createFlight)/general");
-                }
+                InteractionManager.setDeadline(100);
+                InteractionManager.runAfterInteractions(() => {
+                  if (flight?.status !== "Completed") {
+                    dispatch(setCurrentFlightById(flight?.flightId as string));
+                    router.navigate("/(createFlight)/general");
+                  }
+                });
               }}
               onLongPress={() => openMenu()}
             >

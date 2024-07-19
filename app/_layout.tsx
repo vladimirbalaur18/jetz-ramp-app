@@ -106,7 +106,6 @@ function RootLayoutNav() {
 
   const themeBase =
     colorScheme === "light" ? CombinedDefaultTheme : CombinedDarkTheme;
-  const dispatch = useDispatch<AppDispatch>();
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
   );
