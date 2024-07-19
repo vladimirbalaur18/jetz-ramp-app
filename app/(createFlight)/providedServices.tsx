@@ -1268,8 +1268,7 @@ const AirportFeeOverrideModal = ({
               <Text style={{ marginVertical: 10 }} variant="bodySmall">
                 Note: below numbers are the fees precalculated by system. Their
                 sum will not match if the total was overriden before. By
-                clicking submit, you will override the values to default (
-                {totals} EUR)
+                clicking submit, you will override the values to default.
               </Text>
             )}
             <Controller
