@@ -46,13 +46,6 @@ const ERROR_MESSAGES = {
   EMAIL_INVALID: "Not a Valid Email",
 };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: "red" }}>
-      <Text>{error.message} SUKAAAA</Text>
-      <Text onPress={retry}>Try Again?</Text>
-    </View>
-  );
-}
 const Form: React.FC = () => {
   const router = useRouter();
   const currentFlightId = useSelector(

@@ -58,6 +58,7 @@ import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import { SafeNumber } from "@/utils/SafeNumber";
 import { UpdateMode } from "realm";
+import { isLoading } from "expo-font";
 type FormData = IFlight;
 
 const isDifferenceBetweenRootServicesAndProvidedServices = (
@@ -87,23 +88,6 @@ const Form: React.FC = () => {
     JSON.stringify(existingFlight?.providedServices, null)
   );
 
-  const fullDepartureDateTime = getParsedDateTime(
-    existingFlight?.departure?.departureDate,
-    existingFlight?.departure?.departureTime
-  );
-  const fullArrivalDateTime = getParsedDateTime(
-    existingFlight?.arrival?.arrivalDate,
-    existingFlight?.arrival?.arrivalTime
-  );
-
-  const flightHasDeparture =
-    existingFlight?.handlingType === "FULL" ||
-    existingFlight?.handlingType === "Departure";
-
-  const flightHasArrival =
-    existingFlight?.handlingType === "FULL" ||
-    existingFlight?.handlingType === "Arrival";
-
   console.log(
     "Existing flight on render providedServices",
     JSON.stringify(existingFlight, null, 5)
@@ -115,7 +99,6 @@ const Form: React.FC = () => {
   const disbursementPercentage =
     existingFlight?.chargeNote?.disbursementPercentage;
 
-  const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
   const [airportFeeModalVisible, setAirportFeeModalVisible] = useState(false);
   const {
     control,
@@ -195,17 +178,6 @@ const Form: React.FC = () => {
     },
   });
 
-  const airportFeeOverrideForm = useForm<{
-    landing: number | string;
-    takeOff: number | string;
-    passengers: number | string;
-    security: number | string;
-    parking: number | string;
-  }>({
-    defaultValues: {
-      ...airportFeesDetails,
-    },
-  });
   const { errors } = formState;
   const [priceOverrideModalVisible, setPriceOverrideModalVisible] = useState<
     number | null
@@ -257,6 +229,7 @@ const Form: React.FC = () => {
 
     return () => remove();
   }, []);
+
   //disbursement calculation
   useEffect(() => {
     const disbursementFeeMultplier = disbursementPercentage / 100;
@@ -418,294 +391,23 @@ const Form: React.FC = () => {
           alwaysBounceVertical={false}
         >
           <AirportFeeOverrideModal
+            currentSum={watch(
+              "providedServices.supportServices.airportFee.total"
+            )}
             visible={airportFeeModalVisible}
             onDismiss={() => setAirportFeeModalVisible(false)}
-          >
-            <View>
-              <Text variant="headlineSmall">Airport fee details</Text>
-              <Controller
-                control={airportFeeOverrideForm.control}
-                name="landing"
-                rules={{
-                  required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                  pattern: {
-                    message: "Invalid number format",
-                    value: REGEX.number,
-                  },
-                }}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <>
-                    <TextInput
-                      label="Landing fee:"
-                      style={formStyles.input}
-                      value={String(value)}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                      onChangeText={(value) =>
-                        onChange(replaceCommaWithDot(value))
-                      }
-                      error={
-                        airportFeeOverrideForm.formState.errors.landing && true
-                      }
-                    />
-                    {airportFeeOverrideForm?.formState?.errors?.landing &&
-                      true && (
-                        <HelperText type="error">
-                          {
-                            airportFeeOverrideForm?.formState?.errors?.landing
-                              ?.message
-                          }
-                        </HelperText>
-                      )}
-                    {airportFeeOverrideForm.getFieldState("landing")
-                      .isDirty && (
-                      <HelperText type="info">
-                        *Price has been manually overriden
-                      </HelperText>
-                    )}
-                    {flightHasArrival &&
-                      !airportFeeOverrideForm.getFieldState("landing")
-                        .isDirty &&
-                      isWinterNightTime(fullArrivalDateTime) && (
-                        <HelperText type="info">
-                          *Winter night Quota has been applied
-                        </HelperText>
-                      )}
-                    {flightHasArrival &&
-                      !airportFeeOverrideForm.getFieldState("landing")
-                        .isDirty &&
-                      isSummerNightTime(fullArrivalDateTime) && (
-                        <HelperText type="info">
-                          *Summer night Quota has been applied
-                        </HelperText>
-                      )}
-                  </>
-                )}
-              />
-              <Controller
-                control={airportFeeOverrideForm.control}
-                name="takeOff"
-                rules={{
-                  required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                  pattern: {
-                    message: "Invalid number format",
-                    value: REGEX.number,
-                  },
-                }}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <>
-                    <TextInput
-                      label="Takeoff fee:"
-                      style={formStyles.input}
-                      value={String(value)}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                      onChangeText={(value) =>
-                        onChange(replaceCommaWithDot(value))
-                      }
-                      error={
-                        airportFeeOverrideForm.formState.errors.takeOff && true
-                      }
-                    />
-                    {airportFeeOverrideForm?.formState?.errors?.takeOff && (
-                      <HelperText type="error">
-                        {
-                          airportFeeOverrideForm?.formState?.errors?.takeOff
-                            ?.message
-                        }
-                      </HelperText>
-                    )}
-                    {airportFeeOverrideForm.getFieldState("takeOff")
-                      .isDirty && (
-                      <HelperText type="info">
-                        *Price has been manually overriden
-                      </HelperText>
-                    )}
-                    {flightHasDeparture &&
-                      !airportFeeOverrideForm.getFieldState("takeOff")
-                        .isDirty &&
-                      isWinterNightTime(fullDepartureDateTime) && (
-                        <HelperText type="info">
-                          *Winter night Quota has been applied
-                        </HelperText>
-                      )}
-                    {flightHasDeparture &&
-                      !airportFeeOverrideForm.getFieldState("takeOff")
-                        .isDirty &&
-                      isSummerNightTime(fullDepartureDateTime) && (
-                        <HelperText type="info">
-                          *Summer night Quota has been applied
-                        </HelperText>
-                      )}
-                  </>
-                )}
-              />
-              <Controller
-                control={airportFeeOverrideForm.control}
-                name="passengers"
-                rules={{
-                  required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                  pattern: {
-                    message: "Invalid number format",
-                    value: REGEX.number,
-                  },
-                }}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <>
-                    <TextInput
-                      label="Passenger fee:"
-                      style={formStyles.input}
-                      value={String(value)}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                      onChangeText={(value) =>
-                        onChange(replaceCommaWithDot(value))
-                      }
-                      error={
-                        airportFeeOverrideForm.formState.errors.passengers &&
-                        true
-                      }
-                    />
-                    {airportFeeOverrideForm?.formState?.errors?.passengers && (
-                      <HelperText type="error">
-                        {
-                          airportFeeOverrideForm?.formState?.errors?.passengers
-                            ?.message
-                        }
-                      </HelperText>
-                    )}
-                    {airportFeeOverrideForm.getFieldState("passengers")
-                      .isDirty && (
-                      <HelperText type="info">
-                        *Price has been manually overriden
-                      </HelperText>
-                    )}
-                  </>
-                )}
-              />
-              <Controller
-                control={airportFeeOverrideForm.control}
-                name="security"
-                rules={{
-                  required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                  pattern: {
-                    message: "Invalid number format",
-                    value: REGEX.number,
-                  },
-                }}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <>
-                    <TextInput
-                      label="Security fee:"
-                      style={formStyles.input}
-                      value={String(value)}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                      onChangeText={(value) =>
-                        onChange(replaceCommaWithDot(value))
-                      }
-                      error={
-                        airportFeeOverrideForm.formState.errors.security && true
-                      }
-                    />
-                    {airportFeeOverrideForm?.formState?.errors?.security && (
-                      <HelperText type="error">
-                        {
-                          airportFeeOverrideForm?.formState?.errors?.security
-                            ?.message
-                        }
-                      </HelperText>
-                    )}
-                    {airportFeeOverrideForm.getFieldState("security")
-                      .isDirty && (
-                      <HelperText type="info">
-                        *Price has been manually overriden
-                      </HelperText>
-                    )}
-                  </>
-                )}
-              />
-              <Controller
-                control={airportFeeOverrideForm.control}
-                name="parking"
-                rules={{
-                  required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-                  pattern: {
-                    message: "Invalid number format",
-                    value: REGEX.number,
-                  },
-                }}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <>
-                    <TextInput
-                      label="Parking fee:"
-                      style={formStyles.input}
-                      value={String(value)}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                      onChangeText={(value) =>
-                        onChange(replaceCommaWithDot(value))
-                      }
-                      error={
-                        airportFeeOverrideForm.formState.errors.parking && true
-                      }
-                    />
-                    {airportFeeOverrideForm?.formState?.errors?.parking && (
-                      <HelperText type="error">
-                        {
-                          airportFeeOverrideForm?.formState?.errors?.parking
-                            ?.message
-                        }
-                      </HelperText>
-                    )}
-                    {airportFeeOverrideForm.getFieldState("parking")
-                      .isDirty && (
-                      <HelperText type="info">
-                        *Price has been manually overriden
-                      </HelperText>
-                    )}
-                  </>
-                )}
-              />
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  marginVertical: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Button
-                  mode="contained"
-                  onPress={() => {
-                    setAirportFeeModalVisible(false);
-                    airportFeeOverrideForm.reset();
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  mode="outlined"
-                  onPress={airportFeeOverrideForm.handleSubmit((data) => {
-                    const sum = Object.values(data).reduce(
-                      (acc, val) =>
-                        parseFloat(acc as string) + parseFloat(val as string),
-                      0
-                    );
-                    setValue(
-                      "providedServices.supportServices.airportFee.total",
-                      parseFloat(sum as string).toFixed(2) as unknown as number
-                    );
+            existingFlight={existingFlight}
+            onSubmit={(sum) => {
+              setValue(
+                "providedServices.supportServices.airportFee.total",
+                sum
+              );
 
-                    setAirportFeeModalVisible(false);
-                    snackbar.showSnackbar("Airport fees modified successfully");
-                  })}
-                >
-                  Save
-                </Button>
-              </View>
-            </View>
-          </AirportFeeOverrideModal>
+              setAirportFeeModalVisible(false);
+              snackbar.showSnackbar("Airport fees modified successfully");
+            }}
+          />
+
           <SectionTitle>
             Basic Handling (MTOW: {existingFlight?.mtow}kg )
           </SectionTitle>
@@ -1478,14 +1180,69 @@ const PriceOverrideModal = ({
 };
 
 const AirportFeeOverrideModal = ({
-  //@ts-expect-error
-  children,
   visible = false,
   onDismiss = () => {},
-  onSubmit = () => {},
+  onSubmit = (sum: number) => {},
+  existingFlight,
+  currentSum,
+}: {
+  existingFlight: IFlight;
+  visible: boolean;
+  onDismiss: () => void;
+  onSubmit: (sum: number) => void;
+  currentSum: number;
 }) => {
-  const theme = useTheme();
+  if (!existingFlight)
+    throw new Error(
+      "Existing flight not found. Cant initialize airport fees modal"
+    );
 
+  const theme = useTheme();
+  const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
+  const airportFeeOverrideForm = useForm<{
+    landing: number | string;
+    takeOff: number | string;
+    passengers: number | string;
+    security: number | string;
+    parking: number | string;
+  }>({
+    defaultValues: {
+      ...airportFeesDetails,
+    },
+  });
+
+  const fullDepartureDateTime = getParsedDateTime(
+    existingFlight?.departure?.departureDate,
+    existingFlight?.departure?.departureTime
+  );
+  const fullArrivalDateTime = getParsedDateTime(
+    existingFlight?.arrival?.arrivalDate,
+    existingFlight?.arrival?.arrivalTime
+  );
+
+  const flightHasDeparture =
+    existingFlight?.handlingType === "FULL" ||
+    existingFlight?.handlingType === "Departure";
+
+  const flightHasArrival =
+    existingFlight?.handlingType === "FULL" ||
+    existingFlight?.handlingType === "Arrival";
+
+  const [isLoading, setIsLoading] = useState(false);
+  const fees = airportFeeOverrideForm.watch();
+
+  const totals = useMemo(
+    () =>
+      Object.values(fees).reduce(
+        (acc, val) => parseFloat(acc as string) + parseFloat(val as string),
+        0
+      ),
+    [fees]
+  );
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [visible]);
   return (
     <Portal>
       <Modal
@@ -1505,7 +1262,290 @@ const AirportFeeOverrideModal = ({
             borderRadius: 15,
           }}
         >
-          {children}
+          <View>
+            <Text variant="headlineSmall">Airport fee details</Text>
+            {existingFlight?.providedServices && totals != currentSum && (
+              <Text style={{ marginVertical: 10 }} variant="bodySmall">
+                Note: below numbers are the fees precalculated by system. Their
+                sum will not match if the total was overriden before. By
+                clicking submit, you will override the values to default (
+                {totals} EUR)
+              </Text>
+            )}
+            <Controller
+              control={airportFeeOverrideForm.control}
+              name="landing"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Invalid number format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Landing fee:"
+                    style={formStyles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(value) =>
+                      onChange(replaceCommaWithDot(value))
+                    }
+                    error={
+                      airportFeeOverrideForm.formState.errors.landing && true
+                    }
+                  />
+                  {airportFeeOverrideForm?.formState?.errors?.landing &&
+                    true && (
+                      <HelperText type="error">
+                        {
+                          airportFeeOverrideForm?.formState?.errors?.landing
+                            ?.message
+                        }
+                      </HelperText>
+                    )}
+                  {airportFeeOverrideForm.getFieldState("landing").isDirty && (
+                    <HelperText type="info">
+                      *Price has been manually overriden
+                    </HelperText>
+                  )}
+                  {flightHasArrival &&
+                    !airportFeeOverrideForm.getFieldState("landing").isDirty &&
+                    isWinterNightTime(fullArrivalDateTime) && (
+                      <HelperText type="info">
+                        *Winter night Quota has been applied
+                      </HelperText>
+                    )}
+                  {flightHasArrival &&
+                    !airportFeeOverrideForm.getFieldState("landing").isDirty &&
+                    isSummerNightTime(fullArrivalDateTime) && (
+                      <HelperText type="info">
+                        *Summer night Quota has been applied
+                      </HelperText>
+                    )}
+                </>
+              )}
+            />
+            <Controller
+              control={airportFeeOverrideForm.control}
+              name="takeOff"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Invalid number format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Takeoff fee:"
+                    style={formStyles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(value) =>
+                      onChange(replaceCommaWithDot(value))
+                    }
+                    error={
+                      airportFeeOverrideForm.formState.errors.takeOff && true
+                    }
+                  />
+                  {airportFeeOverrideForm?.formState?.errors?.takeOff && (
+                    <HelperText type="error">
+                      {
+                        airportFeeOverrideForm?.formState?.errors?.takeOff
+                          ?.message
+                      }
+                    </HelperText>
+                  )}
+                  {airportFeeOverrideForm.getFieldState("takeOff").isDirty && (
+                    <HelperText type="info">
+                      *Price has been manually overriden
+                    </HelperText>
+                  )}
+                  {flightHasDeparture &&
+                    !airportFeeOverrideForm.getFieldState("takeOff").isDirty &&
+                    isWinterNightTime(fullDepartureDateTime) && (
+                      <HelperText type="info">
+                        *Winter night Quota has been applied
+                      </HelperText>
+                    )}
+                  {flightHasDeparture &&
+                    !airportFeeOverrideForm.getFieldState("takeOff").isDirty &&
+                    isSummerNightTime(fullDepartureDateTime) && (
+                      <HelperText type="info">
+                        *Summer night Quota has been applied
+                      </HelperText>
+                    )}
+                </>
+              )}
+            />
+            <Controller
+              control={airportFeeOverrideForm.control}
+              name="passengers"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Invalid number format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Passenger fee:"
+                    style={formStyles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(value) =>
+                      onChange(replaceCommaWithDot(value))
+                    }
+                    error={
+                      airportFeeOverrideForm.formState.errors.passengers && true
+                    }
+                  />
+                  {airportFeeOverrideForm?.formState?.errors?.passengers && (
+                    <HelperText type="error">
+                      {
+                        airportFeeOverrideForm?.formState?.errors?.passengers
+                          ?.message
+                      }
+                    </HelperText>
+                  )}
+                  {airportFeeOverrideForm.getFieldState("passengers")
+                    .isDirty && (
+                    <HelperText type="info">
+                      *Price has been manually overriden
+                    </HelperText>
+                  )}
+                </>
+              )}
+            />
+            <Controller
+              control={airportFeeOverrideForm.control}
+              name="security"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Invalid number format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Security fee:"
+                    style={formStyles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(value) =>
+                      onChange(replaceCommaWithDot(value))
+                    }
+                    error={
+                      airportFeeOverrideForm.formState.errors.security && true
+                    }
+                  />
+                  {airportFeeOverrideForm?.formState?.errors?.security && (
+                    <HelperText type="error">
+                      {
+                        airportFeeOverrideForm?.formState?.errors?.security
+                          ?.message
+                      }
+                    </HelperText>
+                  )}
+                  {airportFeeOverrideForm.getFieldState("security").isDirty && (
+                    <HelperText type="info">
+                      *Price has been manually overriden
+                    </HelperText>
+                  )}
+                </>
+              )}
+            />
+            <Controller
+              control={airportFeeOverrideForm.control}
+              name="parking"
+              rules={{
+                required: { value: true, message: ERROR_MESSAGES.REQUIRED },
+                pattern: {
+                  message: "Invalid number format",
+                  value: REGEX.number,
+                },
+              }}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <TextInput
+                    label="Parking fee:"
+                    style={formStyles.input}
+                    value={String(value)}
+                    onBlur={onBlur}
+                    keyboardType="numeric"
+                    onChangeText={(value) =>
+                      onChange(replaceCommaWithDot(value))
+                    }
+                    error={
+                      airportFeeOverrideForm.formState.errors.parking && true
+                    }
+                  />
+                  {airportFeeOverrideForm?.formState?.errors?.parking && (
+                    <HelperText type="error">
+                      {
+                        airportFeeOverrideForm?.formState?.errors?.parking
+                          ?.message
+                      }
+                    </HelperText>
+                  )}
+                  {airportFeeOverrideForm.getFieldState("parking").isDirty && (
+                    <HelperText type="info">
+                      *Price has been manually overriden
+                    </HelperText>
+                  )}
+                </>
+              )}
+            />
+            <View
+              style={{
+                justifyContent: "space-between",
+                flexDirection: "row",
+                marginVertical: 10,
+                alignItems: "center",
+              }}
+            >
+              <Button
+                mode="contained"
+                onPress={() => {
+                  airportFeeOverrideForm.reset();
+                  onDismiss && onDismiss();
+                  setIsLoading(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={
+                  !airportFeeOverrideForm?.formState.isValid || isLoading
+                }
+                loading={isLoading}
+                mode="outlined"
+                onPress={airportFeeOverrideForm.handleSubmit((data) => {
+                  setIsLoading(true);
+
+                  const sum = Object.values(data).reduce(
+                    (acc, val) =>
+                      parseFloat(acc as string) + parseFloat(val as string),
+                    0
+                  );
+                  onSubmit && onSubmit(Number(sum));
+                })}
+              >
+                Save
+              </Button>
+            </View>
+          </View>
         </View>
       </Modal>
     </Portal>
