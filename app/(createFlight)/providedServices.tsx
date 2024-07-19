@@ -391,9 +391,9 @@ const Form: React.FC = () => {
           alwaysBounceVertical={false}
         >
           <AirportFeeOverrideModal
-            currentSum={watch(
-              "providedServices.supportServices.airportFee.total"
-            )}
+            currentSum={
+              watch("providedServices.supportServices.airportFee.total") || 0
+            }
             visible={airportFeeModalVisible}
             onDismiss={() => setAirportFeeModalVisible(false)}
             existingFlight={existingFlight}
