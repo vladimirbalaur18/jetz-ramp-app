@@ -182,9 +182,9 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 				? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl139" style="height:16.4pt">&nbsp;</td>
   <td class="xl140" colspan="2" style="mso-ignore:colspan">Express/VIP Terminal</td>
-  <td class="xl140" style="border-top:none">&nbsp;</td>
-  <td class="xl141" style="border-top:none">&nbsp;</td>
-  <td class="xl92" style="border-top:none;border-left:none">&nbsp;</td>
+  <td class="xl140" style="border-top:none;">&nbsp;</td>
+  <td class="xl128" style="border-top:none;">&nbsp;</td>
+  <td class="xl92" style="border-top:none;border-left:none;">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${VIPPriceToEur.toFixed(2) || 0
