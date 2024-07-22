@@ -4,21 +4,20 @@ import { realmWithoutSync } from "@/realm";
 import dayjs from "dayjs";
 import { formatTime } from "./formatTime";
 import { IServiceCategory } from "@/models/ServiceCategory";
-import { IProvidedServices } from "@/models/ProvidedServices";
 
-export default function reampChecklistHTML(flight: IFlight){
-  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
-  let serviceCategories = realmWithoutSync.objects<IServiceCategory>("ServiceCategory");
-  let providedServices  = realmWithoutSync.objects<IProvidedServices>("ProvidedServices");
-    const parsedRoute = flight?.handlingType ==='FULL'? `${flight?.arrival.from}-${config.defaultAirport}-${flight?.departure.to}`: 
-    flight?.handlingType==='Departure'?`${config.defaultAirport}-${flight?.departure.to}`:`${flight?.arrival.from}-${config.defaultAirport}`
+export default function reampChecklistHTML(flight: IFlight) {
+	const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
 
-    const depPaxCount =flight?.handlingType!='Arrival'? flight?.departure.adultCount + flight?.departure.minorCount:0
-    const arrPaxCount =flight?.handlingType!='Departure'? flight?.arrival.adultCount + flight?.arrival.minorCount:0
+	let serviceCategories = realmWithoutSync.objects<IServiceCategory>("ServiceCategory");
+	const parsedRoute = flight?.handlingType === 'FULL' ? `${flight?.arrival.from}-${config.defaultAirport}-${flight?.departure.to}` :
+		flight?.handlingType === 'Departure' ? `${config.defaultAirport}-${flight?.departure.to}` : `${flight?.arrival.from}-${config.defaultAirport}`
 
+	const depPaxCount = flight?.handlingType != 'Arrival' ? flight?.departure.adultCount + flight?.departure.minorCount : 0
+	const arrPaxCount = flight?.handlingType != 'Departure' ? flight?.arrival.adultCount + flight?.arrival.minorCount : 0
 
 
-    const renderCategoryRow = (serviceCategoryName ='') => `<tr height="20" style="height:15.0pt">
+
+	const renderCategoryRow = (serviceCategoryName = '') => `<tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl118" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">${serviceCategoryName}</td>
   <td colspan="2" class="xl106" width="128" style="border-right:.5pt solid black;
@@ -27,54 +26,53 @@ export default function reampChecklistHTML(flight: IFlight){
   width:192pt">&nbsp;</td>
  </tr>`
 
- const renderServiceRow = (serviceName:string='', count?:number, notes?:string ) => ` <tr height="20" style="height:15.0pt">
+	const renderServiceRow = (serviceName: string = '', count?: number, notes?: string) => ` <tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl120" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">${serviceName}</td>
   <td colspan="2" class="xl112" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">${count?count:`&nbsp;`}</td>
+  border-left:none;width:96pt">${count ? count : `&nbsp;`}</td>
   <td colspan="4" class="xl110" width="256" style="border-right:1.0pt solid black;
-  width:192pt">${notes?notes:`&nbsp;`}</td>
+  width:192pt">${notes ? notes : `&nbsp;`}</td>
  </tr>
  `
 
- const renderServices = () => {
-    
-    let resultHTML = '';
-    
-    console.log(JSON.stringify(serviceCategories, null, 3))
+	const renderServices = () => {
 
-   serviceCategories.map(category => {
+		let resultHTML = '';
+		serviceCategories.map(category => {
 
-    resultHTML+= renderCategoryRow(category.categoryName)
+			resultHTML += renderCategoryRow(category.categoryName)
 
-    category.services.map(service =>{
+			category.services.map(service => {
 
-        flight?.providedServices?.otherServices?.forEach(s => {if(s.service.serviceName === service.serviceName){
-             resultHTML+= renderServiceRow(service.serviceName, s?.isUsed? s.quantity:0 ,s.notes)
-        }})
-
-       
-    })
-   })
-
-   resultHTML+= renderCategoryRow('VIP');
-
-   const v = flight?.providedServices?.VIPLoungeServices 
-   resultHTML+= renderServiceRow('VIP / Express terminal',(v!.arrivalAdultPax+v!.arrivalMinorPax+v!.departureAdultPax+v!.departureMinorPax),v?.remarks)
+				flight?.providedServices?.otherServices?.forEach(s => {
+					if (s.service.serviceName === service.serviceName) {
+						resultHTML += renderServiceRow(service.serviceName, s?.isUsed ? s.quantity : 0, s.notes)
+					}
+				})
 
 
-   return resultHTML;
-   
- }
+			})
+		})
 
- const renderSupportServices = () => {
+		resultHTML += renderCategoryRow('VIP');
 
-	const fueling = !!(flight?.providedServices?.supportServices?.fuel?.fuelLitersQuantity) || '&nbsp;'
-	const hotac = !!flight?.providedServices?.supportServices?.HOTAC.total || '&nbsp;'
-	const catering = !!flight?.providedServices?.supportServices?.catering.total|| '&nbsp;'
-	const airportFees = !!flight?.providedServices?.supportServices.airportFee.total|| '&nbsp;'
+		const v = flight?.providedServices?.VIPLoungeServices
+		resultHTML += renderServiceRow('VIP / Express terminal', (v!.arrivalAdultPax + v!.arrivalMinorPax + v!.departureAdultPax + v!.departureMinorPax), v?.remarks)
 
-    return `<tr height="20" style="height:15.0pt">
+
+		return resultHTML;
+
+	}
+
+	const renderSupportServices = () => {
+
+		const fueling = !!(flight?.providedServices?.supportServices?.fuel?.fuelLitersQuantity) || '&nbsp;'
+		const hotac = !!flight?.providedServices?.supportServices?.HOTAC?.total || '&nbsp;'
+		const catering = !!flight?.providedServices?.supportServices?.catering?.total || '&nbsp;'
+		const airportFees = !!flight?.providedServices?.supportServices?.airportFee?.total || '&nbsp;'
+
+		return `<tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl135" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Support Services</td>
   <td colspan="2" class="xl106" width="128" style="border-left:none;width:96pt">&nbsp;</td>
@@ -85,14 +83,14 @@ export default function reampChecklistHTML(flight: IFlight){
   <td colspan="3" height="20" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Fueling</td>
   <td colspan="2" class="xl112" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">${fueling === true?1:fueling}</td>
+  border-left:none;width:96pt">${fueling === true ? 1 : fueling}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   border-left:none;width:192pt">&nbsp;</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td colspan="3" height="20" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.0pt;width:152pt">Catering</td>
-  <td colspan="2" class="xl127" width="128" style="border-left:none;width:96pt">${catering === true?1:catering}</td>
+  <td colspan="2" class="xl127" width="128" style="border-left:none;width:96pt">${catering === true ? 1 : catering}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   width:192pt">&nbsp;</td>
  </tr>
@@ -100,7 +98,7 @@ export default function reampChecklistHTML(flight: IFlight){
   <td colspan="3" height="21" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.6pt;width:152pt">Airport fees</td>
   <td colspan="2" class="xl127" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">${airportFees === true?1:airportFees}</td>
+  border-left:none;width:96pt">${airportFees === true ? 1 : airportFees}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   border-left:none;width:192pt">&nbsp;</td>
  </tr>
@@ -108,13 +106,13 @@ export default function reampChecklistHTML(flight: IFlight){
   <td colspan="3" height="21" class="xl137" width="204" style="border-right:.5pt solid black;
   height:15.6pt;width:152pt">HOTAC</td>
   <td colspan="2" class="xl127" width="128" style="border-right:.5pt solid black;
-  border-left:none;width:96pt">${hotac === true?1:hotac}</td>
+  border-left:none;width:96pt">${hotac === true ? 1 : hotac}</td>
   <td colspan="4" class="xl127" width="256" style="border-right:1.0pt solid black;
   border-left:none;width:192pt">&nbsp;</td>
  </tr>`
 
- }
-    return`<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
+	}
+	return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
 <meta name="Generator" content="Microsoft Excel 15">
@@ -1211,8 +1209,8 @@ td
  <tr height="21" style="height:15.6pt">
   <td height="21" class="xl90" width="70" style="height:15.6pt;width:52pt">${dayjs(flight?.arrival.arrivalDate).format('DD-MMM-YY')}</td>
   <td class="xl91" width="64" style="border-top:none;width:48pt">${formatTime(flight?.arrival.arrivalTime)}</td>
-  <td class="xl92" width="70" style="border-left:none;width:52pt">${flight?.handlingType!=='Arrival'? dayjs(flight?.departure.departureDate).format('DD-MMM-YY'):'-'}</td>
-  <td class="xl91" width="64" style="width:48pt">${flight?.handlingType!=='Arrival'?formatTime(flight?.departure.departureTime):'-'}</td>
+  <td class="xl92" width="70" style="border-left:none;width:52pt">${flight?.handlingType !== 'Arrival' ? dayjs(flight?.departure.departureDate).format('DD-MMM-YY') : '-'}</td>
+  <td class="xl91" width="64" style="width:48pt">${flight?.handlingType !== 'Arrival' ? formatTime(flight?.departure.departureTime) : '-'}</td>
   <td class="xl93" width="64" style="border-left:none;width:48pt">${flight?.aircraftType}</td>
   <td class="xl94" width="64" style="border-left:none;width:48pt">${flight?.aircraftRegistration}</td>
   <td class="xl93" width="64" style="border-top:none;border-left:none;width:48pt">${flight?.mtow}</td>
@@ -1229,9 +1227,9 @@ td
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl98" width="326" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname?'&nbsp;':flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname}</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname ? '&nbsp;' : flight?.arrival?.rampInspectionBeforeArrival?.agent?.fullname}</td>
   <td colspan="2" rowspan="2" class="xl100" width="128" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:96pt">${flight?.arrival?.rampInspectionBeforeArrival?.FOD === undefined?'&nbsp;':flight?.arrival?.rampInspectionBeforeArrival?.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
+  border-bottom:1.0pt solid black;width:96pt">${flight?.arrival?.rampInspectionBeforeArrival?.FOD === undefined ? '&nbsp;' : flight?.arrival?.rampInspectionBeforeArrival?.FOD ? 'FOD FOUND' : 'FOD NOT FOUND'}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td colspan="2" rowspan="4" height="78" class="xl100" width="134" style="border-right:
@@ -1246,9 +1244,9 @@ td
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl98" width="326" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname?'&nbsp;':flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname}</td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:244pt">${!flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname ? '&nbsp;' : flight?.departure?.rampInspectionBeforeDeparture?.agent?.fullname}</td>
   <td colspan="2" rowspan="2" class="xl100" width="128" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:96pt">${flight?.departure?.rampInspectionBeforeDeparture?.FOD === undefined? '&nbsp;':flight?.departure?.rampInspectionBeforeDeparture?.FOD?'FOD FOUND':'FOD NOT FOUND'}</td>
+  border-bottom:1.0pt solid black;width:96pt">${flight?.departure?.rampInspectionBeforeDeparture?.FOD === undefined ? '&nbsp;' : flight?.departure?.rampInspectionBeforeDeparture?.FOD ? 'FOD FOUND' : 'FOD NOT FOUND'}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>
@@ -1338,13 +1336,11 @@ ${renderSupportServices()}
  </tr>
  <tr height="19" style="height:14.4pt">
   <td colspan="5" rowspan="2" height="39" class="xl139" width="332" style="border-right:
-  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:248pt"><img width="150" height="50" src="data:image/png;base64,${
-    flight?.ramp?.signature
-  }"></td>
+  1.0pt solid black;border-bottom:1.0pt solid black;height:29.4pt;width:248pt"><img width="150" height="50" src="data:image/png;base64,${flight?.ramp?.signature
+		}"></td>
   <td colspan="4" rowspan="2" class="xl139" width="256" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:192pt"><img width="150" height="50" src="data:image/png;base64,${
-    flight?.crew?.signature
-  }"></td>
+  border-bottom:1.0pt solid black;width:192pt"><img width="150" height="50" src="data:image/png;base64,${flight?.crew?.signature
+		}"></td>
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>

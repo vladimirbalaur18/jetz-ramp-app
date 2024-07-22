@@ -3,9 +3,9 @@ import { realmWithoutSync } from "@/realm";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 import {
-  getBasicHandlingPrice,
-  getLoungeFeePrice,
-  getTotalAirportFeesPrice,
+	getBasicHandlingPrice,
+	getLoungeFeePrice,
+	getTotalAirportFeesPrice,
 } from "@/services/servicesCalculator";
 import dayjs from "dayjs";
 import convertCurrency from "./convertCurrency";
@@ -14,158 +14,156 @@ import { IFlight } from "@/models/Flight";
 import { getDisbursedServices, getTotalDisbursementFees } from "@/services/totalsCalculator";
 
 type ChargeListService = {
-  serviceName: string;
-  basePrice: number;
-  totalPrice?: number;
-  isPriceOverriden?: boolean;
-  quantity?: number;
+	serviceName: string;
+	basePrice: number;
+	totalPrice?: number;
+	isPriceOverriden?: boolean;
+	quantity?: number;
 };
 export default function chargeNoteTemplateHTML(flight: IFlight) {
-  if (!flight) throw new Error("Flight is undefined");
-  let VATServicesList: Array<ChargeListService> = [];
-  let servicesListNoVAT: Array<ChargeListService> = [];
+	if (!flight) throw new Error("Flight is undefined");
+	let VATServicesList: Array<ChargeListService> = [];
+	let servicesListNoVAT: Array<ChargeListService> = [];
 
-  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
-  const basicHandling = getBasicHandlingPrice(flight);
+	const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
+	const basicHandling = getBasicHandlingPrice(flight);
 
-  const basicHandlingWithoutVAT = (() => {
-    let result = 0;
+	const basicHandlingWithoutVAT = (() => {
+		let result = 0;
 
-    if (flight?.providedServices?.basicHandling?.isPriceOverriden)
-      return Number(flight?.providedServices?.basicHandling?.total);
+		if (flight?.providedServices?.basicHandling?.isPriceOverriden)
+			return Number(flight?.providedServices?.basicHandling?.total);
 
-    if (!basicHandling.vat.arrival) {
-      result += basicHandling.arrival;
-    }
+		if (!basicHandling.vat.arrival) {
+			result += basicHandling.arrival;
+		}
 
-    if (!basicHandling.vat.departure) {
-      result += basicHandling.departure;
-    }
+		if (!basicHandling.vat.departure) {
+			result += basicHandling.departure;
+		}
 
-    return result;
-  })();
-  const basicHandlingWithVAT = (() => {
-    if (flight?.providedServices?.basicHandling?.isPriceOverriden)
-      return Number(flight?.providedServices?.basicHandling?.total);
+		return result;
+	})();
+	const basicHandlingWithVAT = (() => {
+		if (flight?.providedServices?.basicHandling?.isPriceOverriden)
+			return Number(flight?.providedServices?.basicHandling?.total);
 
-    let result = 0;
-    if (basicHandling.vat.arrival) {
-      result += basicHandling.arrival;
-    }
+		let result = 0;
+		if (basicHandling.vat.arrival) {
+			result += basicHandling.arrival;
+		}
 
-    if (basicHandling.vat.departure) {
-      result += basicHandling.departure;
-    }
+		if (basicHandling.vat.departure) {
+			result += basicHandling.departure;
+		}
 
-    return result;
-  })();
+		return result;
+	})();
 
-const disbursedServices = getDisbursedServices(flight?.providedServices, flight)
-const totalDisbursementFeesAmount = getTotalDisbursementFees(flight?.providedServices, flight)
+	const disbursedServices = getDisbursedServices(flight?.providedServices, flight)
+	const totalDisbursementFeesAmount = getTotalDisbursementFees(flight?.providedServices, flight)
 
-  console.warn("Disbursed services", JSON.stringify(disbursedServices, null));
+	console.warn("Disbursed services", JSON.stringify(disbursedServices, null));
 
-console.log(totalDisbursementFeesAmount)
-  if (
-    basicHandlingWithVAT &&
-    !flight?.providedServices!.basicHandling?.isPriceOverriden
-  ) {
-    VATServicesList.push({
-      serviceName: "Basic handling",
-      basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),
-      totalPrice: Number(basicHandlingWithVAT),
-      quantity: 1,
-    });
-  }
+	console.log(totalDisbursementFeesAmount)
+	if (
+		basicHandlingWithVAT &&
+		!flight?.providedServices!.basicHandling?.isPriceOverriden
+	) {
+		VATServicesList.push({
+			serviceName: "Basic handling",
+			basePrice: Number(basicHandlingWithVAT) / getVATMultiplier(),
+			totalPrice: Number(basicHandlingWithVAT),
+			quantity: 1,
+		});
+	}
 
-  if (basicHandlingWithoutVAT) {
-    servicesListNoVAT.push({
-      serviceName: "Basic handling",
-      basePrice: Number(basicHandlingWithoutVAT),
-      totalPrice: Number(basicHandlingWithoutVAT),
-      quantity: 1,
-    });
-  }
+	if (basicHandlingWithoutVAT) {
+		servicesListNoVAT.push({
+			serviceName: "Basic handling",
+			basePrice: Number(basicHandlingWithoutVAT),
+			totalPrice: Number(basicHandlingWithoutVAT),
+			quantity: 1,
+		});
+	}
 
-  flight?.providedServices?.otherServices?.forEach((s) => {
-    if (s?.isUsed) {
-      const quantity = Number(s?.quantity) || 1;
-      const basePrice = s?.service.price;
-      const amount = s?.isPriceOverriden
-        ? s.totalPriceOverride || 0
-        : basePrice || 0;
+	flight?.providedServices?.otherServices?.forEach((s) => {
+		if (s?.isUsed) {
+			const quantity = Number(s?.quantity) || 1;
+			const basePrice = s?.service.price;
+			const amount = s?.isPriceOverriden
+				? s.totalPriceOverride || 0
+				: basePrice || 0;
 
-      if (!s.service.hasVAT) {
-        servicesListNoVAT.push({
-          serviceName: s.service.serviceName,
-          basePrice: Number(amount),
-          totalPrice: Number(amount * quantity),
-          quantity: Number(quantity),
-        });
-      } else
-        VATServicesList.push({
-          serviceName: s.service.serviceName,
-          basePrice: Number(amount),
-          totalPrice: Number(amount * quantity) * getVATMultiplier(),
-          quantity: Number(quantity),
-        });
-    }
-  });
+			if (!s.service.hasVAT) {
+				servicesListNoVAT.push({
+					serviceName: s.service.serviceName,
+					basePrice: Number(amount),
+					totalPrice: Number(amount * quantity),
+					quantity: Number(quantity),
+				});
+			} else
+				VATServicesList.push({
+					serviceName: s.service.serviceName,
+					basePrice: Number(amount),
+					totalPrice: Number(amount * quantity) * getVATMultiplier(),
+					quantity: Number(quantity),
+				});
+		}
+	});
 
 
-  const VIPTerminalPrice = getLoungeFeePrice({
-    ...flight?.providedServices?.VIPLoungeServices,
-  }).amount;
-  const VIPPriceToEur = Number(
-    convertCurrency(
-      VIPTerminalPrice,
-      Number(Number(flight?.chargeNote?.currency?.euroToMDL))
-    )
-  );
-  const airportFeeTotal = Number(
-    flight?.providedServices?.supportServices?.airportFee.total
-  );
-  const cateringFeeTotal = Number(
-    flight?.providedServices?.supportServices?.catering.total
-  );
-  const fuelFeeTotal = getFuelFeeAmount({
-    ...flight?.providedServices?.supportServices?.fuel,
-    flight,
-  });
+	const VIPTerminalPrice = getLoungeFeePrice({
+		...flight?.providedServices?.VIPLoungeServices,
+	}).amount;
+	const VIPPriceToEur = Number(
+		convertCurrency(
+			VIPTerminalPrice,
+			Number(Number(flight?.chargeNote?.currency?.euroToMDL))
+		)
+	);
+	const airportFeeTotal = Number(
+		flight?.providedServices?.supportServices?.airportFee.total
+	);
+	const cateringFeeTotal = Number(
+		flight?.providedServices?.supportServices?.catering.total
+	);
+	const fuelFeeTotal = getFuelFeeAmount({
+		...flight?.providedServices?.supportServices?.fuel,
+		flight,
+	});
 
-  const hotacFeeTotal = Number(
-    flight?.providedServices?.supportServices.HOTAC.total
-  );
+	const hotacFeeTotal = Number(
+		flight?.providedServices?.supportServices.HOTAC.total
+	);
 
-  const totalSupportServicesAmount =
-    VIPPriceToEur + cateringFeeTotal + fuelFeeTotal + hotacFeeTotal;
+	const totalSupportServicesAmount =
+		VIPPriceToEur + cateringFeeTotal + fuelFeeTotal + hotacFeeTotal;
 
-  const additionalServicesRenderHTML = () => {
-    let resultHTML = "";
+	const additionalServicesRenderHTML = () => {
+		let resultHTML = "";
 
-    servicesListNoVAT.map((s) => {
-      if (s.serviceName !== "Basic handling") {
-        resultHTML += `
+		servicesListNoVAT.map((s) => {
+			if (s.serviceName !== "Basic handling") {
+				resultHTML += `
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl118" style="height:16.4pt;">&nbsp;</td>
-  <td colspan="4" class="xl134" style="border-right:.5pt solid black">${
-    s?.serviceName
-  }</td>
+  <td colspan="4" class="xl134" style="border-right:.5pt solid black">${s?.serviceName
+					}</td>
   <td class="xl121" style=";border-left:none">${s?.quantity || ""}</td>
-  <td colspan="2" class="xl114" style="border-right:.5pt solid black">${
-    s?.isPriceOverriden
-      ? Number(s?.totalPrice).toFixed(2)
-      : s?.basePrice?.toFixed(2)
-  }</td>
+  <td colspan="2" class="xl114" style="border-right:.5pt solid black">${s?.isPriceOverriden
+						? Number(s?.totalPrice).toFixed(2)
+						: s?.basePrice?.toFixed(2)
+					}</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-    s?.totalPrice
-  ).toFixed(2)}</td>
+						s?.totalPrice
+					).toFixed(2)}</td>
  </tr>`;
-      } else if (
-        s.serviceName === "Basic handling" &&
-        servicesListNoVAT.length <= 1
-      ) {
-        resultHTML += `
+			} else if (
+				s.serviceName === "Basic handling" &&
+				servicesListNoVAT.length <= 1
+			) {
+				resultHTML += `
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl118" style="height:16.4pt;">&nbsp;</td>
   <td colspan="4" class="xl134" style="border-right:.5pt solid black">&nbsp;</td>
@@ -173,15 +171,15 @@ console.log(totalDisbursementFeesAmount)
   <td colspan="2" class="xl114" style="border-right:.5pt solid black">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">&nbsp;</td>
  </tr>`;
-      }
-    });
+			}
+		});
 
-    return resultHTML;
-  };
-  const thirdPartyServiceProvidersRenderHTML = () => {
-    const VIPString =
-      VIPPriceToEur > 0
-        ? `<tr height="19" style="height:16.4pt">
+		return resultHTML;
+	};
+	const thirdPartyServiceProvidersRenderHTML = () => {
+		const VIPString =
+			VIPPriceToEur > 0
+				? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl139" style="height:16.4pt">&nbsp;</td>
   <td class="xl140" colspan="2" style="mso-ignore:colspan">Express/VIP Terminal</td>
   <td class="xl140" style="border-top:none">&nbsp;</td>
@@ -189,15 +187,14 @@ console.log(totalDisbursementFeesAmount)
   <td class="xl92" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${
-    VIPPriceToEur.toFixed(2) || 0
-  }</td>
+  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${VIPPriceToEur.toFixed(2) || 0
+				}</td>
  </tr>`
-        : "";
+				: "";
 
-    const AirportFeesString =
-      airportFeeTotal > 0
-        ? `<tr height="19" style="height:16.4pt">
+		const AirportFeesString =
+			airportFeeTotal > 0
+				? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt">&nbsp;</td>
   <td class="xl134" colspan="2" style="mso-ignore:colspan">Airport fees</td>
   <td class="xl134">&nbsp;</td>
@@ -205,15 +202,14 @@ console.log(totalDisbursementFeesAmount)
   <td class="xl143" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    airportFeeTotal.toFixed(2) || 0
-  }</td>
+  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${airportFeeTotal.toFixed(2) || 0
+				}</td>
  </tr>`
-        : "";
+				: "";
 
-    const CateringString =
-      cateringFeeTotal > 0
-        ? ` <tr height="19" style="height:16.4pt">
+		const CateringString =
+			cateringFeeTotal > 0
+				? ` <tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">Catering</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
@@ -222,15 +218,14 @@ console.log(totalDisbursementFeesAmount)
   <td class="xl146" style="border-top:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    cateringFeeTotal.toFixed(2) || 0
-  }</td>
+  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${cateringFeeTotal.toFixed(2) || 0
+				}</td>
  </tr>`
-        : "";
+				: "";
 
-    const FuelString =
-      fuelFeeTotal > 0
-        ? `<tr height="19" style="height:16.4pt">
+		const FuelString =
+			fuelFeeTotal > 0
+				? `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
   <td class="xl134" style="border-top:none">Fuel</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
@@ -251,17 +246,16 @@ console.log(totalDisbursementFeesAmount)
   <td class="xl151" style="border-top:none">&nbsp;</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${
-    hotacFeeTotal.toFixed(2) || 0
-  }</td>
+  <td colspan="2" class="xl144" style="border-right:1.0pt solid black">${hotacFeeTotal.toFixed(2) || 0
+				}</td>
  </tr>`
-        : "";
-    return AirportFeesString + CateringString + FuelString + VIPString;
-  };
-  const VATApplicableServicesRenderHTML = () => {
-    return VATServicesList.map(
-      ({ basePrice, serviceName, totalPrice, isPriceOverriden }) => {
-        return ` <tr height="20" style="height:15.0pt">
+				: "";
+		return AirportFeesString + CateringString + FuelString + VIPString;
+	};
+	const VATApplicableServicesRenderHTML = () => {
+		return VATServicesList.map(
+			({ basePrice, serviceName, totalPrice, isPriceOverriden }) => {
+				return ` <tr height="20" style="height:15.0pt">
   <td height="20" class="xl127" style="height:15.0pt;border-top:none">&nbsp;</td>
   <td colspan="2" class="xl134">${serviceName}</td>
   <td class="xl163" style="border-top:none">&nbsp;</td>
@@ -270,83 +264,81 @@ console.log(totalDisbursementFeesAmount)
   <td class="xl115" style="border-top:none">${basePrice.toFixed(2)}</td>
   <td class="xl181" style="border-top:none">${config.VAT}%</td>
   <td colspan="2" class="xl182" style="border-right:1.0pt solid black">${totalPrice?.toFixed(
-    2
-  )}</td>
+					2
+				)}</td>
  </tr>`;
-      }
-    );
-  };
+			}
+		);
+	};
 
-  const renderDisbursementHTML = () => {
-	  const disbursementPercentage = flight.chargeNote.disbursementPercentage;
+	const renderDisbursementHTML = () => {
+		const disbursementPercentage = flight.chargeNote.disbursementPercentage;
 
-    const mapKeyByName: Record<string, string> = {
-      airportFee: "Airport fees",
-      fuelFee: "Fuel",
-      cateringFee: "Catering",
-      HOTACFee: "HOTAC",
-      VIPLoungeFee: "Express/VIP Terminal",
-    };
+		const mapKeyByName: Record<string, string> = {
+			airportFee: "Airport fees",
+			fuelFee: "Fuel",
+			cateringFee: "Catering",
+			HOTACFee: "HOTAC",
+			VIPLoungeFee: "Express/VIP Terminal",
+		};
 
-    let resultHTML = ``;
+		let resultHTML = ``;
 
-    if (flight?.providedServices?.disbursementFees) {
-      Object.entries(flight?.providedServices.disbursementFees).map(
-        ([key, value]) => {
-          if (value > 0) {
-            resultHTML += ` <tr height="19" style="height:16.4pt">
+		if (flight?.providedServices?.disbursementFees) {
+			Object.entries(flight?.providedServices.disbursementFees).map(
+				([key, value]) => {
+					if (value > 0) {
+						resultHTML += ` <tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
-  <td class="xl134" colspan="2" style="mso-ignore:colspan">${
-    mapKeyByName[key]
-  }</td>
+  <td class="xl134" colspan="2" style="mso-ignore:colspan">${mapKeyByName[key]
+							}</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-    value
-  ).toFixed(2)}</td>
+								value
+							).toFixed(2)}</td>
  </tr>`;
-          }
-        }
-      );
-    } else
-      return alert("Something wrong occured while loading disbursement fees. They're not initialized from provided services");
+					}
+				}
+			);
+		} else
+			return alert("Something wrong occured while loading disbursement fees. They're not initialized from provided services");
 
-	  disbursedServices.map(disbursedService => {
-		resultHTML+=`<tr height="19" style="height:16.4pt">
+		disbursedServices.map(disbursedService => {
+			resultHTML += `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
-  <td class="xl134" colspan="2" style="mso-ignore:colspan">${
-    disbursedService?.serviceName
-  }</td>
+  <td class="xl134" colspan="2" style="mso-ignore:colspan">${disbursedService?.serviceName
+				}</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
   <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-    disbursedService?.total
-  ).toFixed(2)}</td>
+					disbursedService?.total
+				).toFixed(2)}</td>
  </tr>`
-	  })
-    return resultHTML;
-  };
-  const servicesTotalAmountNoVAT =
-    servicesListNoVAT.reduce(
-      (accumulator, current) => accumulator + (current?.totalPrice || 0),
-      0
-    ) +
-    getTotalAirportFeesPrice(flight).total +
-    totalDisbursementFeesAmount +
-    totalSupportServicesAmount;
+		})
+		return resultHTML;
+	};
+	const servicesTotalAmountNoVAT =
+		servicesListNoVAT.reduce(
+			(accumulator, current) => accumulator + (current?.totalPrice || 0),
+			0
+		) +
+		getTotalAirportFeesPrice(flight).total +
+		totalDisbursementFeesAmount +
+		totalSupportServicesAmount;
 
-  const servicesTotalAmountWithVAT = VATServicesList.reduce(
-    (accumulator, current) => accumulator + (current?.totalPrice || 0),
-    0
-  );
+	const servicesTotalAmountWithVAT = VATServicesList.reduce(
+		(accumulator, current) => accumulator + (current?.totalPrice || 0),
+		0
+	);
 
-  return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
+	return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
 <meta name="Generator" content="Microsoft Excel 15">
@@ -400,7 +392,7 @@ a:visited
 	{mso-number-format:General;
 	text-align:general;
 	vertical-align:bottom;
-	white-space:nowrap;
+	white-space:normal;
 	mso-rotate:0;
 	mso-background-source:auto;
 	mso-pattern:auto;
@@ -433,7 +425,7 @@ td
 	mso-background-source:auto;
 	mso-pattern:auto;
 	mso-protection:locked visible;
-	white-space:nowrap;
+	white-space:normal;
 	mso-rotate:0;}
 .xl65
 	{mso-style-parent:style0;
@@ -458,7 +450,7 @@ td
 	mso-font-charset:0;
 	text-align:center;
 	vertical-align:middle;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl68
 	{mso-style-parent:style0;
@@ -652,7 +644,7 @@ td
 	text-align:center;
 	vertical-align:middle;
 	border:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl85
 	{mso-style-parent:style0;
@@ -704,7 +696,7 @@ td
 	border-right:none;
 	border-bottom:none;
 	border-left:1.0pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl89
 	{mso-style-parent:style0;
@@ -718,7 +710,7 @@ td
 	border-right:none;
 	border-bottom:none;
 	border-left:none;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl90
 	{mso-style-parent:style0;
@@ -732,7 +724,7 @@ td
 	border-right:1.0pt solid windowtext;
 	border-bottom:none;
 	border-left:none;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl91
 	{mso-style-parent:style0;
@@ -770,7 +762,7 @@ td
 	border-right:1.0pt solid windowtext;
 	border-bottom:.5pt solid windowtext;
 	border-left:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl94
 	{mso-style-parent:style0;
@@ -786,7 +778,7 @@ td
 	border-right:1.0pt solid windowtext;
 	border-bottom:.5pt solid windowtext;
 	border-left:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl95
 	{mso-style-parent:style0;
@@ -800,7 +792,7 @@ td
 	border-right:none;
 	border-bottom:none;
 	border-left:1.0pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl96
 	{mso-style-parent:style0;
@@ -810,7 +802,7 @@ td
 	mso-font-charset:0;
 	text-align:center;
 	vertical-align:middle;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl97
 	{mso-style-parent:style0;
@@ -824,7 +816,7 @@ td
 	border-right:1.0pt solid windowtext;
 	border-bottom:none;
 	border-left:none;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl98
 	{mso-style-parent:style0;
@@ -851,7 +843,7 @@ td
 	border-right:.5pt solid windowtext;
 	border-bottom:none;
 	border-left:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl100
 	{mso-style-parent:style0;
@@ -1247,7 +1239,7 @@ td
 	border-right:.5pt solid windowtext;
 	border-bottom:.5pt solid windowtext;
 	border-left:none;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl132
 	{mso-style-parent:style0;
@@ -1258,7 +1250,7 @@ td
 	text-align:left;
 	vertical-align:middle;
 	border:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl133
 	{mso-style-parent:style0;
@@ -1272,7 +1264,7 @@ td
 	border-right:none;
 	border-bottom:.5pt solid windowtext;
 	border-left:.5pt solid windowtext;
-	white-space:nowrap;
+	white-space:normal;
 	mso-text-control:shrinktofit;}
 .xl134
 	{mso-style-parent:style0;
@@ -2648,58 +2640,49 @@ height="90" width="180" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAA
  </tr>
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl83" style="height:16.4pt;border-top:none">A/C REG</td>
-  <td class="xl84" style="border-top:none;border-left:none">${
-    flight?.aircraftRegistration
-  }</td>
+  <td class="xl84" style="border-top:none;border-left:none">${flight?.aircraftRegistration
+		}</td>
   <td class="xl85" colspan="1" style="border-top:none">FROM</td>
   <td class="xl87" style="border-top:none">${flight?.arrival?.from || "-"}</td>
   <td class="xl85" style="border-top:none;border-left:none">TO</td>
-  <td class="xl87" style="border-top:none;border-left:none">${
-    flight?.departure?.to || "-"
-  }</td>
-  <td colspan="4" rowspan="3" class="xl88" style="border-right:1.0pt solid black">${
-    flight?.operatorName || ""
-  }</td>
+  <td class="xl87" style="border-top:none;border-left:none">${flight?.departure?.to || "-"
+		}</td>
+  <td colspan="4" rowspan="3" class="xl88" style="border-right:1.0pt solid black">${flight?.operatorName || ""
+		}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl91" style="height:16.4pt;border-top:none">FLT NO.</td>
-  <td class="xl92" style="border-top:none;border-left:none">${
-    flight?.flightNumber || ""
-  }</td>
+  <td class="xl92" style="border-top:none;border-left:none">${flight?.flightNumber || ""
+		}</td>
   <td class="xl85" colspan="1" style="border-top:none">DATE</td>
-  <td class="xl93" style="border-top:none">${
-    flight?.arrival?.arrivalDate
-      ? dayjs(flight?.arrival?.arrivalDate).format("DD-MMM-YY")
-      : ""
-  }</td>
+  <td class="xl93" style="border-top:none">${flight?.arrival?.arrivalDate
+			? dayjs(flight?.arrival?.arrivalDate).format("DD-MMM-YY")
+			: ""
+		}</td>
   <td class="xl85" style="border-top:none;border-left:none">DATE</td>
-  <td class="xl94" style="border-top:none;border-left:none;text-align:center">${
-    flight?.departure?.departureDate
-      ? dayjs(flight?.departure?.departureDate).format("DD-MMM-YY")
-      : ""
-  }</td>
+  <td class="xl94" style="border-top:none;border-left:none;text-align:center">${flight?.departure?.departureDate
+			? dayjs(flight?.departure?.departureDate).format("DD-MMM-YY")
+			: ""
+		}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl98" style="height:15.0pt;border-top:none">PAID BY</td>
-  <td class="xl99" style="border-top:none;border-left:none">${
-    flight?.chargeNote?.paymentType
-  }</td>
+  <td class="xl99" style="border-top:none;border-left:none">${flight?.chargeNote?.paymentType
+		}</td>
   <td class="xl100" colspan="1" style="border-top:none">UTC</td>
-  <td class="xl102" style="border-top:none">${
-    flight?.arrival?.arrivalTime
-      ? getParsedDateTime(new Date(), flight?.arrival?.arrivalTime).format(
-          "HH:mm"
-        )
-      : "-"
-  }</td>
+  <td class="xl102" style="border-top:none">${flight?.arrival?.arrivalTime
+			? getParsedDateTime(new Date(), flight?.arrival?.arrivalTime).format(
+				"HH:mm"
+			)
+			: "-"
+		}</td>
   <td class="xl100" style="border-top:none;border-left:none">UTC</td>
-  <td class="xl103" style="border-top:none;border-left:none">${
-    flight?.departure?.departureTime
-      ? getParsedDateTime(new Date(), flight?.departure?.departureTime).format(
-          "HH:mm"
-        )
-      : "-"
-  }</td>
+  <td class="xl103" style="border-top:none;border-left:none">${flight?.departure?.departureTime
+			? getParsedDateTime(new Date(), flight?.departure?.departureTime).format(
+				"HH:mm"
+			)
+			: "-"
+		}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td colspan="5" height="19" class="xl104" style="height:16.4pt">ITEMS with VAT = 0%</td>
@@ -2711,11 +2694,11 @@ height="90" width="180" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAA
   <td colspan="5" height="19" class="xl111" style="height:16.4pt">Basic Handling</td>
   <td class="xl92" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:.5pt solid black">${basicHandlingWithoutVAT.toFixed(
-    2
-  )}</td>
+			2
+		)}</td>
   <td colspan="2" rowspan="2" class="xl116" style="border-right:1.0pt solid black">${basicHandlingWithoutVAT.toFixed(
-    2
-  )}</td>
+			2
+		)}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl118" style="height:16.4pt;border-top:none">&nbsp;</td>
@@ -2772,8 +2755,8 @@ ${renderDisbursementHTML()}
   <td class="xl163">&nbsp;</td>
   <td class="xl164" style="border-top:none">TOTAL</td>
   <td colspan="2" class="xl165" style="border-right:1.0pt solid black">${servicesTotalAmountNoVAT.toFixed(
-    2
-  )}</td>
+			2
+		)}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl139" style="height:16.4pt">&nbsp;</td>
@@ -2796,9 +2779,9 @@ ${renderDisbursementHTML()}
   <td colspan="2" class="xl172" style="border-right:.5pt solid black;border-left:
   none">TOTAL MDL</td>
   <td colspan="2" class="xl174" style="border-right:1.0pt solid black">${convertCurrency(
-    servicesTotalAmountNoVAT,
-    1 / Number(flight?.chargeNote?.currency?.euroToMDL)
-  ).toFixed(2)}</td>
+			servicesTotalAmountNoVAT,
+			1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+		).toFixed(2)}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td colspan="3" height="19" class="xl176" style="height:16.4pt">Services with VAT
@@ -2815,14 +2798,13 @@ ${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl184" style="height:16.4pt">Billing to:</td>
   <td colspan="5" rowspan="7" class="xl185" width="320" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:240pt">${
-    flight?.chargeNote?.billingTo
-  }</td>
+  border-bottom:1.0pt solid black;width:240pt">${flight?.chargeNote?.billingTo
+		}</td>
   <td class="xl187" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl188" style="border-top:none">TOTAL:</td>
   <td colspan="2" class="xl189" style="border-right:1.0pt solid black">${servicesTotalAmountWithVAT.toFixed(
-    2
-  )}</td>
+			2
+		)}</td>
  </tr>
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl191" style="height:16.4pt">&nbsp;</td>
@@ -2837,24 +2819,24 @@ ${VATApplicableServicesRenderHTML()}
   none">TOTAL MDL</td>
   <td colspan="2" class="xl197" style="border-right:1.0pt solid black;border-left:
   none">${convertCurrency(
-    servicesTotalAmountWithVAT,
-    1 / Number(flight?.chargeNote?.currency?.euroToMDL)
-  ).toFixed(2)}</td>
+			servicesTotalAmountWithVAT,
+			1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+		).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl199" width="64" style="height:15.0pt;width:48pt">&nbsp;</td>
   <td colspan="2" class="xl200" style="border-right:.5pt solid black;border-left:
   none">GRAND TOTAL MDL</td>
   <td colspan="2" class="xl202" style="border-right:1.0pt solid black">${(
-    convertCurrency(
-      servicesTotalAmountNoVAT,
-      1 / Number(flight?.chargeNote?.currency?.euroToMDL)
-    ) +
-    convertCurrency(
-      servicesTotalAmountWithVAT,
-      1 / Number(flight?.chargeNote?.currency?.euroToMDL)
-    )
-  ).toFixed(2)}</td>
+			convertCurrency(
+				servicesTotalAmountNoVAT,
+				1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+			) +
+			convertCurrency(
+				servicesTotalAmountWithVAT,
+				1 / Number(flight?.chargeNote?.currency?.euroToMDL)
+			)
+		).toFixed(2)}</td>
  </tr>
  <tr height="20" style="height:15.0pt">
   <td height="20" class="xl199" width="64" style="height:15.0pt;width:48pt">&nbsp;</td>
@@ -2890,27 +2872,23 @@ ${VATApplicableServicesRenderHTML()}
   <td height="19" class="xl184" colspan="4" style="height:16.4pt;mso-ignore:colspan">Name
   and signature of handling agent</td>
   <td class="xl226" style="border-top:none">&nbsp;</td>
-  <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black;	white-space:nowrap;
+  <td class="xl227" colspan="5" style="mso-ignore:colspan;border-right:1.0pt solid black;	white-space:normal;
 ">Name
   and signature of Crew/Carrier representative</td>
  </tr>
  <tr>
- <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black">${
-   flight!.ramp!.name
- }</td>
- <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black"">${
-   flight!.crew!.name
- }</td>
+ <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black">${flight!.ramp!.name
+		}</td>
+ <td colspan="5"  style="border-right:1.0pt solid black;border-left:1.0pt solid black"">${flight!.crew!.name
+		}</td>
  </tr>
 
  <tr height="19" style="height:10.4pt">
   <td colspan="5" " class="xl228" style="border-right:1.0pt solid black;border-bottom:1.0pt solid black;
-  "><img  width="320" height="120" src="data:image/png;base64,${
-    flight?.ramp?.signature
-  }"/></td>
-  <td class="xl170" style="border-left:none"><img  width="320" height="120" src="data:image/png;base64,${
-    flight?.crew?.signature
-  }"/></td>
+  "><img  width="320" height="120" src="data:image/png;base64,${flight?.ramp?.signature
+		}"/></td>
+  <td class="xl170" style="border-left:none"><img  width="320" height="120" src="data:image/png;base64,${flight?.crew?.signature
+		}"/></td>
   <td class="xl170"></td>
   <td class="xl170"></td>
   <td class="xl170"></td>

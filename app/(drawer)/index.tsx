@@ -106,6 +106,7 @@ export default function Page() {
         }}
       />
       <FAB
+        id="create-new-flight-button"
         icon="plus"
         color={theme.colors.text}
         style={{ ...styles.fab }}

@@ -80,7 +80,7 @@ const SignaturePage = () => {
         icon={"clipboard-list"}
         onPress={handleSubmit(submit)}
       >
-        Invoice
+        Generate files
       </Button>
     </View>
   );

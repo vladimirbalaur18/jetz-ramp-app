@@ -113,7 +113,6 @@ export default function Page() {
   }, []);
 
   const { errors } = formState;
-  const allProvidedServices = watch("providedServices");
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {(!fields || fields?.filter((f) => f.isUsed).length == 0) && (
@@ -125,16 +124,7 @@ export default function Page() {
         </Text>
       )}
       {fields.map((field, serviceIndex, array) => {
-        const {
-          service,
-          isPriceOverriden,
-          isUsed,
-          notes,
-          quantity,
-          totalPriceOverride,
-        } = field;
-
-        const { serviceName, hasVAT, price } = service;
+        const { service, isPriceOverriden, isUsed } = field;
 
         return (
           isUsed === true && (

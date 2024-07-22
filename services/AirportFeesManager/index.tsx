@@ -1,4 +1,5 @@
 import {
+  applyVAT,
   getDifferenceBetweenArrivalDeparture,
   getFlightMTOWinTons,
   getPassengerCount,
@@ -14,6 +15,7 @@ import { FuelFeesState } from "@/models/Fuelfees";
 import { IFlight } from "@/models/Flight";
 import { Dayjs } from "dayjs";
 import { IAirportFees } from "@/models/AirportFees";
+import { AirportSubFeeTotal } from "./types";
 
 const applyWinterSummerQuota = (
   fullArrivalDateTime: Dayjs,
@@ -50,11 +52,11 @@ export const getFuelFeeAmount = ({
 
   return VATRateMultiplier * fuelEURAmount;
 };
-export const getLandingFees = (flight: IFlight): number => {
+export const getLandingFees = (flight: IFlight): AirportSubFeeTotal => {
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
-  if (flight?.handlingType === "Departure") return 0;
+  if (flight?.handlingType === "Departure") return { total: 0, VAT: false };
   if (!AirportFees.commercial.landingFee.perTon)
     throw new Error("Undefined commercial landing fee per ton value");
   if (!AirportFees.nonCommercial.landingFee.perTon)
@@ -66,35 +68,42 @@ export const getLandingFees = (flight: IFlight): number => {
   const fullArrivalDateTime = getParsedDateTime(arrivalDate, arrivalTime);
   const mtowTons = getFlightMTOWinTons(flight);
 
-  if (flight.isCommercialFlight) {
-    return (
-      mtowTons *
+  const total = flight.isCommercialFlight
+    ? mtowTons *
       AirportFees.commercial.landingFee.perTon *
       applyWinterSummerQuota(
         fullArrivalDateTime,
         AirportFees.commercial.landingFee.summerPeriodQuotaPercentage || 0,
         AirportFees.commercial.landingFee.winterPeriodQuotaPercentage || 0
       )
-    );
-  } else {
-    return isLightAircraft(flight)
-      ? mtowTons * AirportFees.nonCommercial.landingFee.lightAircraft
-      : mtowTons *
-          AirportFees.nonCommercial.landingFee.perTon *
-          applyWinterSummerQuota(
-            fullArrivalDateTime,
-            AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage ||
-              0,
-            AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage ||
-              0
-          );
+    : isLightAircraft(flight)
+    ? mtowTons * AirportFees.nonCommercial.landingFee.lightAircraft
+    : mtowTons *
+      AirportFees.nonCommercial.landingFee.perTon *
+      applyWinterSummerQuota(
+        fullArrivalDateTime,
+        AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage || 0,
+        AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage || 0
+      );
+
+  const isLandingLegInternal = flight?.arrival?.isLocalFlight;
+
+  if (isLandingLegInternal) {
+    console.warn("Applying VAT on landing fee", {
+      withVAT: applyVAT(total),
+      withoutVAT: total,
+    });
   }
+  return {
+    total: isLandingLegInternal ? applyVAT(total) : total,
+    VAT: isLandingLegInternal,
+  };
 };
-export const getTakeOffFees = (flight: IFlight): number => {
+export const getTakeOffFees = (flight: IFlight): AirportSubFeeTotal => {
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
-  if (flight.handlingType === "Arrival") return 0;
+  if (flight.handlingType === "Arrival") return { total: 0, VAT: false };
 
   if (!AirportFees.commercial.takeoffFee.perTon)
     throw new Error("Commercial takeoff fee per ton is undefined");
@@ -106,35 +115,42 @@ export const getTakeOffFees = (flight: IFlight): number => {
   const mtowTons = getFlightMTOWinTons(flight);
   const { departureDate, departureTime } = flight?.departure;
   const fullDepartureDateTime = getParsedDateTime(departureDate, departureTime);
-
-  if (flight.isCommercialFlight) {
-    return (
-      mtowTons *
+  const total = flight?.isCommercialFlight
+    ? mtowTons *
       AirportFees.commercial.takeoffFee.perTon *
       applyWinterSummerQuota(
         fullDepartureDateTime,
         AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage || 0,
         AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage || 0
       )
-    );
-  } else
-    return isLightAircraft(flight)
-      ? mtowTons * AirportFees.nonCommercial.takeoffFee.lightAircraft
-      : mtowTons *
-          AirportFees.nonCommercial.takeoffFee.perTon *
-          applyWinterSummerQuota(
-            fullDepartureDateTime,
-            AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage ||
-              0,
-            AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage ||
-              0
-          );
+    : isLightAircraft(flight)
+    ? mtowTons * AirportFees.nonCommercial.takeoffFee.lightAircraft
+    : mtowTons *
+      AirportFees.nonCommercial.takeoffFee.perTon *
+      applyWinterSummerQuota(
+        fullDepartureDateTime,
+        AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage || 0,
+        AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage || 0
+      );
+
+  const isDepartureLegInternal = flight?.departure?.isLocalFlight;
+
+  if (isDepartureLegInternal) {
+    console.warn("Applying VAT on takeoff fee", {
+      withVAT: applyVAT(total),
+      withoutVAT: total,
+    });
+  }
+  return {
+    total: isDepartureLegInternal ? applyVAT(total) : total,
+    VAT: isDepartureLegInternal,
+  };
 };
 
 // Daca e light isLightAircraft, se returneaza mtowTons*feeLightAicraft
 // Altfel, se ia takeoff fee per ton, si se aplica winterSummerQuota (la voi matinca e de 20 procente)
 
-export const getPassengersFee = (flight: IFlight): number => {
+export const getPassengersFee = (flight: IFlight): AirportSubFeeTotal => {
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
@@ -146,10 +162,23 @@ export const getPassengersFee = (flight: IFlight): number => {
 
   const paxCount =
     getPassengerCount(flight?.arrival) + getPassengerCount(flight?.departure);
+  const total = feePerPax * paxCount;
 
-  return feePerPax * paxCount;
+  const isAnyOfLegsInternal =
+    flight?.departure?.isLocalFlight || flight?.arrival?.isLocalFlight;
+
+  if (isAnyOfLegsInternal) {
+    console.warn("Applying VAT on passenger fee", {
+      withVAT: applyVAT(total),
+      withoutVAT: total,
+    });
+  }
+  return {
+    total: isAnyOfLegsInternal ? applyVAT(total) : total,
+    VAT: isAnyOfLegsInternal,
+  };
 };
-export const getSecurityFee = (flight: IFlight): number => {
+export const getSecurityFee = (flight: IFlight) => {
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
@@ -166,16 +195,30 @@ export const getSecurityFee = (flight: IFlight): number => {
   if (!securityFeePerPax) throw new Error("Security fee per pax is undefined");
   if (!securityFeePerTon) throw new Error("Security fee per ton is undefined");
 
-  return departingPax > 0
-    ? securityFeePerPax * departingPax
-    : securityFeePerTon * mtowTons;
+  const total =
+    departingPax > 0
+      ? securityFeePerPax * departingPax
+      : securityFeePerTon * mtowTons;
+
+  const isDepartureLegInternal = flight?.departure?.isLocalFlight;
+
+  if (isDepartureLegInternal) {
+    console.warn("Applying VAT on security fee", {
+      withVAT: applyVAT(total),
+      withoutVAT: total,
+    });
+  }
+  return {
+    total: isDepartureLegInternal ? applyVAT(total) : total,
+    VAT: isDepartureLegInternal,
+  };
 };
-export const getParkingFee = (flight: IFlight): number => {
+export const getParkingFee = (flight: IFlight): AirportSubFeeTotal => {
   const FREE_PARKING_HOURS = 3;
   const [AirportFees] = realmWithoutSync
     .objects<IAirportFees>("AirportFees")
     .toJSON() as IAirportFees[];
-  if (flight.handlingType === "Arrival") return 0;
+  if (flight.handlingType === "Arrival") return { total: 0, VAT: false };
   const { hours, days } = getDifferenceBetweenArrivalDeparture(flight);
   const mtowTons = getFlightMTOWinTons(flight);
 
@@ -184,10 +227,16 @@ export const getParkingFee = (flight: IFlight): number => {
     : AirportFees.nonCommercial.parkingDay.perTon;
 
   if (!feePerTon) throw new Error("Parking fee per ton is undefined");
+  const total =
+    hours <= FREE_PARKING_HOURS //first 3 hours of parking are free
+      ? 0
+      : days * mtowTons * feePerTon;
 
-  return hours <= FREE_PARKING_HOURS //first 3 hours of parking are free
-    ? 0
-    : days * mtowTons * feePerTon;
+  const applyVATCondition = false; //TODO: check with client
+  return {
+    total: applyVATCondition ? applyVAT(total) : total,
+    VAT: applyVATCondition,
+  };
 };
 // daca e mai mic sau egal cu 4 ore - 0
 //alfel, se ia days (differenta in zile dintre arrival - departure) * mtowTons * feePerTon

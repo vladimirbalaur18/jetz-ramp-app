@@ -59,6 +59,7 @@ import getParsedDateTime from "@/utils/getParsedDateTime";
 import { SafeNumber } from "@/utils/SafeNumber";
 import { UpdateMode } from "realm";
 import { isLoading } from "expo-font";
+import { AirportSubFeeTotal } from "@/services/AirportFeesManager/types";
 type FormData = IFlight;
 
 const isDifferenceBetweenRootServicesAndProvidedServices = (
@@ -81,12 +82,6 @@ const Form: React.FC = () => {
   const [general] = useQuery<GeneralConfigState>("General");
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   const existingFlight = realmExistingFlight?.toJSON() as IFlight;
-
-  console.log(
-    "@test nullified services",
-    JSON.stringify(defaultServicesPerCategories, null),
-    JSON.stringify(existingFlight?.providedServices, null)
-  );
 
   console.log(
     "Existing flight on render providedServices",
@@ -1200,11 +1195,11 @@ const AirportFeeOverrideModal = ({
   const theme = useTheme();
   const airportFeesDetails = getTotalAirportFeesPrice(existingFlight).fees;
   const airportFeeOverrideForm = useForm<{
-    landing: number | string;
-    takeOff: number | string;
-    passengers: number | string;
-    security: number | string;
-    parking: number | string;
+    landing: AirportSubFeeTotal;
+    takeOff: AirportSubFeeTotal;
+    passengers: AirportSubFeeTotal;
+    security: AirportSubFeeTotal;
+    parking: AirportSubFeeTotal;
   }>({
     defaultValues: {
       ...airportFeesDetails,
@@ -1232,11 +1227,7 @@ const AirportFeeOverrideModal = ({
   const fees = airportFeeOverrideForm.watch();
 
   const totals = useMemo(
-    () =>
-      Object.values(fees).reduce(
-        (acc, val) => parseFloat(acc as string) + parseFloat(val as string),
-        0
-      ),
+    () => Object.values(fees).reduce((acc, val) => acc + val.total, 0),
     [fees]
   );
 
@@ -1273,7 +1264,7 @@ const AirportFeeOverrideModal = ({
             )}
             <Controller
               control={airportFeeOverrideForm.control}
-              name="landing"
+              name="landing.total"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
                 pattern: {
@@ -1286,50 +1277,59 @@ const AirportFeeOverrideModal = ({
                   <TextInput
                     label="Landing fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>
                       onChange(replaceCommaWithDot(value))
                     }
                     error={
-                      airportFeeOverrideForm.formState.errors.landing && true
+                      airportFeeOverrideForm.formState.errors.landing?.total &&
+                      true
                     }
                   />
-                  {airportFeeOverrideForm?.formState?.errors?.landing &&
+                  {airportFeeOverrideForm?.formState?.errors?.landing?.total &&
                     true && (
                       <HelperText type="error">
                         {
                           airportFeeOverrideForm?.formState?.errors?.landing
-                            ?.message
+                            .total?.message
                         }
                       </HelperText>
                     )}
-                  {airportFeeOverrideForm.getFieldState("landing").isDirty && (
+                  {airportFeeOverrideForm.getFieldState("landing.total")
+                    .isDirty && (
                     <HelperText type="info">
                       *Price has been manually overriden
                     </HelperText>
                   )}
                   {flightHasArrival &&
-                    !airportFeeOverrideForm.getFieldState("landing").isDirty &&
+                    !airportFeeOverrideForm.getFieldState("landing.total")
+                      .isDirty &&
                     isWinterNightTime(fullArrivalDateTime) && (
                       <HelperText type="info">
                         *Winter night Quota has been applied
                       </HelperText>
                     )}
                   {flightHasArrival &&
-                    !airportFeeOverrideForm.getFieldState("landing").isDirty &&
+                    !airportFeeOverrideForm.getFieldState("landing.total")
+                      .isDirty &&
                     isSummerNightTime(fullArrivalDateTime) && (
                       <HelperText type="info">
                         *Summer night Quota has been applied
                       </HelperText>
+                    )}
+                  {!airportFeeOverrideForm.getFieldState("landing.total")
+                    .isDirty &&
+                    airportFeeOverrideForm.getValues("landing.VAT") && (
+                      <HelperText type="info">*With VAT</HelperText>
                     )}
                 </>
               )}
             />
             <Controller
               control={airportFeeOverrideForm.control}
-              name="takeOff"
+              name="takeOff.total"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
                 pattern: {
@@ -1342,49 +1342,59 @@ const AirportFeeOverrideModal = ({
                   <TextInput
                     label="Takeoff fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>
                       onChange(replaceCommaWithDot(value))
                     }
                     error={
-                      airportFeeOverrideForm.formState.errors.takeOff && true
+                      airportFeeOverrideForm.formState.errors.takeOff?.total &&
+                      true
                     }
                   />
-                  {airportFeeOverrideForm?.formState?.errors?.takeOff && (
+                  {airportFeeOverrideForm?.formState?.errors?.takeOff
+                    ?.total && (
                     <HelperText type="error">
                       {
                         airportFeeOverrideForm?.formState?.errors?.takeOff
-                          ?.message
+                          ?.total?.message
                       }
                     </HelperText>
                   )}
-                  {airportFeeOverrideForm.getFieldState("takeOff").isDirty && (
+                  {airportFeeOverrideForm.getFieldState("takeOff.total")
+                    .isDirty && (
                     <HelperText type="info">
                       *Price has been manually overriden
                     </HelperText>
                   )}
                   {flightHasDeparture &&
-                    !airportFeeOverrideForm.getFieldState("takeOff").isDirty &&
+                    !airportFeeOverrideForm.getFieldState("takeOff.total")
+                      .isDirty &&
                     isWinterNightTime(fullDepartureDateTime) && (
                       <HelperText type="info">
                         *Winter night Quota has been applied
                       </HelperText>
                     )}
                   {flightHasDeparture &&
-                    !airportFeeOverrideForm.getFieldState("takeOff").isDirty &&
+                    !airportFeeOverrideForm.getFieldState("takeOff.total")
+                      .isDirty &&
                     isSummerNightTime(fullDepartureDateTime) && (
                       <HelperText type="info">
                         *Summer night Quota has been applied
                       </HelperText>
+                    )}
+                  {!airportFeeOverrideForm.getFieldState("takeOff.total")
+                    .isDirty &&
+                    airportFeeOverrideForm.getValues("takeOff.VAT") && (
+                      <HelperText type="info">*With VAT</HelperText>
                     )}
                 </>
               )}
             />
             <Controller
               control={airportFeeOverrideForm.control}
-              name="passengers"
+              name="passengers.total"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
                 pattern: {
@@ -1397,36 +1407,43 @@ const AirportFeeOverrideModal = ({
                   <TextInput
                     label="Passenger fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>
                       onChange(replaceCommaWithDot(value))
                     }
                     error={
-                      airportFeeOverrideForm.formState.errors.passengers && true
+                      airportFeeOverrideForm.formState.errors.passengers
+                        ?.total && true
                     }
                   />
-                  {airportFeeOverrideForm?.formState?.errors?.passengers && (
+                  {airportFeeOverrideForm?.formState?.errors?.passengers
+                    ?.total && (
                     <HelperText type="error">
                       {
                         airportFeeOverrideForm?.formState?.errors?.passengers
-                          ?.message
+                          .total?.message
                       }
                     </HelperText>
                   )}
-                  {airportFeeOverrideForm.getFieldState("passengers")
+                  {airportFeeOverrideForm.getFieldState("passengers.total")
                     .isDirty && (
                     <HelperText type="info">
                       *Price has been manually overriden
                     </HelperText>
                   )}
+                  {!airportFeeOverrideForm.getFieldState("passengers.total")
+                    .isDirty &&
+                    airportFeeOverrideForm.getValues("passengers.VAT") && (
+                      <HelperText type="info">*With VAT</HelperText>
+                    )}
                 </>
               )}
             />
             <Controller
               control={airportFeeOverrideForm.control}
-              name="security"
+              name="security.total"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
                 pattern: {
@@ -1439,35 +1456,43 @@ const AirportFeeOverrideModal = ({
                   <TextInput
                     label="Security fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>
                       onChange(replaceCommaWithDot(value))
                     }
                     error={
-                      airportFeeOverrideForm.formState.errors.security && true
+                      airportFeeOverrideForm.formState.errors.security?.total &&
+                      true
                     }
                   />
-                  {airportFeeOverrideForm?.formState?.errors?.security && (
+                  {airportFeeOverrideForm?.formState?.errors?.security
+                    ?.total && (
                     <HelperText type="error">
                       {
                         airportFeeOverrideForm?.formState?.errors?.security
-                          ?.message
+                          .total?.message
                       }
                     </HelperText>
                   )}
-                  {airportFeeOverrideForm.getFieldState("security").isDirty && (
+                  {airportFeeOverrideForm.getFieldState("security.total")
+                    .isDirty && (
                     <HelperText type="info">
                       *Price has been manually overriden
                     </HelperText>
                   )}
+                  {!airportFeeOverrideForm.getFieldState("security.total")
+                    .isDirty &&
+                    airportFeeOverrideForm.getValues("security.VAT") && (
+                      <HelperText type="info">*With VAT</HelperText>
+                    )}
                 </>
               )}
             />
             <Controller
               control={airportFeeOverrideForm.control}
-              name="parking"
+              name="parking.total"
               rules={{
                 required: { value: true, message: ERROR_MESSAGES.REQUIRED },
                 pattern: {
@@ -1480,29 +1505,37 @@ const AirportFeeOverrideModal = ({
                   <TextInput
                     label="Parking fee:"
                     style={formStyles.input}
-                    value={String(value)}
+                    value={SafeNumber(value)}
                     onBlur={onBlur}
                     keyboardType="numeric"
                     onChangeText={(value) =>
                       onChange(replaceCommaWithDot(value))
                     }
                     error={
-                      airportFeeOverrideForm.formState.errors.parking && true
+                      airportFeeOverrideForm.formState.errors.parking?.total &&
+                      true
                     }
                   />
-                  {airportFeeOverrideForm?.formState?.errors?.parking && (
+                  {airportFeeOverrideForm?.formState?.errors?.parking
+                    ?.total && (
                     <HelperText type="error">
                       {
                         airportFeeOverrideForm?.formState?.errors?.parking
-                          ?.message
+                          ?.total?.message
                       }
                     </HelperText>
                   )}
-                  {airportFeeOverrideForm.getFieldState("parking").isDirty && (
+                  {airportFeeOverrideForm.getFieldState("parking.total")
+                    .isDirty && (
                     <HelperText type="info">
                       *Price has been manually overriden
                     </HelperText>
                   )}
+                  {!airportFeeOverrideForm.getFieldState("parking.total")
+                    .isDirty &&
+                    airportFeeOverrideForm.getValues("parking.VAT") && (
+                      <HelperText type="info">*With VAT</HelperText>
+                    )}
                 </>
               )}
             />
@@ -1534,10 +1567,11 @@ const AirportFeeOverrideModal = ({
                   setIsLoading(true);
 
                   const sum = Object.values(data).reduce(
-                    (acc, val) =>
-                      parseFloat(acc as string) + parseFloat(val as string),
+                    (acc, val) => Number(acc) + Number(val.total),
                     0
                   );
+
+                  console.log("Override sum", sum);
                   onSubmit && onSubmit(Number(sum));
                 })}
               >
