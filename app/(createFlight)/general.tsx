@@ -179,7 +179,7 @@ const Form: React.FC = () => {
           realmExistingFlight.chargeNote.disbursementPercentage = Number(
             data.chargeNote.disbursementPercentage
           );
-          realmExistingFlight.departure = data?.departure;
+          // realmExistingFlight.departure = data?.departure;
           realmExistingFlight.flightNumber =
             data?.flightNumber?.toLocaleUpperCase();
           realmExistingFlight.handlingType = data?.handlingType;
@@ -533,10 +533,10 @@ const Form: React.FC = () => {
                 autoCapitalize="characters"
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(value)}
-                error={errors?.arrival?.from && true}
+                error={errors.chargeNote?.paymentType && true}
               />
               <HelperText type="error">
-                {errors.arrival?.from?.message}
+                {errors.chargeNote?.paymentType?.message}
               </HelperText>
             </>
           )}

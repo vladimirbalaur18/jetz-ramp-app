@@ -193,7 +193,7 @@ td
 	mso-background-source:auto;
 	mso-pattern:auto;
 	mso-protection:locked visible;
-	white-space:nowrap;
+	white-space:normal;
 	mso-rotate:0;}
 .xl65
 	{mso-style-parent:style0;
@@ -1114,7 +1114,7 @@ td
 <body link="#0563C1" vlink="#954F72">
 
 <table border="0" cellpadding="0" cellspacing="0" width="588" style="border-collapse:
- collapse;table-layout:fixed;width:440pt">
+ collapse;table-layout:fixed;width:640pt">
  <colgroup><col width="70" style="mso-width-source:userset;mso-width-alt:2474;width:52pt">
  <col width="64" style="width:48pt">
  <col width="70" style="mso-width-source:userset;mso-width-alt:2474;width:52pt">

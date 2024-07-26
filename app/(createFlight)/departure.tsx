@@ -56,7 +56,7 @@ const Form: React.FC = () => {
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onBlur",
-      defaultValues: _existingFlight?.toJSON().departure
+      defaultValues: _existingFlight?.toJSON()?.departure
         ? _existingFlight?.toJSON()
         : {
             ..._existingFlight?.toJSON(),
@@ -70,6 +70,10 @@ const Form: React.FC = () => {
                 status: false,
                 FOD: false,
               },
+            },
+            arrival: {
+              arrivalDate: new Date(),
+              arrivalTime: { hours: 0, minutes: 0 },
             },
           },
     });
@@ -104,10 +108,6 @@ const Form: React.FC = () => {
           minorCount: Number(data.departure.minorCount),
           rampInspectionBeforeDeparture: rampInspection,
           to: data.departure.to?.toLocaleUpperCase(),
-        });
-        const arrival = realm.create<IArrival>("Arrival", {
-          arrivalDate: data.arrival.arrivalDate,
-          arrivalTime: data.arrival.arrivalTime,
         });
 
         if (_existingFlight?.departure) {
@@ -160,6 +160,11 @@ const Form: React.FC = () => {
           _existingFlight.departure = departure;
 
           if (_existingFlight.handlingType === "Departure") {
+            const arrival = realm.create<IArrival>("Arrival", {
+              arrivalDate: data.arrival.arrivalDate,
+              arrivalTime: data.arrival.arrivalTime,
+            });
+
             _existingFlight.arrival = arrival;
           }
         }

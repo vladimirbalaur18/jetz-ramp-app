@@ -372,6 +372,7 @@ const Form: React.FC = () => {
                   });
                 }}
                 mode="text"
+                icon={"table-refresh"}
               >
                 Reset services
               </Button>
@@ -1247,7 +1248,7 @@ const AirportFeeOverrideModal = ({
         <View
           style={{
             backgroundColor: theme.colors.surface,
-            height: 550,
+            // height: ,
             padding: 30,
             justifyContent: "center",
             borderRadius: 15,

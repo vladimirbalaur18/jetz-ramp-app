@@ -78,7 +78,7 @@ export default function Page() {
     printToFile({
       html: rampChecklistHTML({ ...existingFlightJSON, ...data }),
       fileName: `rampChecklist_${existingFlightJSON?.flightNumber}_${existingFlightJSON?.aircraftRegistration}`,
-      width: 485,
+      width: 585,
       height: 942,
     }).finally(() => setIsLoading(false));
   };
@@ -110,7 +110,7 @@ export default function Page() {
     return () => {
       remove();
     };
-  }, []);
+  }, [JSON.stringify(realmExistingFlight?.toJSON())]);
 
   const { errors } = formState;
   return (

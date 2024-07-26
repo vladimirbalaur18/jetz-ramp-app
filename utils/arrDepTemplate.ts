@@ -5,25 +5,25 @@ import { useQuery } from "@realm/react";
 import dayjs from "dayjs";
 
 export default function ArrDepTemplateRenderHTML(flight: IFlight, handlingType: any) {
-  const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
-  const arrivalDate = dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
-  const departureDate = dayjs(flight?.departure.departureDate).format(
-    "DD-MMM-YY"
-  );
-  const {
-    operatorName,
-    aircraftRegistration,
-    aircraftType,
-    mtow,
-    flightNumber,
-    crew,
-  } = flight;
-  const arrivalRoute = `${flight?.arrival?.from}-${config.defaultAirport}`;
-  const departureRoute = `${config.defaultAirport}-${flight?.departure?.to}`;
-  const { departure, arrival } = flight;
+	const [config] = realmWithoutSync.objects<GeneralConfigState>("General");
+	const arrivalDate = dayjs(flight?.arrival.arrivalDate).format("DD-MMM-YY");
+	const departureDate = dayjs(flight?.departure.departureDate).format(
+		"DD-MMM-YY"
+	);
+	const {
+		operatorName,
+		aircraftRegistration,
+		aircraftType,
+		mtow,
+		flightNumber,
+		crew,
+	} = flight;
+	const arrivalRoute = `${flight?.arrival?.from}-${config.defaultAirport}`;
+	const departureRoute = `${config.defaultAirport}-${flight?.departure?.to}`;
+	const { departure, arrival } = flight;
 
-  if (handlingType === "FULL")
-    return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
+	if (handlingType === "FULL")
+		return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="ProgId" content="Excel.Sheet">
 <meta name="Generator" content="Microsoft Excel 15">
@@ -608,8 +608,7 @@ td
 	border-left:none;}
 
 td{
-  text-wrap:wrap;
-  word-wrap: break-word;
+white-space:normal;
 }
 </style>
 
@@ -620,8 +619,8 @@ td{
 <table border="0" cellpadding="0" cellspacing="0" width="896" style="border-collapse:
  collapse;table-layout:fixed;width:772pt">
  <colgroup><col width="64" span="14" style="width:48pt">
- </colgroup><tbody><tr height="19" style="height:14.4pt">
-  <td height="19" width="64" style="height:14.4pt;width:48pt;border-top: 1px solid black;
+ </colgroup><tbody><tr  style="height:14.4pt">
+  <td  width="64" style="height:14.4pt;width:48pt;border-top: 1px solid black;
     border-left: 1px solid black;" align="left" valign="top"><span style="mso-ignore:vglayout;
   position:absolute;z-index:1;margin-left:5px;margin-top:0;width:84px;
   height:50px"><img width="80" height="50" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIMAAABNCAMAAACyoSeQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAALcUExURf////Hx8djY2NLS0qCgoIODg8PDw9TU1P7+/ujo6MjIyG9vb0RERAwMDAAAAAICAmNjY7+/v/z8/PT09MbGxpGRkVBQUDAwMBYWFgkJCY6Ojs/Pz21tbYyMjPr6+tnZ2cDAwIuLi01NTRoaGg0NDQEBAYGBgXR0dHBwcKysrICAgEpKShwcHFFRUa6urtXV1QsLC3d3d+/v79vb22dnZzg4OB0dHQUFBWRkZLq6uvj4+FxcXFRUVOXl5efn58fHx6WlpWVlZSkpKQoKChERETExMU9PT39/f7u7u/Dw8KGhoTo6OuPj47m5uYWFhVhYWDQ0NAgICDw8PGhoaJKSksLCwurq6t/f3yQkJDY2NvX19eDg4H5+fj8/PyYmJg4ODh8fHzk5OXx8fLOzs9bW1u3t7UZGRmJiYqioqHl5eRMTExAQEF9fX7W1tezs7FpaWkFBQUlJSS4uLkdHR3V1daSkpMXFxenp6RISEhUVFSsrK1NTU4KCguLi4qqqqiIiIi0tLXJycpiYmObm5ri4uLe3t+Hh4fPz8/b29tfX15SUlJWVlZOTk5eXl93d3ZCQkJaWlt7e3v39/YqKiqampiMjI0tLS9zc3BQUFDU1Nc7OzsTExDIyMtra2iwsLKOjowMDAwYGBqurq15eXhcXFxgYGNDQ0O7u7sHBwT09PRkZGSgoKGxsbA8PD83NzUNDQ/n5+SAgIISEhLGxsaKiop2dnUVFRczMzLy8vHt7e/f3956enmlpaSEhIWBgYCcnJzMzMz4+PsnJyZubm4aGhp+fn8rKygQEBE5OTh4eHpqamhsbG+Tk5FdXVzs7O3h4eNHR0dPT07S0tLa2tr6+vn19fYiIiCoqKuvr642Njfv7+zc3Ny8vL0xMTPLy8mpqaqmpqW5ubiUlJaenp2ZmZltbW6+vr7CwsK2trYeHh5ycnLKyspmZmVlZWWFhYVJSUo+Pj3Fxcb29vQAAAMuq2HYAAAD0dFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wAY4PcXAAAACXBIWXMAABcRAAAXEQHKJvM/AAAERElEQVRoQ+2Zy7HsKAxACYByLuy9ZEFUkAFpKAS2REEEXhLECJDlH3bbU327pmp82n7PmL8khPAVLy8v/x98sCp4SvweCHaSQ2U09O6nmCydbgOoZHr/HfyU6KkP+JDkuvuKotzvMA3DRI9HvFXH/r+vC49t9mYF3k6x0/+gp+9bw4jtjkCJBoQ8udbjBh1l+hNztKX1yOsNTBpj7XFHnFLYDvV7+DrjMgjwRsXe/F1M5m+dAlrlEOXYNz8dx2T+avoLZpxGKXvyl8r+mfh3jMf5a4fW96PuK1ZurMBJlQNl/Q5Aa1z45fRfXl5eXnqAR89cr5oMKR9/JVboZpRfDSTM+s3ql+ydOMPg9lT3SdkGkeo+tWMCAd1gqlDicH+aq21t9poSslSocC9wGnDfDL2AtuDK4P1Zbsv+QI0fCzQGHpPWeNVb67J3G1eh3BJTNFoAHPDQs6pBZRB3Qxtzn7UftI+5kxh8IDat0Pmu0zaXR5ah3gm85zZ1kxlQsqq5Awv9/CSEhcoBoeLumEMLoxHZ0pmSZ0dIQ9mz6npYloK8sywWU6PDlaIkqeYAr5tzGSe2hpvHUJ43zWtWTWzJA7P5nJraQz0UeBnsTZKiyf1hhvNPllxgT7Gc1T4xV6FlfPQC28l8MsnFxd3/HABzm3TMZdUwW7tgb9JdNrA4lwdfRQLVmducTZJx7f0M5/dM8t/oAWHZ0bjZW2Rid7xgj9YxB8t6xP3lATsvyd5irMkDvHORN1kBLKIneijsTLJ8hal88pIHi/OzBNHJ06ubnHrJEw/EJrnPX1zj7hvOZ9gkaV471RyYzWe/IbNZ6RMBXsB1yQvMqjnzkrMP3Pa0uManeiiwEmktsbdoyQMk8a2jXjbqJ3oA70sMGdiUSRW8KU5Yol2lZMtEZpPd+M4lhFLYJtVpXA3JxOhiZI8yx5KLSWKuo190y1Ijk9xqggc+rOpg63hfaWbrDTUvNNbrhmXW1Xz2y59t6oC+8pZsBjhjmZaSi2RWrFrC/DjtG+4PvHAZzqqxoewm/gdrba6/zUW5iLGdL0OmllpXmK/rRXI1wJeXl/8Gq3V6vWQfLOhna98mdCU5Qf3XGmFUNiJbkbzPCV0oPuKFpwyVqz/zGcoX9JwFZCVCECkrK2zGXpXBQsKA37m+T4Absbitf5qLxSu7cnBwY8AoxmAaMD06UF4MeCNJW4x/QWLeNGQLXhs3ihE3e8D3cvBWKA2Pwgg/1O0i4jECYvncUndJlzP6+jSUNMpBT2VAZaoYacmMZZXEncxKLTGYBplECZ9AG1ARN8Bpspe71Z7gDG76yuB0vcPhhJhw15d2woklvIs8hEbZZNdOfTKZCGHKWDgHrJWlxcO1Vh6sg5BNEYZKZ3FYFx8MKtALbwSUR3zAvvAJO8TXuCPhXf6ABMZUAQePgi4VUHD1/1q0VAUsBqVse/Xy8vJyHyH+ARKef7ZwZAAnAAAAAElFTkSuQmCC" alt="" v:shapes="Picture_x0020_1"></span><!--[endif]--></td>
@@ -632,7 +631,7 @@ td{
   <td class="xl66" width="64" style="width:48pt">&nbsp;</td>
   <td class="xl67" width="64" style="width:48pt">&nbsp;</td>
   <td width="64" style="width:48pt;border-top: 1px solid black;
-    border-left: 1px solid black;; " align="left" valign="top"><span style="mso-ignore:vglayout;
+    border-left: 1px solid black; " align="left" valign="top"><span style="mso-ignore:vglayout;
   position:absolute;z-index:2;margin-left:5px;margin-top:0;width:83px;
   height:50px">
   <img width="83" height="50" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIMAAABNCAMAAACyoSeQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAALcUExURf////Hx8djY2NLS0qCgoIODg8PDw9TU1P7+/ujo6MjIyG9vb0RERAwMDAAAAAICAmNjY7+/v/z8/PT09MbGxpGRkVBQUDAwMBYWFgkJCY6Ojs/Pz21tbYyMjPr6+tnZ2cDAwIuLi01NTRoaGg0NDQEBAYGBgXR0dHBwcKysrICAgEpKShwcHFFRUa6urtXV1QsLC3d3d+/v79vb22dnZzg4OB0dHQUFBWRkZLq6uvj4+FxcXFRUVOXl5efn58fHx6WlpWVlZSkpKQoKChERETExMU9PT39/f7u7u/Dw8KGhoTo6OuPj47m5uYWFhVhYWDQ0NAgICDw8PGhoaJKSksLCwurq6t/f3yQkJDY2NvX19eDg4H5+fj8/PyYmJg4ODh8fHzk5OXx8fLOzs9bW1u3t7UZGRmJiYqioqHl5eRMTExAQEF9fX7W1tezs7FpaWkFBQUlJSS4uLkdHR3V1daSkpMXFxenp6RISEhUVFSsrK1NTU4KCguLi4qqqqiIiIi0tLXJycpiYmObm5ri4uLe3t+Hh4fPz8/b29tfX15SUlJWVlZOTk5eXl93d3ZCQkJaWlt7e3v39/YqKiqampiMjI0tLS9zc3BQUFDU1Nc7OzsTExDIyMtra2iwsLKOjowMDAwYGBqurq15eXhcXFxgYGNDQ0O7u7sHBwT09PRkZGSgoKGxsbA8PD83NzUNDQ/n5+SAgIISEhLGxsaKiop2dnUVFRczMzLy8vHt7e/f3956enmlpaSEhIWBgYCcnJzMzMz4+PsnJyZubm4aGhp+fn8rKygQEBE5OTh4eHpqamhsbG+Tk5FdXVzs7O3h4eNHR0dPT07S0tLa2tr6+vn19fYiIiCoqKuvr642Njfv7+zc3Ny8vL0xMTPLy8mpqaqmpqW5ubiUlJaenp2ZmZltbW6+vr7CwsK2trYeHh5ycnLKyspmZmVlZWWFhYVJSUo+Pj3Fxcb29vQAAAMuq2HYAAAD0dFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wAY4PcXAAAACXBIWXMAABcRAAAXEQHKJvM/AAAERElEQVRoQ+2Zy7HsKAxACYByLuy9ZEFUkAFpKAS2REEEXhLECJDlH3bbU327pmp82n7PmL8khPAVLy8v/x98sCp4SvweCHaSQ2U09O6nmCydbgOoZHr/HfyU6KkP+JDkuvuKotzvMA3DRI9HvFXH/r+vC49t9mYF3k6x0/+gp+9bw4jtjkCJBoQ8udbjBh1l+hNztKX1yOsNTBpj7XFHnFLYDvV7+DrjMgjwRsXe/F1M5m+dAlrlEOXYNz8dx2T+avoLZpxGKXvyl8r+mfh3jMf5a4fW96PuK1ZurMBJlQNl/Q5Aa1z45fRfXl5eXnqAR89cr5oMKR9/JVboZpRfDSTM+s3ql+ydOMPg9lT3SdkGkeo+tWMCAd1gqlDicH+aq21t9poSslSocC9wGnDfDL2AtuDK4P1Zbsv+QI0fCzQGHpPWeNVb67J3G1eh3BJTNFoAHPDQs6pBZRB3Qxtzn7UftI+5kxh8IDat0Pmu0zaXR5ah3gm85zZ1kxlQsqq5Awv9/CSEhcoBoeLumEMLoxHZ0pmSZ0dIQ9mz6npYloK8sywWU6PDlaIkqeYAr5tzGSe2hpvHUJ43zWtWTWzJA7P5nJraQz0UeBnsTZKiyf1hhvNPllxgT7Gc1T4xV6FlfPQC28l8MsnFxd3/HABzm3TMZdUwW7tgb9JdNrA4lwdfRQLVmducTZJx7f0M5/dM8t/oAWHZ0bjZW2Rid7xgj9YxB8t6xP3lATsvyd5irMkDvHORN1kBLKIneijsTLJ8hal88pIHi/OzBNHJ06ubnHrJEw/EJrnPX1zj7hvOZ9gkaV471RyYzWe/IbNZ6RMBXsB1yQvMqjnzkrMP3Pa0uManeiiwEmktsbdoyQMk8a2jXjbqJ3oA70sMGdiUSRW8KU5Yol2lZMtEZpPd+M4lhFLYJtVpXA3JxOhiZI8yx5KLSWKuo190y1Ijk9xqggc+rOpg63hfaWbrDTUvNNbrhmXW1Xz2y59t6oC+8pZsBjhjmZaSi2RWrFrC/DjtG+4PvHAZzqqxoewm/gdrba6/zUW5iLGdL0OmllpXmK/rRXI1wJeXl/8Gq3V6vWQfLOhna98mdCU5Qf3XGmFUNiJbkbzPCV0oPuKFpwyVqz/zGcoX9JwFZCVCECkrK2zGXpXBQsKA37m+T4Absbitf5qLxSu7cnBwY8AoxmAaMD06UF4MeCNJW4x/QWLeNGQLXhs3ihE3e8D3cvBWKA2Pwgg/1O0i4jECYvncUndJlzP6+jSUNMpBT2VAZaoYacmMZZXEncxKLTGYBplECZ9AG1ARN8Bpspe71Z7gDG76yuB0vcPhhJhw15d2woklvIs8hEbZZNdOfTKZCGHKWDgHrJWlxcO1Vh6sg5BNEYZKZ3FYFx8MKtALbwSUR3zAvvAJO8TXuCPhXf6ABMZUAQePgi4VUHD1/1q0VAUsBqVse/Xy8vJyHyH+ARKef7ZwZAAnAAAAAElFTkSuQmCC" alt="" v:shapes="Picture_x0020_2"></span></td>
@@ -643,16 +642,16 @@ td{
   <td class="xl66" width="64" style="width:48pt">&nbsp;</td>
   <td class="xl67" width="64" style="width:48pt">&nbsp;</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl68" style="height:14.4pt">&nbsp;</td>
+ <tr  style="height:14.4pt">
+  <td  class="xl68" style="height:14.4pt">&nbsp;</td>
   <td colspan="5" style="mso-ignore:colspan"></td>
   <td class="xl69">&nbsp;</td>
   <td class="xl68" style="border-left:none">&nbsp;</td>
   <td colspan="5" style="mso-ignore:colspan"></td>
   <td class="xl69">&nbsp;</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl68" style="height:14.4pt">&nbsp;</td>
+ <tr  style="height:14.4pt">
+  <td  class="xl68" style="height:14.4pt">&nbsp;</td>
   <td></td>
   <td colspan="3" class="xl70">ARRIVAL INFORMATION</td>
   <td></td>
@@ -677,8 +676,8 @@ td{
   <td class="xl72">&nbsp;</td>
   <td class="xl73">&nbsp;</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl74" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl74" style="border-right:.5pt solid black;
   height:14.4pt">NAME</td>
   <td colspan="3" class="xl77" style="border-right:1.0pt solid black;border-left:
   none">DATE</td>
@@ -686,8 +685,8 @@ td{
   <td colspan="3" class="xl79" style="border-right:1.0pt solid black;border-left:
   none">DATE</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">DATE</td>
   <td colspan="3" class="xl85" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${arrivalDate}</td>
@@ -696,8 +695,8 @@ td{
   <td colspan="3" class="xl85" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${departureDate}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">FLIGHT NO.</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${flightNumber}</td>
@@ -706,8 +705,8 @@ td{
   <td colspan="3" class="xl91" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${flightNumber}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">OPERATOR</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${operatorName}</td>
@@ -716,8 +715,8 @@ td{
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${operatorName}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">ROUTE</td>
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${arrivalRoute}</td>
@@ -726,8 +725,8 @@ td{
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${departureRoute}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">A/C REG</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${aircraftRegistration}</td>
@@ -736,8 +735,8 @@ td{
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${aircraftRegistration}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">A/C TYPE</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${aircraftType}</td>
@@ -746,8 +745,8 @@ td{
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${aircraftType}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">MTOW (kg)</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${mtow}</td>
@@ -756,8 +755,8 @@ td{
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${mtow}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">CREW No.</td>
   <td colspan="3" class="xl90" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${arrival?.crewNumber}</td>
@@ -766,22 +765,20 @@ td{
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${departure?.crewNumber}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">PAX No.</td>
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
-  none;text-wrap:wrap">${
-    Number(arrival?.adultCount) + Number(arrival?.minorCount)
-  }</td>
+  none;text-wrap:wrap">${Number(arrival?.adultCount) + Number(arrival?.minorCount)
+			}</td>
   <td colspan="4" class="xl82" style="border-right:.5pt solid black;border-left:
   none">PAX No.</td>
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
-  none;text-wrap:wrap">${
-    Number(departure?.adultCount) + Number(departure?.minorCount)
-  }</td>
+  none;text-wrap:wrap">${Number(departure?.adultCount) + Number(departure?.minorCount)
+			}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">CARGO</td>
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${arrival?.cargoInfo}</td>
@@ -790,8 +787,8 @@ td{
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${departure?.cargoInfo}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="4" height="19" class="xl82" style="border-right:.5pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="4"  class="xl82" style="border-right:.5pt solid black;
   height:14.4pt">MAIL</td>
   <td colspan="3" class="xl92" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap">${arrival?.mailInfo}</td>
@@ -806,12 +803,11 @@ td{
   <td colspan="3" class="xl101" style="border-right:1.0pt solid black;border-left:
   none;text-wrap:wrap;">${arrival?.specialInfo}</td>
   <td colspan="4" class="xl98" style="border-left:none">SPECIAL</td>
-  <td colspan="3" class="xl101" style="border-right:1.0pt solid black;text-wrap:wrap;">${
-    departure?.specialInfo
-  }</td>
+  <td colspan="3" class="xl101" style="border-right:1.0pt solid black;text-wrap:wrap;">${departure?.specialInfo
+			}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl104" style="height:14.4pt">REMARKS</td>
+ <tr  style="height:14.4pt">
+  <td  class="xl104" style="height:14.4pt">REMARKS</td>
   <td class="xl105"></td>
   <td class="xl105"></td>
   <td class="xl105"></td>
@@ -826,33 +822,31 @@ td{
   <td class="xl105"></td>
   <td class="xl106">&nbsp;</td>
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
   <td colspan="7" rowspan="6" class="xl111" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;">${
-    arrival?.remarksInfo
-  }<div style="max-width:100%"></div></td>
+  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;">${arrival?.remarksInfo
+			}<div style="max-width:100%"></div></td>
   <td colspan="7" rowspan="6" class="xl111" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;">${
-    departure?.remarksInfo
-  }</td>
+  border-bottom:1.0pt solid black;vertical-align:top;text-wrap:wrap;">${departure?.remarksInfo
+			}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>
- <tr height="19" style="height:14.4pt">
-  <td colspan="7" height="19" class="xl120" style="border-right:1.0pt solid black;
+ <tr  style="height:14.4pt">
+  <td colspan="7"  class="xl120" style="border-right:1.0pt solid black;
   height:14.4pt">PILOT IN COMMAND</td>
   <td colspan="7" class="xl120" style="border-right:1.0pt solid black;border-left:
   none">PILOT IN COMMAND</td>
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
   <td colspan="3" rowspan="2" height="38" class="xl123" style="border-bottom:.5pt solid black;
   height:28.8pt">NAME<span style="mso-spacerun:yes">   </span></td>
   <td colspan="4" rowspan="2" class="xl124" style="border-right:1.0pt solid black;
@@ -861,24 +855,22 @@ td{
   <td colspan="4" rowspan="2" class="xl124" style="border-right:1.0pt solid black;
   border-bottom:.5pt solid black">${crew?.name}</td>
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
   <td colspan="2" rowspan="4" height="77" class="xl123" style="border-bottom:1.0pt solid black;
   height:58.2pt">SIGNATURE</td>
   <td colspan="5" rowspan="4" class="xl124" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${
-    flight?.crew?.signature
-  }"></td>
+  border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${flight?.crew?.signature
+			}"></td>
   <td colspan="2" rowspan="4" class="xl123" style="border-bottom:1.0pt solid black">SIGNATURE</td>
   <td colspan="5" rowspan="4" class="xl124" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${
-    flight?.crew?.signature
-  }"></td>
+  border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${flight?.crew?.signature
+			}"></td>
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
- <tr height="19" style="height:14.4pt">
+ <tr  style="height:14.4pt">
  </tr>
  <tr height="20" style="height:15.0pt">
  </tr>
@@ -892,7 +884,7 @@ td{
 </body></html>
 `;
 
-  return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
+	return `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <meta name="ProgId" content="Excel.Sheet">
   <meta name="Generator" content="Microsoft Excel 15">
@@ -1354,7 +1346,9 @@ td{
   	border-right:1.0pt solid windowtext;
   	border-bottom:1.0pt solid windowtext;
   	border-left:none;}
-
+td{
+white-space:normal;
+}
   </style>
 
   </head>
@@ -1364,8 +1358,8 @@ td{
   <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:
    collapse;table-layout:fixed;">
    <colgroup><col width="64" span="7" style="width:48pt">
-   </colgroup><tbody><tr height="19" style="height:14.4pt">
-    <td height="19" class="xl104" width="64" style="height:14.4pt;width:48pt">&nbsp;</td>
+   </colgroup><tbody><tr  style="height:14.4pt">
+    <td  class="xl104" width="64" style="height:14.4pt;width:48pt">&nbsp;</td>
     <td class="xl105" width="64" style="width:48pt">&nbsp;</td>
     <td class="xl105" width="64" style="width:48pt">&nbsp;</td>
     <td class="xl105" width="64" style="width:48pt">&nbsp;</td>
@@ -1373,8 +1367,8 @@ td{
     <td class="xl105" width="64" style="width:48pt">&nbsp;</td>
     <td class="xl106" width="64" style="width:48pt">&nbsp;</td>
    </tr>
-   <tr height="19"  style="height:14.4pt;border-left: 1px solid black;">
-    <td height="19" style="height:14.4pt"  align="left" valign="top"><!--[if gte vml 1]><v:shapetype
+   <tr   style="height:14.4pt;border-left: 1px solid black;">
+    <td  style="height:14.4pt"  align="left" valign="top"><!--[if gte vml 1]><v:shapetype
      id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
      path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
      <v:stroke joinstyle="miter"/>
@@ -1504,12 +1498,11 @@ td{
     <td colspan="5" style="mso-ignore:colspan"></td>
     <td class="xl107">&nbsp;</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td height="19" class="xl65" style="height:14.4pt">&nbsp;</td>
+   <tr  style="height:14.4pt">
+    <td  class="xl65" style="height:14.4pt">&nbsp;</td>
     <td></td>
-    <td colspan="3" class="xl108">${
-      handlingType === "Arrival" ? "ARRIVAL" : "DEPARTURE"
-    } INFORMATION</td>
+    <td colspan="3" class="xl108">${handlingType === "Arrival" ? "ARRIVAL" : "DEPARTURE"
+		} INFORMATION</td>
     <td></td>
     <td class="xl107">&nbsp;</td>
    </tr>
@@ -1520,100 +1513,94 @@ td{
     <td class="xl66">&nbsp;</td>
     <td class="xl67">&nbsp;</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl68" style="border-right:.5pt solid black; border-left:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl68" style="border-right:.5pt solid black; border-left:.5pt solid black;
     height:14.4pt">NAME</td>
     <td colspan="3" class="xl70" style="border-right:1.0pt solid black;border-left:
     none">DATE</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">DATE</td>
     <td colspan="3" class="xl76" style="border-right:1.0pt solid black;border-left:
     none">${handlingType === "Arrival" ? arrivalDate : departureDate}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">FLIGHT NO.</td>
     <td colspan="3" class="xl79" style="border-right:1.0pt solid black;border-left:
     none">${flightNumber}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">OPERATOR</td>
     <td colspan="3" class="xl80" style="border-right:1.0pt solid black;border-left:
     none">${operatorName}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">ROUTE</td>
     <td colspan="3" class="xl83" style="border-right:1.0pt solid black;border-left:
-    none">${
-      handlingType === "Arrival"
-        ? `${arrival.from}-${config.defaultAirport}`
-        : `${config.defaultAirport}-${departure.to}`
-    }</td>
+    none">${handlingType === "Arrival"
+			? `${arrival.from}-${config.defaultAirport}`
+			: `${config.defaultAirport}-${departure.to}`
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">A/C REG</td>
     <td colspan="3" class="xl83" style="border-right:1.0pt solid black;border-left:
     none">${aircraftRegistration}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">A/C TYPE</td>
     <td colspan="3" class="xl83" style="border-right:1.0pt solid black;border-left:
     none">${aircraftType}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">MTOW (kg)</td>
     <td colspan="3" class="xl83" style="border-right:1.0pt solid black;border-left:
     none">${mtow}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">CREW No.</td>
     <td colspan="3" class="xl80" style="border-right:1.0pt solid black;border-left:
-    none">${
-      handlingType === "Arrival" ? arrival.crewNumber : departure.crewNumber
-    }</td>
+    none">${handlingType === "Arrival" ? arrival.crewNumber : departure.crewNumber
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">PAX No.</td>
     <td colspan="3" class="xl80" style="border-right:1.0pt solid black;border-left:
-    none">${
-      handlingType === "Departure"
-        ? Number(departure?.adultCount) + Number(departure?.minorCount)
-        : Number(arrival?.adultCount) + Number(arrival?.minorCount)
-    }</td>
+    none">${handlingType === "Departure"
+			? Number(departure?.adultCount) + Number(departure?.minorCount)
+			: Number(arrival?.adultCount) + Number(arrival?.minorCount)
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">CARGO</td>
     <td colspan="3" class="xl80" style="border-right:1.0pt solid black;border-left:
-    none">${
-      handlingType === "Arrival" ? arrival.cargoInfo : departure.cargoInfo
-    }</td>
+    none">${handlingType === "Arrival" ? arrival.cargoInfo : departure.cargoInfo
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="4" height="19" class="xl73" style="border-right:.5pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="4"  class="xl73" style="border-right:.5pt solid black;
     height:14.4pt">MAIL</td>
     <td colspan="3" class="xl84" style="border-right:1.0pt solid black;border-left:
-    none">${
-      handlingType === "Arrival" ? arrival.mailInfo : departure.mailInfo
-    }</td>
+    none">${handlingType === "Arrival" ? arrival.mailInfo : departure.mailInfo
+		}</td>
    </tr>
    <tr height="20" style="height:15.0pt">
     <td colspan="4" height="20" class="xl87" style="height:15.0pt">SPECIAL</td>
-    <td colspan="3" class="xl89" style="border-right:1.0pt solid black">${
-      handlingType === "Arrival" ? arrival.specialInfo : departure.specialInfo
-    }</td>
+    <td colspan="3" class="xl89" style="border-right:1.0pt solid black">${handlingType === "Arrival" ? arrival.specialInfo : departure.specialInfo
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td height="19" class="xl92" style="height:14.4pt;border-top:none">REMARKS</td>
+   <tr  style="height:14.4pt">
+    <td  class="xl92" style="height:14.4pt;border-top:none">REMARKS</td>
     <td class="xl93"></td>
     <td class="xl93"></td>
     <td class="xl93"></td>
@@ -1621,45 +1608,43 @@ td{
     <td class="xl93"></td>
     <td class="xl94">&nbsp;</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
     <td colspan="7" rowspan="6" height="115" class="xl95" style="border-right:1.0pt solid black;
-    border-bottom:1.0pt solid black;height:87.0pt">${
-      handlingType === "Arrival" ? arrival.remarksInfo : departure.remarksInfo
-    }</td>
+    border-bottom:1.0pt solid black;height:87.0pt">${handlingType === "Arrival" ? arrival.remarksInfo : departure.remarksInfo
+		}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
    <tr height="20" style="height:15.0pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
-    <td colspan="7" height="19" class="xl101" style="border-right:1.0pt solid black;
+   <tr  style="height:14.4pt">
+    <td colspan="7"  class="xl101" style="border-right:1.0pt solid black;
     height:14.4pt">PILOT IN COMMAND</td>
    </tr>
-   <tr height="19" style="mso-height-source:userset;height:14.4pt">
+   <tr  style="mso-height-source:userset;height:14.4pt">
     <td colspan="3" rowspan="2" height="38" class="xl109" style="border-bottom:.5pt solid black;
     height:28.8pt">NAME<span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;</span></td>
     <td colspan="4" rowspan="2" class="xl110" style="border-right:1.0pt solid black;
     border-bottom:.5pt solid black">${crew?.name}</td>
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
     <td colspan="2" rowspan="4" height="77" class="xl109" style="border-bottom:1.0pt solid black;
     height:58.2pt">SIGNATURE</td>
     <td colspan="5" rowspan="4" class="xl110" style="border-right:1.0pt solid black;
-    border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${
-      flight?.crew?.signature
-    }"></td>
+    border-bottom:1.0pt solid black"><img width="150" height="50" src="data:image/png;base64,${flight?.crew?.signature
+		}"></td>
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
-   <tr height="19" style="height:14.4pt">
+   <tr  style="height:14.4pt">
    </tr>
    <tr height="20" style="height:15.0pt">
    </tr>

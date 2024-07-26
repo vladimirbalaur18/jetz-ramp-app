@@ -49,7 +49,7 @@ export default function App() {
       printToFile({
         html: chargeNoteTemplateHTML({ ...existingFlightJSON, ...data }),
         fileName: pdfName,
-        width: 485,
+        width: 585,
         height: 742,
       }).then(() => setIsLoading(false));
     } catch (e) {
