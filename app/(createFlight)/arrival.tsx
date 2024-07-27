@@ -51,11 +51,21 @@ const Form: React.FC = () => {
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
   );
+  if (!currentFlightId)
+    throw new Error(
+      "There was an error initiailzing currentFlightId on arrival page. Reload the app."
+    );
+
   const realm = useRealm();
   const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
+  if (!_existingFlight)
+    throw new Error(
+      "There was an error initiailzing the existing flight frmo database on arrival page. Reload the app."
+    );
 
   const dispatch = useDispatch();
   const snackbar = useSnackbar();
+
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
       mode: "onBlur",
@@ -106,50 +116,48 @@ const Form: React.FC = () => {
           from: data.arrival.from?.toLocaleUpperCase(),
         });
 
-        if (_existingFlight?.arrival) {
-          if (_.isEqual(_existingFlight.toJSON(), data)) {
-            _existingFlight.arrival = arrival;
-          } else {
-            if (
-              (!_.isEqual(
-                (_existingFlight.toJSON() as IFlight).arrival.arrivalDate,
-                data.arrival.arrivalDate
-              ) ||
-                !_.isEqual(
-                  (_existingFlight.toJSON() as IFlight).arrival.arrivalTime,
-                  data.arrival.arrivalTime
-                )) &&
-              _existingFlight.providedServices
-            ) {
-              alert(
-                "Airport fees were reset due to arrival date / time updated"
-              );
-              if (
-                _existingFlight.providedServices?.supportServices?.airportFee
-              ) {
-                _existingFlight.providedServices.supportServices.airportFee =
-                  undefined;
-              }
-            }
+        if (_existingFlight) {
+          _existingFlight.arrival = arrival;
+        } else
+          throw new Error(
+            "Couldn't retrieve the existing flight from the database. Create a new flight."
+          );
 
-            if (
+        if (_existingFlight?.arrival) {
+          if (
+            (!_.isEqual(
+              (_existingFlight.toJSON() as IFlight).arrival.arrivalDate,
+              data.arrival.arrivalDate
+            ) ||
               !_.isEqual(
-                (_existingFlight.toJSON() as IFlight).arrival.isLocalFlight,
-                data.arrival.isLocalFlight
-              ) &&
-              _existingFlight.providedServices
-            ) {
-              alert(
-                "Basic handling fees were recalculated due to local flight param being changed"
-              );
-              if (_existingFlight?.providedServices)
-                _existingFlight.providedServices.basicHandling = undefined;
+                (_existingFlight.toJSON() as IFlight).arrival.arrivalTime,
+                data.arrival.arrivalTime
+              )) &&
+            _existingFlight.providedServices
+          ) {
+            alert("Airport fees were reset due to arrival date / time updated");
+            if (_existingFlight.providedServices?.supportServices?.airportFee) {
+              _existingFlight.providedServices.supportServices.airportFee =
+                undefined;
             }
           }
-        } else if (_existingFlight) {
-          _existingFlight.arrival = arrival;
+
+          if (
+            !_.isEqual(
+              (_existingFlight.toJSON() as IFlight).arrival.isLocalFlight,
+              data.arrival.isLocalFlight
+            ) &&
+            _existingFlight.providedServices
+          ) {
+            alert(
+              "Basic handling fees were recalculated due to local flight param being changed"
+            );
+            if (_existingFlight?.providedServices)
+              _existingFlight.providedServices.basicHandling = undefined;
+          }
         }
       });
+
       dispatch(
         setCurrentFlightById(_existingFlight?.toJSON().flightId as string)
       );
@@ -161,7 +169,11 @@ const Form: React.FC = () => {
           : "/(createFlight)/departure"
       );
     } catch (e) {
-      Alert.alert("Error saving arrival data", JSON.stringify(e, null, 5));
+      Alert.alert(
+        "Error saving arrival data",
+        //@ts-expect-error
+        e?.message || JSON.stringify(e, null)
+      );
       throw e;
     }
   };

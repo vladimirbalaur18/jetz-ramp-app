@@ -44,8 +44,16 @@ const Form: React.FC = () => {
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
   );
+  if (!currentFlightId)
+    throw new Error(
+      "There was an error initiailzing currentFlightId on departure page. Reload the app."
+    );
   const realm = useRealm();
   const _existingFlight = _selectCurrentFlight(currentFlightId || ""); // alert(JSON.stringLUKify(currentFlight));
+  if (!_existingFlight)
+    throw new Error(
+      "There was an error initiailzing the existing flight frmo database on departure page. Reload the app."
+    );
 
   const { control, formState, handleSubmit, getValues, watch } =
     useForm<FormData>({
@@ -171,8 +179,9 @@ const Form: React.FC = () => {
       router.navigate("/(createFlight)/providedServices");
     } catch (e) {
       Alert.alert(
-        "Error saving departure information",
-        JSON.stringify(e, null, 2)
+        "Error saving departure data",
+        //@ts-expect-error
+        e?.message || JSON.stringify(e, null)
       );
       throw e;
     }

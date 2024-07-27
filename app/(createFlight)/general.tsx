@@ -154,13 +154,11 @@ const Form: React.FC = () => {
           console.warn(
             "Resetting disbursement fees due to change of percentage"
           );
-          realm.write(
-            () =>
-              realmExistingFlight.providedServices &&
-              realm.delete(
-                realmExistingFlight.providedServices?.disbursementFees
-              )
-          );
+          realm.write(() => {
+            if (realmExistingFlight.providedServices) {
+              realmExistingFlight.providedServices.disbursementFees = undefined;
+            }
+          });
         }
         realm.write(() => {
           realmExistingFlight.aircraftRegistration =
@@ -194,7 +192,12 @@ const Form: React.FC = () => {
           realmExistingFlight.scheduleType = data?.scheduleType;
           realmExistingFlight.status = data?.status;
         });
-        dispatch(setCurrentFlightById(data.flightId as any));
+
+        dispatch(
+          setCurrentFlightById(
+            (realmExistingFlight?.toJSON() as IFlight)?.flightId as string
+          )
+        );
       }
       snackbar.showSnackbar("General details saved successfully");
 
@@ -206,8 +209,9 @@ const Form: React.FC = () => {
       );
     } catch (e) {
       Alert.alert(
-        "Error saving general flight details",
-        JSON.stringify(e, null, 2)
+        "Error saving generak data",
+        //@ts-expect-error
+        e?.message || JSON.stringify(e, null)
       );
     }
   };

@@ -79,8 +79,17 @@ const Form: React.FC = () => {
   const currentFlightId = useSelector(
     (state: RootState) => state?.flights.currentFlightId
   );
+
+  if (!currentFlightId)
+    throw new Error(
+      "There was an error initiailzing currentFlightId on providedServices page. Reload the app."
+    );
   const [general] = useQuery<GeneralConfigState>("General");
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
+  if (!realmExistingFlight)
+    throw new Error(
+      "There was an error initiailzing the existing flight from database on providedServices page. Reload the app."
+    );
   const existingFlight = realmExistingFlight?.toJSON() as IFlight;
 
   console.log(
@@ -465,27 +474,7 @@ const Form: React.FC = () => {
               <IconButton
                 icon="information"
                 size={16}
-                onPress={() =>
-                  // Alert.alert(
-                  //   "Airport fee details:",
-                  //   `Take-off: ${airportFeesDetails.takeOff.toFixed(
-                  //     2
-                  //   )}\nSecurity: ${airportFeesDetails.security.toFixed(
-                  //     2
-                  //   )} \nPassengers: ${airportFeesDetails.passengers.toFixed(
-                  //     2
-                  //   )} \nParking: ${airportFeesDetails.parking.toFixed(
-                  //     2
-                  //   )} \nLanding: ${airportFeesDetails.takeOff.toFixed(2)}`,
-                  //   [
-                  //     {
-                  //       text: "OK",
-                  //     },
-                  //   ],
-                  //   { cancelable: true }
-                  // )
-                  setAirportFeeModalVisible(true)
-                }
+                onPress={() => setAirportFeeModalVisible(true)}
               />
             </View>
 

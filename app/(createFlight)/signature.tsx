@@ -69,7 +69,11 @@ const SignaturePage = () => {
         });
       router.navigate("(tabs)/chargeNote");
     } catch (e) {
-      Alert.alert("Error saving signature", JSON.stringify(e, null, 5));
+      Alert.alert(
+        "Error saving signature ",
+        //@ts-expect-error
+        e?.message || JSON.stringify(e, null)
+      );
     }
   };
 
