@@ -16,26 +16,20 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { DatePickerInput, TimePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
-import { ErrorBoundaryProps, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import REGEX from "@/utils/regexp";
-import {
-  setCurrentFlightById,
-  updateFlight,
-} from "@/redux/slices/flightsSlice";
+import { setCurrentFlightById } from "@/redux/slices/flightsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _ from "lodash";
 import { IFlight } from "@/models/Flight";
-import { IProvidedServices } from "@/models/ProvidedServices";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useRealm } from "@realm/react";
 import { IArrival, IDeparture } from "@/models/DepartureArrival";
 import { ITime } from "@/models/Time";
 import { IRampInspection } from "@/models/RampInspection";
-import { IRampAgent, RampAgent } from "@/models/RampAgentName";
-import { IChargeNoteDetails } from "@/models/ChargeNoteDetails";
+import { IRampAgent } from "@/models/RampAgentName";
 import { formatTime } from "@/utils/formatTime";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";

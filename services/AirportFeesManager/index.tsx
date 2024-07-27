@@ -16,6 +16,7 @@ import { IFlight } from "@/models/Flight";
 import { Dayjs } from "dayjs";
 import { IAirportFees } from "@/models/AirportFees";
 import { AirportSubFeeTotal } from "./types";
+import { round } from "lodash";
 
 const applyWinterSummerQuota = (
   fullArrivalDateTime: Dayjs,
@@ -48,7 +49,7 @@ export const getFuelFeeAmount = ({
     Number(flight?.chargeNote?.currency?.euroToMDL)
   );
   const fuelTons = ((fuelDensity || 0) * (fuelLitersQuantity || 0)) / 1000;
-  const fuelEURAmount = priceEURPerTon * fuelTons;
+  const fuelEURAmount = round(priceEURPerTon * fuelTons, 2);
 
   return VATRateMultiplier * fuelEURAmount;
 };
@@ -68,23 +69,26 @@ export const getLandingFees = (flight: IFlight): AirportSubFeeTotal => {
   const fullArrivalDateTime = getParsedDateTime(arrivalDate, arrivalTime);
   const mtowTons = getFlightMTOWinTons(flight);
 
-  const total = flight.isCommercialFlight
-    ? mtowTons *
-      AirportFees.commercial.landingFee.perTon *
-      applyWinterSummerQuota(
-        fullArrivalDateTime,
-        AirportFees.commercial.landingFee.summerPeriodQuotaPercentage || 0,
-        AirportFees.commercial.landingFee.winterPeriodQuotaPercentage || 0
-      )
-    : isLightAircraft(flight)
-    ? mtowTons * AirportFees.nonCommercial.landingFee.lightAircraft
-    : mtowTons *
-      AirportFees.nonCommercial.landingFee.perTon *
-      applyWinterSummerQuota(
-        fullArrivalDateTime,
-        AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage || 0,
-        AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage || 0
-      );
+  const total = round(
+    flight.isCommercialFlight
+      ? mtowTons *
+          AirportFees.commercial.landingFee.perTon *
+          applyWinterSummerQuota(
+            fullArrivalDateTime,
+            AirportFees.commercial.landingFee.summerPeriodQuotaPercentage || 0,
+            AirportFees.commercial.landingFee.winterPeriodQuotaPercentage || 0
+          )
+      : isLightAircraft(flight)
+      ? mtowTons * AirportFees.nonCommercial.landingFee.lightAircraft
+      : mtowTons *
+        AirportFees.nonCommercial.landingFee.perTon *
+        applyWinterSummerQuota(
+          fullArrivalDateTime,
+          AirportFees.nonCommercial.landingFee.summerPeriodQuotaPercentage || 0,
+          AirportFees.nonCommercial.landingFee.winterPeriodQuotaPercentage || 0
+        ),
+    2
+  );
 
   const isLandingLegInternal = flight?.arrival?.isLocalFlight;
 
@@ -115,23 +119,26 @@ export const getTakeOffFees = (flight: IFlight): AirportSubFeeTotal => {
   const mtowTons = getFlightMTOWinTons(flight);
   const { departureDate, departureTime } = flight?.departure;
   const fullDepartureDateTime = getParsedDateTime(departureDate, departureTime);
-  const total = flight?.isCommercialFlight
-    ? mtowTons *
-      AirportFees.commercial.takeoffFee.perTon *
-      applyWinterSummerQuota(
-        fullDepartureDateTime,
-        AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage || 0,
-        AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage || 0
-      )
-    : isLightAircraft(flight)
-    ? mtowTons * AirportFees.nonCommercial.takeoffFee.lightAircraft
-    : mtowTons *
-      AirportFees.nonCommercial.takeoffFee.perTon *
-      applyWinterSummerQuota(
-        fullDepartureDateTime,
-        AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage || 0,
-        AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage || 0
-      );
+  const total = round(
+    flight?.isCommercialFlight
+      ? mtowTons *
+          AirportFees.commercial.takeoffFee.perTon *
+          applyWinterSummerQuota(
+            fullDepartureDateTime,
+            AirportFees.commercial.takeoffFee.summerPeriodQuotaPercentage || 0,
+            AirportFees.commercial.takeoffFee.winterPeriodQuotaPercentage || 0
+          )
+      : isLightAircraft(flight)
+      ? mtowTons * AirportFees.nonCommercial.takeoffFee.lightAircraft
+      : mtowTons *
+        AirportFees.nonCommercial.takeoffFee.perTon *
+        applyWinterSummerQuota(
+          fullDepartureDateTime,
+          AirportFees.nonCommercial.takeoffFee.summerPeriodQuotaPercentage || 0,
+          AirportFees.nonCommercial.takeoffFee.winterPeriodQuotaPercentage || 0
+        ),
+    2
+  );
 
   const isDepartureLegInternal = flight?.departure?.isLocalFlight;
 
@@ -162,7 +169,7 @@ export const getPassengersFee = (flight: IFlight): AirportSubFeeTotal => {
 
   const paxCount =
     getPassengerCount(flight?.arrival) + getPassengerCount(flight?.departure);
-  const total = feePerPax * paxCount;
+  const total = round(feePerPax * paxCount, 2);
 
   const isAnyOfLegsInternal =
     flight?.departure?.isLocalFlight || flight?.arrival?.isLocalFlight;
@@ -195,10 +202,12 @@ export const getSecurityFee = (flight: IFlight) => {
   if (!securityFeePerPax) throw new Error("Security fee per pax is undefined");
   if (!securityFeePerTon) throw new Error("Security fee per ton is undefined");
 
-  const total =
+  const total = round(
     departingPax > 0
       ? securityFeePerPax * departingPax
-      : securityFeePerTon * mtowTons;
+      : securityFeePerTon * mtowTons,
+    2
+  );
 
   const isDepartureLegInternal = flight?.departure?.isLocalFlight;
 
@@ -227,10 +236,12 @@ export const getParkingFee = (flight: IFlight): AirportSubFeeTotal => {
     : AirportFees.nonCommercial.parkingDay.perTon;
 
   if (!feePerTon) throw new Error("Parking fee per ton is undefined");
-  const total =
+  const total = round(
     hours <= FREE_PARKING_HOURS //first 3 hours of parking are free
       ? 0
-      : days * mtowTons * feePerTon;
+      : days * mtowTons * feePerTon,
+    2
+  );
 
   const applyVATCondition = false; //TODO: check with client
   return {
