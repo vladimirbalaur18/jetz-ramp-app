@@ -20,6 +20,7 @@ import { useRealm } from "@realm/react";
 import { IAppData } from "@/models/AppData";
 import { JetzSvg } from "@/components/JetzSVG";
 import { useTheme } from "@react-navigation/native";
+import { errorPrint } from "@/utils/errorPrint";
 
 type FormData = {
   password: string;
@@ -46,7 +47,7 @@ const Page = () => {
       });
       router.navigate("/(drawer)/config");
     } catch (e) {
-      Alert.alert("Error saving master password", JSON.stringify(e, null, 5));
+      errorPrint("Error saving master password", e);
     }
   };
   return (

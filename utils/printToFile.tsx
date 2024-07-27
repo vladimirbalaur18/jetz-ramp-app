@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as Print from "expo-print";
 import { shareAsync, isAvailableAsync } from "expo-sharing";
+import { errorPrint } from "./errorPrint";
 
 const printToFile = async ({
   html = "",
@@ -68,10 +69,7 @@ const printToFile = async ({
       } else alert("Cannot save due to lack of permissions");
     } else alert("File cannot be generated. Invalid platform");
   } catch (e) {
-    Alert.alert(
-      "Unexpected error occured during file generation",
-      JSON.stringify(e, null, 2)
-    );
+    errorPrint("Unexpected error occured during file generation", e);
   }
 };
 export default printToFile;

@@ -8,6 +8,7 @@ import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
+import { errorPrint } from "@/utils/errorPrint";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
 import { useTheme } from "@react-navigation/native";
@@ -69,11 +70,7 @@ const SignaturePage = () => {
         });
       router.navigate("(tabs)/chargeNote");
     } catch (e) {
-      Alert.alert(
-        "Error saving signature ",
-        //@ts-expect-error
-        e?.message || JSON.stringify(e, null)
-      );
+      errorPrint("Error saving signature ", e);
     }
   };
 

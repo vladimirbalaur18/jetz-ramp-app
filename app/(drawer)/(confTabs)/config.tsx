@@ -12,6 +12,7 @@ import {
   replaceCommaWithDot,
 } from "@/utils/numericInputFormatter";
 import REGEX from "@/utils/regexp";
+import { SafeNumber } from "@/utils/SafeNumber";
 import { useQuery, useRealm } from "@realm/react";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -209,7 +210,7 @@ const Form: React.FC = () => {
                 label="Fuel price USD per KG"
                 style={styles.input}
                 inputMode="numeric"
-                value={String(value)}
+                value={SafeNumber(value)}
                 onBlur={onBlur}
                 onChangeText={(value) => onChange(replaceCommaWithDot(value))}
                 error={errors?.priceUSDperKG && true}

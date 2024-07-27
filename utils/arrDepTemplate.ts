@@ -80,7 +80,9 @@ td
 	mso-background-source:auto;
 	mso-pattern:auto;
 	mso-protection:locked visible;
-	white-space:nowrap;
+	white-space:normal;
+	overflow-wrap: break-word;
+	word-break: break-all;
 	mso-rotate:0;}
 .xl65
 	{mso-style-parent:style0;
@@ -609,7 +611,8 @@ td
 
 td{
 white-space:normal;
-}
+	overflow-wrap: break-word;
+	word-break: break-all;}
 </style>
 
 </head>
@@ -1348,7 +1351,8 @@ white-space:normal;
   	border-left:none;}
 td{
 white-space:normal;
-}
+	overflow-wrap: break-word;
+	word-break: break-all;}
   </style>
 
   </head>

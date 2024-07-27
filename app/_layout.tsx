@@ -21,11 +21,6 @@ import merge from "deepmerge";
 import { useColorScheme } from "@/components/useColorScheme";
 import { AppDispatch, RootState, store } from "@/redux/store";
 import { RealmProvider, useQuery, useRealm } from "@realm/react";
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
 import { enGB, registerTranslation } from "react-native-paper-dates";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { realmConfig, realmWithoutSync } from "@/realm";
@@ -109,9 +104,9 @@ function RootLayoutNav() {
   const currentFlightId = useSelector(
     (state: RootState) => state.flights.currentFlightId
   );
-  const currentFlightNumber = _selectCurrentFlight(
-    currentFlightId || ""
-  )?.toJSON()?.flightNumber;
+  const currentFlightNumber = currentFlightId
+    ? _selectCurrentFlight(currentFlightId || "")?.toJSON()?.flightNumber
+    : undefined;
   const [configs] = realmWithoutSync.objects("General");
   const [AppData] = realmWithoutSync.objects("AppData").toJSON() as IAppData[];
   const [AirportFees] = realmWithoutSync.objects<IAirportFees>("AirportFees");

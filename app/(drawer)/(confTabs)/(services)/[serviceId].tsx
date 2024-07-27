@@ -21,6 +21,7 @@ import {
   TextInput,
   useTheme,
 } from "react-native-paper";
+import { errorPrint } from "@/utils/errorPrint";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
@@ -70,7 +71,7 @@ const Form: React.FC = () => {
         router.back();
       });
     } catch (e) {
-      Alert.alert("Error trying to remove service", JSON.stringify(e, null, 5));
+      errorPrint("Error trying to remove service", e);
     }
   };
   const handleServiceSubmit = () => {
@@ -86,7 +87,7 @@ const Form: React.FC = () => {
         }
       });
     } catch (e) {
-      Alert.alert("Error trying to update service", JSON.stringify(e, null, 5));
+      errorPrint("Error trying to update service", e);
     }
   };
   const disableField = scope === "view";

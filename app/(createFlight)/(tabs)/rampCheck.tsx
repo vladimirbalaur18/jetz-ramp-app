@@ -6,6 +6,7 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
 import ArrDepTemplateRenderHTML from "@/utils/arrDepTemplate";
+import { errorPrint } from "@/utils/errorPrint";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import printToFile from "@/utils/printToFile";
@@ -53,10 +54,7 @@ export default function Page() {
         }
       });
     } catch (e) {
-      Alert.alert(
-        "Error saving data to ramp checklist",
-        JSON.stringify(e, null, 5)
-      );
+      errorPrint("Error submitting ramp checklist", e);
     }
   };
 
@@ -89,28 +87,25 @@ export default function Page() {
   });
 
   useEffect(() => {
-    const areThereFieldsToRender =
-      fields?.length <=
-      existingFlightJSON!.providedServices!.otherServices!.filter(
-        (s) => s && s.isUsed
-      ).length;
+    if (fields?.length) remove();
+    if (existingFlightJSON?.providedServices?.otherServices) {
+      console.warn(
+        "@rampCheck provided services",
+        JSON.stringify(existingFlightJSON.providedServices.otherServices, null)
+      );
+      append([
+        ...existingFlightJSON.providedServices.otherServices.map((s) => ({
+          service: s.service,
+          isUsed: s.isUsed,
+          isPriceOverriden: s.isPriceOverriden,
+          quantity: s.isPriceOverriden ? 1 : s.quantity,
+          notes: s.notes || "",
+        })),
+      ]);
+    }
 
-    areThereFieldsToRender &&
-      existingFlightJSON?.providedServices?.otherServices?.forEach((s) => {
-        s.isUsed &&
-          append({
-            service: s.service,
-            isUsed: s.isUsed,
-            isPriceOverriden: s.isPriceOverriden,
-            quantity: s.isPriceOverriden ? 1 : s.quantity,
-            notes: s.notes || "",
-          });
-      });
-
-    return () => {
-      remove();
-    };
-  }, [JSON.stringify(realmExistingFlight?.toJSON())]);
+    return () => remove();
+  }, [JSON.stringify(realmExistingFlight?.toJSON(), null)]);
 
   const { errors } = formState;
   return (

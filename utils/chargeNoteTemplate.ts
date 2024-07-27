@@ -11,7 +11,10 @@ import dayjs from "dayjs";
 import convertCurrency from "./convertCurrency";
 import getParsedDateTime from "./getParsedDateTime";
 import { IFlight } from "@/models/Flight";
-import { getDisbursedServices, getTotalDisbursementFees } from "@/services/totalsCalculator";
+import {
+	getDisbursedServices,
+	getTotalDisbursementFees,
+} from "@/services/totalsCalculator";
 
 type ChargeListService = {
 	serviceName: string;
@@ -60,12 +63,18 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 		return result;
 	})();
 
-	const disbursedServices = getDisbursedServices(flight?.providedServices, flight)
-	const totalDisbursementFeesAmount = getTotalDisbursementFees(flight?.providedServices, flight)
+	const disbursedServices = getDisbursedServices(
+		flight?.providedServices,
+		flight
+	);
+	const totalDisbursementFeesAmount = getTotalDisbursementFees(
+		flight?.providedServices,
+		flight
+	);
 
 	console.warn("Disbursed services", JSON.stringify(disbursedServices, null));
 
-	console.log(totalDisbursementFeesAmount)
+	console.log(totalDisbursementFeesAmount);
 	if (
 		basicHandlingWithVAT &&
 		!flight?.providedServices!.basicHandling?.isPriceOverriden
@@ -111,7 +120,6 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 				});
 		}
 	});
-
 
 	const VIPTerminalPrice = getLoungeFeePrice({
 		...flight?.providedServices?.VIPLoungeServices,
@@ -305,9 +313,11 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 				}
 			);
 		} else
-			return alert("Something wrong occured while loading disbursement fees. They're not initialized from provided services");
+			return alert(
+				"Something wrong occured while loading disbursement fees. They're not initialized from provided services"
+			);
 
-		disbursedServices.map(disbursedService => {
+		disbursedServices.map((disbursedService) => {
 			resultHTML += `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
   <td class="xl134" colspan="2" style="mso-ignore:colspan">${disbursedService?.serviceName
@@ -320,8 +330,8 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
 					disbursedService?.total
 				).toFixed(2)}</td>
- </tr>`
-		})
+ </tr>`;
+		});
 		return resultHTML;
 	};
 	const servicesTotalAmountNoVAT =
@@ -426,6 +436,8 @@ td
 	mso-pattern:auto;
 	mso-protection:locked visible;
 	white-space:normal;
+	overflow-wrap: break-word;
+	word-break: break-word;
 	mso-rotate:0;}
 .xl65
 	{mso-style-parent:style0;
@@ -2609,8 +2621,7 @@ height="90" width="180" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAA
   <td class="xl66"></td>
  </tr>
  <tr height="19" style="height:16.4pt">
-  <td colspan="2" height="19" class="xl65" style="height:16.4pt">Chisinau, Republic
-  of Moldova</td>
+  <td colspan="3" height="19" class="xl65" style="height:16.4pt">Chisinau, Republic of Moldova</td>
   <td class="xl65"></td>
   <td class="xl71"></td>
   <td class="xl71"></td>
@@ -2622,9 +2633,8 @@ height="90" width="180" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWQAA
  <tr height="20" style="height:15.0pt">
   <td colspan="2" height="20" class="xl68" style="height:15.0pt">CHARGE NOTE No.</td>
   <td class="xl72">${dayjs().format("DD/MMM/YY")} //</td>
-  <td class="xl65" >${flight?.aircraftRegistration || ""}</td>
+  <td class="xl65" colspan="2" >${flight?.aircraftRegistration || ""}</td>
   <td class="xl74">// ${dayjs().format("HHmmss")}</td>
-  <td class="xl65"></td>
   <td class="xl65"></td>
   <td class="xl65"></td>
   <td class="xl66"></td>

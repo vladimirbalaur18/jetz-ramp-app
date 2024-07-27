@@ -126,8 +126,8 @@ const TotalServicesSection: React.FC<{
           : Number(loungeFeeAmount)) +
         Number(catering.total) +
         Number(HOTAC.total) +
-        Number(airportFee.total) +
-        Number(basicHandling.total) +
+        Number(airportFee?.total) +
+        Number(basicHandling?.total) +
         calculateOtherServicesTotal() +
         getTotalDisbursementFees(providedServices, existingFlight)
     );
@@ -246,22 +246,22 @@ const TotalServicesSection: React.FC<{
         Disbursement fees:
       </Text>
       <Text>
-        Airport fees: {Number(disbursementFees.airportFee).toFixed(2) || 0}
+        Airport fees: {Number(disbursementFees?.airportFee).toFixed(2) || 0}
         &euro;
       </Text>
       <Text>
-        HOTAC fees: {Number(disbursementFees.HOTACFee).toFixed(2) || 0}&euro;
+        HOTAC fees: {Number(disbursementFees?.HOTACFee).toFixed(2) || 0}&euro;
       </Text>
       <Text>
-        Catering fees: {Number(disbursementFees.cateringFee).toFixed(2) || 0}
+        Catering fees: {Number(disbursementFees?.cateringFee).toFixed(2) || 0}
         &euro;
       </Text>
       <Text>
-        Fuel fee: {Number(disbursementFees.fuelFee).toFixed(2) || 0}&euro;
+        Fuel fee: {Number(disbursementFees?.fuelFee).toFixed(2) || 0}&euro;
       </Text>
       <Text>
         Express/VIP Lounge fee:{" "}
-        {Number(disbursementFees.VIPLoungeFee).toFixed(2)}&euro;
+        {Number(disbursementFees?.VIPLoungeFee).toFixed(2)}&euro;
       </Text>
       {getDisbursedServices(providedServices, existingFlight).map(
         ({ serviceName, total }) => (

@@ -27,10 +27,6 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [searchVisible, setSearchVisible] = React.useState(false);
 
-  // const flightsArr = useSelector((state: RootState) =>
-  //   state.flights.flightsArray.filter((f) => f?.status !== "Completed")
-  // );
-
   const flightsArr = useQuery<IFlight>("Flight", (collection) =>
     collection.filtered("status != $0", "Completed")
   );

@@ -22,6 +22,7 @@ import { GeneralConfigState } from "@/models/Config";
 import { IFlight } from "@/models/Flight";
 import { realmWithoutSync } from "@/realm";
 import { Animated } from "react-native";
+import { errorPrint } from "@/utils/errorPrint";
 
 type Field = [
   label: ReactNode,
@@ -76,7 +77,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
     [
       "ETA:",
       <>
-        {dayjs(flight?.arrival?.arrivalDate).format("DD/MM/YYYY" || "N/A")}{" "}
+        {dayjs(flight?.arrival?.arrivalDate).format("DD/MM/YYYY")}{" "}
         {flight?.arrival?.arrivalTime
           ? formatFlightTime(flight?.arrival?.arrivalTime)
           : "N/A"}
@@ -169,10 +170,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
                         try {
                           realm.write(() => realm.delete(realmCurrentFlight));
                         } catch (e) {
-                          Alert.alert(
-                            "Error removing flight",
-                            JSON.stringify(e, null, 5)
-                          );
+                          errorPrint("Error removing flight", e);
                         }
                       }),
                     style: "destructive",
@@ -293,10 +291,7 @@ const FlightItem = ({ flight }: { flight: IFlight }) => {
                             realmCurrentFlight.status = "Completed";
                           });
                         } catch (e) {
-                          Alert.alert(
-                            "Error changing flight status",
-                            JSON.stringify(e, null, 5)
-                          );
+                          errorPrint("Error changing flight status", e);
                         }
                       }}
                       leadingIcon={() => (

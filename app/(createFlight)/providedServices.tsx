@@ -1,15 +1,13 @@
 import formStyles from "@/styles/formStyles";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, View, Alert } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 
 import SectionTitle from "@/components/FormUtils/SectionTitle";
 import TotalServicesSection from "@/components/TotalServicesSection";
 import { GeneralConfigState } from "@/models/Config";
-import { updateFlight } from "@/redux/slices/flightsSlice";
-import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
-import { RootState, useAppDispatch } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import { getFuelFeeAmount } from "@/services/AirportFeesManager";
-import { IService, Service } from "@/models/Services";
+import { Service } from "@/models/Services";
 import {
   getBasicHandlingPrice,
   getLoungeFeePrice,
@@ -26,7 +24,6 @@ import {
   Button,
   Divider,
   HelperText,
-  Icon,
   IconButton,
   Modal,
   Portal,
@@ -35,30 +32,24 @@ import {
   TextInput,
   useTheme,
 } from "react-native-paper";
-import DropDown from "react-native-paper-dropdown";
 import { useSelector } from "react-redux";
 import { IFlight } from "@/models/Flight";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
-import { IProvidedServices, ProvidedServices } from "@/models/ProvidedServices";
+import { IProvidedServices } from "@/models/ProvidedServices";
 import { IBasicHandling } from "@/models/BasicHandling";
 import { IVIPLoungeService } from "@/models/VIPLoungeService";
 import { ISupportServices } from "@/models/SupportServices";
-import { ObjectId } from "bson";
 import { IServiceCategory } from "@/models/ServiceCategory";
-import { IProvidedService, ProvidedService } from "@/models/ProvidedService";
-import uuid from "react-uuid";
+import { ProvidedService } from "@/models/ProvidedService";
 import {
   onlyIntNumber,
   replaceCommaWithDot,
 } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";
 import _ from "lodash";
-import { getDifferenceBetweenArrivalDeparture } from "@/services/AirportFeesManager/utils";
 import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import { SafeNumber } from "@/utils/SafeNumber";
-import { UpdateMode } from "realm";
-import { isLoading } from "expo-font";
 import { AirportSubFeeTotal } from "@/services/AirportFeesManager/types";
 type FormData = IFlight;
 
@@ -194,31 +185,38 @@ const Form: React.FC = () => {
   let providedServicesObj = watch("providedServices");
 
   useEffect(() => {
+    console.warn("Appending services");
+    if (fields && fields.length) remove();
     if (!existingFlight.providedServices) {
-      defaultServicesPerCategories.map((s) => {
-        append({
+      append([
+        ...defaultServicesPerCategories.map((s) => ({
           service: s,
           isUsed: false,
           isPriceOverriden: false,
           quantity: 0,
-        });
-      });
+        })),
+      ]);
     } else {
       let pushedServices: Record<string, boolean> = {};
-      existingFlight.providedServices.otherServices?.forEach((s) => {
-        if (s.service) {
-          append({
+
+      if (existingFlight?.providedServices?.otherServices) {
+        append([
+          ...existingFlight.providedServices.otherServices.map((s) => ({
             service: s.service,
             isUsed: s.isUsed,
             isPriceOverriden: s.isPriceOverriden,
             quantity: s.quantity,
             notes: s.notes || "",
             totalPriceOverride: s.totalPriceOverride,
-          });
+          })),
+        ]);
+      }
+      //loops through root services and see if there are some new services that didn't exist previously
+      existingFlight.providedServices.otherServices?.forEach((s) => {
+        if (s.service) {
           pushedServices[s?.service?.serviceName] = true;
         }
       });
-      //loops through root services and see if there are some new services that didn't exist previously
       defaultServicesPerCategories.map((s) => {
         if (!pushedServices[s?.serviceName]) {
           append({
@@ -285,7 +283,6 @@ const Form: React.FC = () => {
     }
   };
 
-  // HELPERS
   const submit = (data: IFlight) => {
     realm.write(() => {
       const providedServices = realm.create<IProvidedServices>(

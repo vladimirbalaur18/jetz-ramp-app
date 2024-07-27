@@ -33,6 +33,7 @@ import { IRampAgent } from "@/models/RampAgentName";
 import { formatTime } from "@/utils/formatTime";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";
+import { errorPrint } from "@/utils/errorPrint";
 type FormData = IFlight;
 
 export { ErrorBoundary } from "expo-router";
@@ -178,12 +179,7 @@ const Form: React.FC = () => {
 
       router.navigate("/(createFlight)/providedServices");
     } catch (e) {
-      Alert.alert(
-        "Error saving departure data",
-        //@ts-expect-error
-        e?.message || JSON.stringify(e, null)
-      );
-      throw e;
+      errorPrint("Error saving departure data", e);
     }
   };
 

@@ -45,6 +45,7 @@ import {
   replaceCommaWithDot,
 } from "@/utils/numericInputFormatter";
 import { useSnackbar } from "@/context/snackbarContext";
+import { errorPrint } from "@/utils/errorPrint";
 type FormData = IFlight;
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
@@ -207,11 +208,7 @@ const Form: React.FC = () => {
           : "/(createFlight)/arrival"
       );
     } catch (e) {
-      Alert.alert(
-        "Error saving generak data",
-        //@ts-expect-error
-        e?.message || JSON.stringify(e, null)
-      );
+      errorPrint("Error saving generak data", e);
     }
   };
 

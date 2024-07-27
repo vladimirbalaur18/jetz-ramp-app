@@ -6,6 +6,7 @@ import { useQuery, useRealm } from "@realm/react";
 import { ObjectId } from "bson";
 import { IOperatorInput, OperatorInput } from "@/components/OperatorInput";
 import { IFlight } from "@/models/Flight";
+import { errorPrint } from "@/utils/errorPrint";
 
 //issue: create button disappears when adding more than 2
 const BillingOperators = () => {
@@ -32,10 +33,7 @@ const BillingOperators = () => {
 
       setIsPendingItemCreate(false);
     } catch (e) {
-      Alert.alert(
-        "Error creating billing operator",
-        JSON.stringify(e, null, 5)
-      );
+      errorPrint("Error creating billing operator", e);
     }
   };
   const onFieldUpdatePress = ({
@@ -65,10 +63,7 @@ const BillingOperators = () => {
         }
       });
     } catch (e) {
-      Alert.alert(
-        "Error updating billing operator",
-        JSON.stringify(e, null, 5)
-      );
+      errorPrint("Error updating billing operator", e);
     }
   };
   const onFieldRemovePress = (id: Realm.BSON.ObjectId) => {
@@ -80,10 +75,7 @@ const BillingOperators = () => {
         realm.delete(removedField);
       });
     } catch (e) {
-      Alert.alert(
-        "Error removing billing operator",
-        JSON.stringify(e, null, 5)
-      );
+      errorPrint("Error removing billing operator", e);
     }
   };
   const onFieldDismissPress = (id: Realm.BSON.ObjectId) => {

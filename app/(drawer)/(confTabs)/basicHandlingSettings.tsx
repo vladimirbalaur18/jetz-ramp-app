@@ -24,6 +24,7 @@ import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import REGEX from "@/utils/regexp";
 import { useSnackbar } from "@/context/snackbarContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { errorPrint } from "@/utils/errorPrint";
 
 type FormData = {
   BasicHandlingFees: (IBasicHandlingRule & { alreadyExists: boolean })[];
@@ -77,97 +78,6 @@ const Form: React.FC = () => {
   };
   return (
     <SafeAreaView>
-      {/* <ScrollView
-        contentContainerStyle={styles.container}
-        alwaysBounceVertical={false}
-      >
-        <View style={styles.row}>
-          <Text variant="headlineSmall">Basic handling prices: </Text>
-        </View>
-        {fieldArray.fields.map((fee) => {
-          return (
-            <BasicHandlingInput
-              {...fee}
-              key={fee.id}
-              disabled={fee.alreadyExists}
-              onFieldCreatePress={() => {
-                showSnackbar("Rule created successfully");
-
-                setForceRender(forceRenderIndex + 1);
-                fieldArray.remove();
-              }}
-              onFieldUpdatePress={() => {
-                showSnackbar("Rule updated successfully");
-
-                setForceRender(forceRenderIndex + 1);
-                fieldArray.remove();
-              }}
-              onFieldRemovePress={() => {
-                const feeToRemove = basicHandlingFees.find(
-                  (f) =>
-                    f.maxMTOW == Number(fee.maxMTOW) &&
-                    f.minMTOW == Number(fee.minMTOW) &&
-                    f.pricePerLeg == Number(fee.pricePerLeg)
-                );
-                if (feeToRemove)
-                  Alert.alert(
-                    "Remove rule?",
-                    `Are you sure you want to remove this rule?`,
-                    [
-                      {
-                        text: "Confirm",
-                        onPress: () => {
-                          try {
-                            realm.write(() => {
-                              if (feeToRemove) {
-                                realm.delete(feeToRemove);
-                                showSnackbar(
-                                  "Rule has been removed successfully"
-                                );
-                                setSnackbarVisible(true);
-                              }
-                            });
-                          } catch (e) {
-                            Alert.alert(
-                              "Error trying to remove fee",
-                              JSON.stringify(e, null, 5)
-                            );
-                          }
-                        },
-                        style: "destructive",
-                      },
-                      {
-                        text: "Cancel",
-                        style: "cancel",
-                      },
-                    ],
-                    {
-                      cancelable: true,
-                    }
-                  );
-                fieldArray.remove();
-                setForceRender(forceRenderIndex + 1);
-              }} //removes all fields to re-render them again from the database accordingly from useEffect
-            />
-          );
-        })}
-        <Button
-          mode="elevated"
-          disabled={fieldArray.fields.at(-1)?.alreadyExists === false}
-          icon={"clipboard-plus-outline"}
-          onPress={() =>
-            fieldArray.append({
-              minMTOW: +Number(fieldArray.fields.at(-1)?.maxMTOW) + 1,
-              //@ts-expect-error: Passing empty data instead of type number
-              maxMTOW: "", //@ts-expect-error: Passing empty data instead of type number
-              pricePerLeg: "",
-              alreadyExists: false,
-            })
-          }
-        >
-          Add new rule
-        </Button>
-      </ScrollView> */}
       <FlatList
         // ref={flatListRef}
         ListHeaderComponent={() => (
@@ -221,10 +131,7 @@ const Form: React.FC = () => {
                               }
                             });
                           } catch (e) {
-                            Alert.alert(
-                              "Error trying to remove fee",
-                              JSON.stringify(e, null, 5)
-                            );
+                            errorPrint("Error trying to remove fee", e);
                           }
                         },
                         style: "destructive",
@@ -340,10 +247,7 @@ function BasicHandlingInput({
           setScope("view");
         });
       } catch (e) {
-        Alert.alert(
-          "Error creating basic handling rule",
-          JSON.stringify(e, null, 5)
-        );
+        errorPrint("Error creating basic handling rule", e);
       }
     }
   };
@@ -362,10 +266,7 @@ function BasicHandlingInput({
         });
         onFieldUpdatePress && onFieldUpdatePress();
       } catch (e) {
-        Alert.alert(
-          "Error trying to update basic handling fee",
-          JSON.stringify(e, null, 5)
-        );
+        errorPrint("Error trying to update basic handling fee", e);
       }
     });
   };

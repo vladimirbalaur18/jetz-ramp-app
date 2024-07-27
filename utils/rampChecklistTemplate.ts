@@ -193,8 +193,9 @@ td
 	mso-background-source:auto;
 	mso-pattern:auto;
 	mso-protection:locked visible;
-	white-space:normal;
-	mso-rotate:0;}
+white-space:normal;
+	overflow-wrap: break-word;
+	word-break: break-all;	mso-rotate:0;}
 .xl65
 	{mso-style-parent:style0;
 	font-size:10.0pt;

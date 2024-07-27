@@ -12,6 +12,7 @@ import {
 } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
+import { errorPrint } from "@/utils/errorPrint";
 import { formatTime } from "@/utils/formatTime";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import REGEX from "@/utils/regexp";
@@ -169,12 +170,7 @@ const Form: React.FC = () => {
           : "/(createFlight)/departure"
       );
     } catch (e) {
-      Alert.alert(
-        "Error saving arrival data",
-        //@ts-expect-error
-        e?.message || JSON.stringify(e, null)
-      );
-      throw e;
+      errorPrint("Error saving arrival data", e);
     }
   };
   const [arrivalTimerVisible, setArrivalTimerVisible] = React.useState(false);

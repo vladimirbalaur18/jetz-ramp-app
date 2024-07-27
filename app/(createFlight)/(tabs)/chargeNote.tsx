@@ -6,6 +6,7 @@ import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import formStyles from "@/styles/formStyles";
 import chargeNoteTemplateHTML from "@/utils/chargeNoteTemplate";
+import { errorPrint } from "@/utils/errorPrint";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import printToFile from "@/utils/printToFile";
 import _selectCurrentFlight from "@/utils/selectCurrentFlight";
@@ -53,7 +54,7 @@ export default function App() {
         height: 742,
       }).then(() => setIsLoading(false));
     } catch (e) {
-      Alert.alert("Error saving charge note", JSON.stringify(e, null, 5));
+      errorPrint("Error generating charge note", e);
     }
   };
 

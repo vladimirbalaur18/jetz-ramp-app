@@ -27,6 +27,7 @@ import { IService } from "@/models/Services";
 import { useSnackbar } from "@/context/snackbarContext";
 import uuid from "react-uuid";
 import { IServiceCategory } from "@/models/ServiceCategory";
+import { errorPrint } from "@/utils/errorPrint";
 const ERROR_MESSAGES = {
   REQUIRED: "This Field Is Required",
   NAME_INVALID: "Not a Valid Name",
@@ -72,7 +73,7 @@ const NewService: React.FC = () => {
             );
           });
         } catch (e) {
-          Alert.alert("Error creating service", JSON.stringify(e, null, 5));
+          errorPrint("Error creating service", e);
         }
       }
     }
@@ -197,12 +198,10 @@ const NewService: React.FC = () => {
                   categoryName: values.serviceCategoryName,
                 });
               });
+              showSnackbar("Category created successfully");
               setShowAddCategoryModal(false);
             } catch (e) {
-              Alert.alert(
-                "Error creating new service category",
-                JSON.stringify(e, null, 5)
-              );
+              errorPrint("Error creating new service category", e);
             }
           }}
         />

@@ -12,7 +12,9 @@ export const getDisbursedServices = (
     )
     .map((disbursedService) => {
       const getDisbursement = (price: any) =>
-        price * (1 / flight?.chargeNote?.disbursementPercentage);
+        flight?.chargeNote?.disbursementPercentage === 0
+          ? 0
+          : price * (1 / flight?.chargeNote?.disbursementPercentage);
       const withVATIfExists = (total: number) =>
         disbursedService?.service?.hasVAT ? total * getVATMultiplier() : total;
 

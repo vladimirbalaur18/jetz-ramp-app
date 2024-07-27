@@ -5,6 +5,7 @@ import { updateFlight } from "@/redux/slices/flightsSlice";
 import { selectCurrentFlight } from "@/redux/slices/flightsSlice/selectors";
 import { RootState } from "@/redux/store";
 import ArrDepTemplateRenderHTML from "@/utils/arrDepTemplate";
+import { errorPrint } from "@/utils/errorPrint";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import { onlyIntNumber } from "@/utils/numericInputFormatter";
 import printToFile from "@/utils/printToFile";
@@ -94,7 +95,7 @@ export default function Page() {
           }
         });
     } catch (e) {
-      Alert.alert("Error saving data to DepArr", JSON.stringify(e, null, 5));
+      errorPrint("Error saving Departure Arrival information", e);
     }
   };
   const { control, formState, handleSubmit, getValues } = useForm<IFlight>({
