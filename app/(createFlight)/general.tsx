@@ -89,7 +89,6 @@ const Form: React.FC = () => {
   const { errors } = formState;
   const snackbar = useSnackbar();
   const realm = useRealm();
-  const allFlight = useQuery<IFlight>("Flight");
   const submit = (data: IFlight) => {
     try {
       if (!realmExistingFlight) {
