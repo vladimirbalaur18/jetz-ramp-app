@@ -89,7 +89,7 @@ export default function Page() {
               onPress={() => setSearchVisible((prev) => !prev)}
               icon="airplane-search"
             >
-              Find flight
+              Find
             </Button>
           ),
           drawerIcon: () => (
@@ -118,7 +118,7 @@ export default function Page() {
         {searchVisible && (
           <Searchbar
             style={{ marginHorizontal: 10, marginTop: 10 }}
-            placeholder="Flight number / Operator"
+            placeholder="Search by flight number / Operator"
             onChangeText={setSearchQuery}
             value={searchQuery}
           />
