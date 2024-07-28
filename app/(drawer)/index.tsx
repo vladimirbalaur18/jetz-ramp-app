@@ -89,7 +89,7 @@ export default function Page() {
               onPress={() => setSearchVisible((prev) => !prev)}
               icon="airplane-search"
             >
-              Find
+              Find flight
             </Button>
           ),
           drawerIcon: () => (

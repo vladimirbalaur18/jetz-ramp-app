@@ -28,7 +28,7 @@
       },
       "package": "com.anonymous.jetzrampapp",
       "runtimeVersion": "1.0.0",
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "bundler": "metro",
