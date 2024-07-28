@@ -35,11 +35,13 @@ export const getTotalDisbursementFees = (
   providedServices: IFlight["providedServices"],
   flight: IFlight
 ) =>
-  Object.values(providedServices!.disbursementFees).reduce(
-    (accumulator, current) => Number(accumulator) + Number(current || 0),
-    0
-  ) +
-  getDisbursedServices(providedServices, flight).reduce(
-    (sum, item) => sum + item.total,
-    0
-  );
+  providedServices!.disbursementFees
+    ? Object.values(providedServices!.disbursementFees).reduce(
+        (accumulator, current) => Number(accumulator) + Number(current || 0),
+        0
+      )
+    : 0 +
+      getDisbursedServices(providedServices, flight).reduce(
+        (sum, item) => sum + item.total,
+        0
+      );

@@ -2808,7 +2808,8 @@ ${VATApplicableServicesRenderHTML()}
  <tr height="19" style="height:16.4pt">
   <td height="19" class="xl184" style="height:16.4pt">Billing to:</td>
   <td colspan="5" rowspan="7" class="xl185" width="320" style="border-right:1.0pt solid black;
-  border-bottom:1.0pt solid black;width:240pt">${flight?.chargeNote?.billingTo
+  border-bottom:1.0pt solid black;width:240pt;overflow-wrap: normal;white-space: nowrap;
+	word-break: normal;">${flight?.chargeNote?.billingTo.replace(/\n/g, "<br>")
 		}</td>
   <td class="xl187" style="border-top:none;border-left:none">&nbsp;</td>
   <td class="xl188" style="border-top:none">TOTAL:</td>
