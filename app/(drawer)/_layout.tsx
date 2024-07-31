@@ -7,6 +7,8 @@ import { useTheme } from "@react-navigation/native";
 import { useQuery } from "@realm/react";
 import { GeneralConfigState } from "@/models/Config";
 import { JetzSvg } from "@/components/JetzSVG";
+import { Button } from "react-native-paper";
+import { onFetchUpdateAsync } from "@/utils/onFetchUpdateAsync";
 
 export default function Layout() {
   const themeStyle = useColorScheme();
@@ -57,6 +59,11 @@ export default function Layout() {
             title: "Configurations",
             drawerIcon: () => (
               <FontAwesome6 name="user-gear" size={24} color={iconColor} />
+            ),
+            headerRight: () => (
+              <Button onPress={() => onFetchUpdateAsync()}>
+                Check updates
+              </Button>
             ),
           }}
         />
