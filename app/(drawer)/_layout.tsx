@@ -61,9 +61,7 @@ export default function Layout() {
               <FontAwesome6 name="user-gear" size={24} color={iconColor} />
             ),
             headerRight: () => (
-              <Button onPress={() => onFetchUpdateAsync()}>
-                Check updates
-              </Button>
+              <Button onPress={() => onFetchUpdateAsync()}>Update</Button>
             ),
           }}
         />
