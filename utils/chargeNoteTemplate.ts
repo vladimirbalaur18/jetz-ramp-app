@@ -4,17 +4,16 @@ import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { getVATMultiplier } from "@/services/AirportFeesManager/utils";
 import {
 	getBasicHandlingPrice,
-	getLoungeFeePrice,
+	getVIPLoungeFeePrice,
 	getTotalAirportFeesPrice,
-} from "@/services/servicesCalculator";
+} from "@/services/feeCalculator";
 import dayjs from "dayjs";
 import convertCurrency from "./convertCurrency";
 import getParsedDateTime from "./getParsedDateTime";
 import { IFlight } from "@/models/Flight";
 import {
-	getDisbursedServices,
-	getTotalDisbursementFees,
-} from "@/services/totalsCalculator";
+	getAllDisbursedItems, getTotalDisbursementAmount
+} from "@/services/disburseCalculator";
 
 type ChargeListService = {
 	serviceName: string;
@@ -63,18 +62,12 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 		return result;
 	})();
 
-	const disbursedServices = getDisbursedServices(
-		flight?.providedServices,
-		flight
-	);
-	const totalDisbursementFeesAmount = getTotalDisbursementFees(
+
+	const totalDisbursementFeesAmount = getTotalDisbursementAmount(
 		flight?.providedServices,
 		flight
 	);
 
-	console.warn("Disbursed services", JSON.stringify(disbursedServices, null));
-
-	console.log(totalDisbursementFeesAmount);
 	if (
 		basicHandlingWithVAT &&
 		!flight?.providedServices!.basicHandling?.isPriceOverriden
@@ -96,8 +89,8 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 		});
 	}
 
-	flight?.providedServices?.otherServices?.forEach((s) => {
-		if (s?.isUsed) {
+	flight?.providedServices?.otherServices?.filter(_ => _.service)?.forEach((s) => {
+		if (s?.service && s?.isUsed) {
 			const quantity = Number(s?.quantity) || 1;
 			const basePrice = s?.service.price;
 			const amount = s?.isPriceOverriden
@@ -121,7 +114,7 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 		}
 	});
 
-	const VIPTerminalPrice = getLoungeFeePrice({
+	const VIPTerminalPrice = getVIPLoungeFeePrice({
 		...flight?.providedServices?.VIPLoungeServices,
 	}).amount;
 	const VIPPriceToEur = Number(
@@ -280,55 +273,19 @@ export default function chargeNoteTemplateHTML(flight: IFlight) {
 	};
 
 	const renderDisbursementHTML = () => {
-		const disbursementPercentage = flight.chargeNote.disbursementPercentage;
-
-		const mapKeyByName: Record<string, string> = {
-			airportFee: "Airport fees",
-			fuelFee: "Fuel",
-			cateringFee: "Catering",
-			HOTACFee: "HOTAC",
-			VIPLoungeFee: "Express/VIP Terminal",
-		};
-
-		let resultHTML = ``;
-
-		if (flight?.providedServices?.disbursementFees) {
-			Object.entries(flight?.providedServices.disbursementFees).map(
-				([key, value]) => {
-					if (value > 0) {
-						resultHTML += ` <tr height="19" style="height:16.4pt">
-  <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
-  <td class="xl134" colspan="2" style="mso-ignore:colspan">${mapKeyByName[key]
-							}</td>
-  <td class="xl134" style="border-top:none">&nbsp;</td>
-  <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
-  <td class="xl114" style="border-top:none">&nbsp;</td>
-  <td class="xl115" style="border-top:none">&nbsp;</td>
-  <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-								value
-							).toFixed(2)}</td>
- </tr>`;
-					}
-				}
-			);
-		} else
-			return alert(
-				"Something wrong occured while loading disbursement fees. They're not initialized from provided services"
-			);
-
-		disbursedServices.map((disbursedService) => {
+		let resultHTML = '';
+		getAllDisbursedItems(flight).map(({ feeName, total, percentage }) => {
 			resultHTML += `<tr height="19" style="height:16.4pt">
   <td height="19" class="xl142" style="height:16.4pt;border-top:none">&nbsp;</td>
-  <td class="xl134" colspan="2" style="mso-ignore:colspan">${disbursedService?.serviceName
+  <td class="xl134" colspan="2" style="mso-ignore:colspan">${feeName
 				}</td>
   <td class="xl134" style="border-top:none">&nbsp;</td>
   <td class="xl128" style="border-top:none">&nbsp;</td>
-  <td class="xl155" style="border-top:none">${disbursementPercentage}%</td>
+  <td class="xl155" style="border-top:none">${percentage}%</td>
   <td class="xl114" style="border-top:none">&nbsp;</td>
   <td class="xl115" style="border-top:none">&nbsp;</td>
   <td colspan="2" class="xl114" style="border-right:1.0pt solid black">${Number(
-					disbursedService?.total
+					total
 				).toFixed(2)}</td>
  </tr>`;
 		});

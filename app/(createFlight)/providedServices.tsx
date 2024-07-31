@@ -10,9 +10,9 @@ import { getFuelFeeAmount } from "@/services/AirportFeesManager";
 import { Service } from "@/models/Services";
 import {
   getBasicHandlingPrice,
-  getLoungeFeePrice,
+  getVIPLoungeFeePrice,
   getTotalAirportFeesPrice,
-} from "@/services/servicesCalculator";
+} from "@/services/feeCalculator";
 import ERROR_MESSAGES from "@/utils/formErrorMessages";
 import formatMDLPriceToEuro from "@/utils/priceFormatter";
 import REGEX from "@/utils/regexp";
@@ -51,237 +51,111 @@ import { isSummerNightTime, isWinterNightTime } from "@/utils/isNightTime";
 import getParsedDateTime from "@/utils/getParsedDateTime";
 import { SafeNumber } from "@/utils/SafeNumber";
 import { AirportSubFeeTotal } from "@/services/AirportFeesManager/types";
+import { useProvidedServicesFields } from "@/hooks/useProvidedServicesFields";
 type FormData = IFlight;
 
-const isDifferenceBetweenRootServicesAndProvidedServices = (
-  flight: IFlight,
-  rootServices: Service[]
-) => {
-  //if the root services are changed, then we need to nullify the provided services and provide a message update
-  if (flight?.providedServices?.otherServices?.length !== rootServices?.length)
-    return true;
-};
-
 const Form: React.FC = () => {
-  const realmServices = useQuery<IServiceCategory>("ServiceCategory");
-  const defaultServicesPerCategories = realmServices.flatMap((sc) => [
-    ...sc.services,
-  ]);
+  const [airportFeeModalVisible, setAirportFeeModalVisible] = useState(false);
+  const [priceOverrideModalVisible, setPriceOverrideModalVisible] = useState<
+    number | null
+  >(null);
+
+  const [general] = useQuery<GeneralConfigState>("General");
+  const realm = useRealm();
+  const router = useRouter();
+  const snackbar = useSnackbar();
+  const theme = useTheme();
   const currentFlightId = useSelector(
     (state: RootState) => state?.flights.currentFlightId
   );
 
-  if (!currentFlightId)
-    throw new Error(
-      "There was an error initiailzing currentFlightId on providedServices page. Reload the app."
-    );
-  const [general] = useQuery<GeneralConfigState>("General");
   const realmExistingFlight = _selectCurrentFlight(currentFlightId || "");
   if (!realmExistingFlight)
     throw new Error(
       "There was an error initiailzing the existing flight from database on providedServices page. Reload the app."
     );
+
   const existingFlight = realmExistingFlight?.toJSON() as IFlight;
+
+  if (!currentFlightId)
+    throw new Error(
+      "There was an error initiailzing currentFlightId on providedServices page. Reload the app."
+    );
 
   console.log(
     "Existing flight on render providedServices",
     JSON.stringify(existingFlight, null, 5)
   );
-  const realm = useRealm();
-  const router = useRouter();
   const basicHandlingPricePerLegs =
     existingFlight && getBasicHandlingPrice({ ...existingFlight });
-  const disbursementPercentage =
-    existingFlight?.chargeNote?.disbursementPercentage;
 
-  const [airportFeeModalVisible, setAirportFeeModalVisible] = useState(false);
-  const {
-    control,
-    formState,
-    handleSubmit,
-    getFieldState,
-    getValues,
-    resetField,
-    watch,
-    reset,
-    setValue,
-  } = useForm<FormData>({
-    mode: "onBlur",
-    defaultValues: {
-      providedServices: {
-        basicHandling: existingFlight?.providedServices?.basicHandling
-          ? { ...existingFlight.providedServices.basicHandling }
-          : {
-              total:
-                (basicHandlingPricePerLegs?.arrival || 0) +
-                (basicHandlingPricePerLegs?.departure || 0),
-              isPriceOverriden: false,
+  const { control, formState, handleSubmit, getFieldState, watch, setValue } =
+    useForm<FormData>({
+      mode: "onBlur",
+      defaultValues: {
+        providedServices: {
+          basicHandling: existingFlight?.providedServices?.basicHandling
+            ? { ...existingFlight.providedServices.basicHandling }
+            : {
+                total:
+                  (basicHandlingPricePerLegs?.arrival || 0) +
+                  (basicHandlingPricePerLegs?.departure || 0),
+                isPriceOverriden: false,
+              },
+          supportServices: {
+            airportFee: {
+              total: Number(
+                existingFlight?.providedServices?.supportServices?.airportFee
+                  ?.total
+                  ? existingFlight?.providedServices?.supportServices
+                      ?.airportFee?.total
+                  : getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
+              ),
             },
-        disbursementFees: {
-          airportFee: 0,
-          cateringFee: 0,
-          fuelFee: 0,
-          HOTACFee: 0,
-          VIPLoungeFee: 0,
-        },
-        supportServices: {
-          airportFee: {
-            total: Number(
-              existingFlight?.providedServices?.supportServices?.airportFee
-                ?.total
-                ? existingFlight?.providedServices?.supportServices?.airportFee
-                    ?.total
-                : getTotalAirportFeesPrice(existingFlight).total.toFixed(2)
-            ),
+            fuel: {
+              fuelLitersQuantity:
+                existingFlight?.providedServices?.supportServices?.fuel
+                  ?.fuelLitersQuantity || 0,
+              fuelDensity:
+                existingFlight?.providedServices?.supportServices?.fuel
+                  ?.fuelDensity || 0,
+            },
+            catering: {
+              total:
+                existingFlight?.providedServices?.supportServices?.catering
+                  ?.total || 0,
+            },
+            HOTAC: {
+              total:
+                existingFlight?.providedServices?.supportServices?.HOTAC
+                  ?.total || 0,
+            },
           },
-          fuel: {
-            fuelLitersQuantity:
-              existingFlight?.providedServices?.supportServices?.fuel
-                ?.fuelLitersQuantity || 0,
-            fuelDensity:
-              existingFlight?.providedServices?.supportServices?.fuel
-                ?.fuelDensity || 0,
+          VIPLoungeServices: {
+            departureAdultPax:
+              existingFlight?.providedServices?.VIPLoungeServices
+                ?.departureAdultPax || 0,
+            departureMinorPax:
+              existingFlight?.providedServices?.VIPLoungeServices
+                ?.departureMinorPax || 0,
+            arrivalAdultPax:
+              existingFlight?.providedServices?.VIPLoungeServices
+                ?.arrivalAdultPax || 0,
+            arrivalMinorPax:
+              existingFlight?.providedServices?.VIPLoungeServices
+                ?.arrivalMinorPax || 0,
+            remarks:
+              existingFlight?.providedServices?.VIPLoungeServices?.remarks ||
+              "",
           },
-          catering: {
-            total:
-              existingFlight?.providedServices?.supportServices?.catering
-                ?.total || 0,
-          },
-          HOTAC: {
-            total:
-              existingFlight?.providedServices?.supportServices?.HOTAC?.total ||
-              0,
-          },
-        },
-        VIPLoungeServices: {
-          departureAdultPax:
-            existingFlight?.providedServices?.VIPLoungeServices
-              ?.departureAdultPax || 0,
-          departureMinorPax:
-            existingFlight?.providedServices?.VIPLoungeServices
-              ?.departureMinorPax || 0,
-          arrivalAdultPax:
-            existingFlight?.providedServices?.VIPLoungeServices
-              ?.arrivalAdultPax || 0,
-          arrivalMinorPax:
-            existingFlight?.providedServices?.VIPLoungeServices
-              ?.arrivalMinorPax || 0,
-          remarks:
-            existingFlight?.providedServices?.VIPLoungeServices?.remarks || "",
         },
       },
-    },
-  });
+    });
 
-  const { errors } = formState;
-  const [priceOverrideModalVisible, setPriceOverrideModalVisible] = useState<
-    number | null
-  >(null);
-  const { fields, append, update, remove } = useFieldArray({
+  const { fields, update } = useProvidedServicesFields({
     control,
-    name: "providedServices.otherServices",
+    existingFlight,
   });
-  const snackbar = useSnackbar();
-  let providedServicesObj = watch("providedServices");
-
-  useEffect(() => {
-    console.warn("Appending services");
-    if (fields && fields.length) remove();
-    if (!existingFlight.providedServices) {
-      append([
-        ...defaultServicesPerCategories.map((s) => ({
-          service: s,
-          isUsed: false,
-          isPriceOverriden: false,
-          quantity: 0,
-        })),
-      ]);
-    } else {
-      let pushedServices: Record<string, boolean> = {};
-
-      if (existingFlight?.providedServices?.otherServices) {
-        append([
-          ...existingFlight.providedServices.otherServices.map((s) => ({
-            service: s.service,
-            isUsed: s.isUsed,
-            isPriceOverriden: s.isPriceOverriden,
-            quantity: s.quantity,
-            notes: s.notes || "",
-            totalPriceOverride: s.totalPriceOverride,
-          })),
-        ]);
-      }
-      //loops through root services and see if there are some new services that didn't exist previously
-      existingFlight.providedServices.otherServices?.forEach((s) => {
-        if (s.service) {
-          pushedServices[s?.service?.serviceName] = true;
-        }
-      });
-      defaultServicesPerCategories.map((s) => {
-        if (!pushedServices[s?.serviceName]) {
-          append({
-            service: s,
-            isUsed: false,
-            isPriceOverriden: false,
-            quantity: 0,
-          });
-        }
-      });
-    }
-
-    return () => remove();
-  }, []);
-
-  //disbursement calculation
-  useEffect(() => {
-    const disbursementFeeMultplier = disbursementPercentage / 100;
-    const disbursementFees = {
-      airportFee:
-        (providedServicesObj?.supportServices.airportFee?.total || 0) *
-        disbursementFeeMultplier,
-      fuelFee:
-        getFuelFeeAmount({
-          ...(providedServicesObj?.supportServices.fuel || {
-            fuelDensity: 0,
-            fuelLitersQuantity: 0,
-          }),
-          flight: existingFlight,
-        }) * disbursementFeeMultplier,
-      cateringFee:
-        (providedServicesObj?.supportServices.catering.total || 0) *
-        disbursementFeeMultplier,
-      HOTACFee:
-        (providedServicesObj?.supportServices.HOTAC.total || 0) *
-        disbursementFeeMultplier,
-      VIPLoungeFee:
-        formatMDLPriceToEuro({
-          ...getLoungeFeePrice({ ...providedServicesObj?.VIPLoungeServices }),
-          euroToMDL: Number(existingFlight?.chargeNote.currency.euroToMDL),
-        }).amountEuro * disbursementFeeMultplier,
-    };
-
-    setValue("providedServices.disbursementFees", disbursementFees);
-  }, [
-    providedServicesObj?.supportServices.HOTAC.total,
-    providedServicesObj?.supportServices.catering.total,
-    JSON.stringify(providedServicesObj?.supportServices.fuel),
-    providedServicesObj?.supportServices.airportFee?.total,
-    JSON.stringify(providedServicesObj?.VIPLoungeServices),
-  ]);
-  const theme = useTheme();
-
-  const renderBasicHandlingVATString = () => {
-    if (
-      existingFlight?.departure?.isLocalFlight &&
-      existingFlight?.arrival?.isLocalFlight
-    ) {
-      return `*${general?.VAT}% VAT applied`;
-    } else if (existingFlight?.departure?.isLocalFlight) {
-      return `*${general?.VAT}% VAT applied on departure leg`;
-    } else if (existingFlight?.arrival?.isLocalFlight) {
-      return `*${general?.VAT}% VAT applied on arrival leg`;
-    }
-  };
 
   const submit = (data: IFlight) => {
     realm.write(() => {
@@ -311,7 +185,6 @@ const Form: React.FC = () => {
             isPriceOverriden:
               data.providedServices?.basicHandling?.isPriceOverriden,
           }),
-          disbursementFees: data.providedServices?.disbursementFees,
           supportServices: realm.create<ISupportServices>("SupportServices", {
             HOTAC: {
               total: Number(
@@ -360,6 +233,31 @@ const Form: React.FC = () => {
     router.navigate("/signature");
   };
 
+  let providedServicesObj = watch("providedServices");
+  const { errors } = formState;
+  const renderBasicHandlingVATString = () => {
+    if (
+      existingFlight?.departure?.isLocalFlight &&
+      existingFlight?.arrival?.isLocalFlight
+    ) {
+      return `*${general?.VAT}% VAT applied`;
+    } else if (existingFlight?.departure?.isLocalFlight) {
+      return `*${general?.VAT}% VAT applied on departure leg`;
+    } else if (existingFlight?.arrival?.isLocalFlight) {
+      return `*${general?.VAT}% VAT applied on arrival leg`;
+    }
+  };
+
+  const resetServices = () => {
+    realm.write(() => {
+      if (realmExistingFlight?.providedServices) {
+        realm.delete(realmExistingFlight?.providedServices);
+        router.replace("/(createFlight)/providedServices");
+        snackbar.showSnackbar("Services have been reset");
+      }
+    });
+  };
+
   return (
     <>
       <Stack.Screen
@@ -368,15 +266,7 @@ const Form: React.FC = () => {
             <>
               <Button
                 disabled={!realmExistingFlight?.providedServices}
-                onPress={() => {
-                  realm.write(() => {
-                    if (realmExistingFlight?.providedServices) {
-                      realm.delete(realmExistingFlight?.providedServices);
-                      router.replace("/(createFlight)/providedServices");
-                      snackbar.showSnackbar("Services have been reset");
-                    }
-                  });
-                }}
+                onPress={resetServices}
                 mode="text"
                 icon={"table-refresh"}
               >
@@ -865,7 +755,6 @@ const Form: React.FC = () => {
                 quantity,
                 totalPriceOverride,
               } = field;
-
               const { serviceName, hasVAT, price } = service;
 
               return (

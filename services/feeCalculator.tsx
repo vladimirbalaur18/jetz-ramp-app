@@ -110,7 +110,7 @@ export const getTotalAirportFeesPrice = (flight: IFlight) => {
     fees: { ...result },
   };
 };
-export const getLoungeFeePrice = ({
+export const getVIPLoungeFeePrice = ({
   departureMinorPax = 0,
   departureAdultPax = 0,
   arrivalAdultPax = 0,

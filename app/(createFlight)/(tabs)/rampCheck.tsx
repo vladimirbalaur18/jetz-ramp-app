@@ -1,4 +1,5 @@
 import SectionTitle from "@/components/FormUtils/SectionTitle";
+import { useProvidedServicesFields } from "@/hooks/useProvidedServicesFields";
 import { IFlight } from "@/models/Flight";
 import { IProvidedService } from "@/models/ProvidedService";
 import { updateFlight } from "@/redux/slices/flightsSlice";
@@ -35,19 +36,21 @@ export default function Page() {
     try {
       realm.write(() => {
         if (realmExistingFlight) {
-          realmExistingFlight!.providedServices!.otherServices?.map(
-            (service) => {
-              data.providedServices?.otherServices?.map((s) => {
-                if (
-                  service.service.serviceName == s.service.serviceName &&
-                  s.isUsed
-                ) {
-                  service.notes = s.notes;
-                  service.quantity = Number(s.quantity);
-                }
-              });
-            }
-          );
+          realmExistingFlight!
+            .providedServices!.otherServices?.filter((_) => _.service)
+            .map((service) => {
+              data.providedServices?.otherServices
+                ?.filter((s) => s?.service?._id)
+                .map((s) => {
+                  if (
+                    service.service.serviceName == s.service?.serviceName &&
+                    s.isUsed
+                  ) {
+                    service.notes = s.notes;
+                    service.quantity = Number(s.quantity);
+                  }
+                });
+            });
 
           realmExistingFlight!.providedServices!.remarks =
             data.providedServices?.remarks;
@@ -81,32 +84,11 @@ export default function Page() {
     }).finally(() => setIsLoading(false));
   };
 
-  const { fields, append, update, remove } = useFieldArray({
+  const { fields, update, remove } = useProvidedServicesFields({
     control,
-    name: "providedServices.otherServices",
+    existingFlight: existingFlightJSON,
   });
-
-  useEffect(() => {
-    if (fields?.length) remove();
-    if (existingFlightJSON?.providedServices?.otherServices) {
-      console.warn(
-        "@rampCheck provided services",
-        JSON.stringify(existingFlightJSON.providedServices.otherServices, null)
-      );
-      append([
-        ...existingFlightJSON.providedServices.otherServices.map((s) => ({
-          service: s.service,
-          isUsed: s.isUsed,
-          isPriceOverriden: s.isPriceOverriden,
-          quantity: s.isPriceOverriden ? 1 : s.quantity,
-          notes: s.notes || "",
-        })),
-      ]);
-    }
-
-    return () => remove();
-  }, [JSON.stringify(realmExistingFlight?.toJSON(), null)]);
-
+  console.warn("initial fields", JSON.stringify(fields));
   const { errors } = formState;
   return (
     <ScrollView contentContainerStyle={styles.container}>

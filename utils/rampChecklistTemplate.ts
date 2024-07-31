@@ -45,7 +45,7 @@ export default function reampChecklistHTML(flight: IFlight) {
 
 			category.services.map(service => {
 
-				flight?.providedServices?.otherServices?.forEach(s => {
+				flight?.providedServices?.otherServices?.filter(_ => _.service).forEach(s => {
 					if (s.service.serviceName === service.serviceName) {
 						resultHTML += renderServiceRow(service.serviceName, s?.isUsed ? s.quantity : 0, s.notes)
 					}
