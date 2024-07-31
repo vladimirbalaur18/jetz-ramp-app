@@ -2,7 +2,7 @@
   "expo": {
     "name": "jetz-ramp-app",
     "slug": "jetz-ramp-app",
-    "version": "0.0.3",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -25,8 +25,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.jetzrampapp",
-      "runtimeVersion": "1.0.0",
-      "versionCode": 5
+      "versionCode": 1,
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
